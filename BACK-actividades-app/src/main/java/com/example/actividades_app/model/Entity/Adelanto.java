@@ -1,20 +1,20 @@
-package com.example.actividades_app.model;
+package com.example.actividades_app.model.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "bonificacion")
+@Table(name = "adelanto")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Bonificacion {
+public class Adelanto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bonificacionID")
+    @Column(name = "adelantoID")
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 150)

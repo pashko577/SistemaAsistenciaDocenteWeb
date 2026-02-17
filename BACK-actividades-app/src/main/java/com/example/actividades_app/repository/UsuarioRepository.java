@@ -1,7 +1,9 @@
 package com.example.actividades_app.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.actividades_app.model.Usuario;
+
+import com.example.actividades_app.model.Entity.Usuario;
+
 import java.util.Optional;
 
 

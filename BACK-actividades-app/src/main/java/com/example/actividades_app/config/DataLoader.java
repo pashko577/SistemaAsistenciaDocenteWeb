@@ -1,6 +1,6 @@
 package com.example.actividades_app.config;
 
-import com.example.actividades_app.model.Rol;
+import com.example.actividades_app.model.Entity.Rol;
 import com.example.actividades_app.repository.RolRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.actividades_app.config.JwtUtils;
-import com.example.actividades_app.model.Usuario;
+import com.example.actividades_app.model.Entity.Usuario;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
