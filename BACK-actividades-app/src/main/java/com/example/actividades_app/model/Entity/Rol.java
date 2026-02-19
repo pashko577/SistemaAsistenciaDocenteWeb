@@ -18,7 +18,5 @@ public class Rol {
 
     @Column(name = "nombreRol", nullable = false, unique = true)
     private String nombreRol;
-
-    
 }
 

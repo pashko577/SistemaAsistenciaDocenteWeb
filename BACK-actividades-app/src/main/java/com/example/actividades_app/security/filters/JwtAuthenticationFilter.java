@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.actividades_app.config.JwtUtils;
+import com.example.actividades_app.dto.LoginRequestDTO;
 import com.example.actividades_app.model.Entity.Usuario;
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
@@ -35,25 +36,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException {
-        Usuario usuario = null;
-        String username = "";
-        String password = "";
         try {
-            usuario = new ObjectMapper().readValue(request.getInputStream(), Usuario.class);
-            //username = usuario.getUsername();
-            password = usuario.getPassword();
-        } catch (StreamReadException e) {
-            throw new RuntimeException(e);
-        } catch (DatabindException e) {
-            throw new RuntimeException(e);
+            // Mapear al DTO de login, no a la entidad Usuario
+            LoginRequestDTO loginRequest = new ObjectMapper().readValue(request.getInputStream(),
+                    LoginRequestDTO.class);
+            String dni = loginRequest.getUsername(); // Aquí el usuario enviará su DNI
+            String password = loginRequest.getPassword();
+
+            UsernamePasswordAuthenticationToken authWithDni = new UsernamePasswordAuthenticationToken(dni, password);
+            return getAuthenticationManager().authenticate(authWithDni);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error al leer las credenciales", e);
         }
-
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,
-                password);
-
-        return getAuthenticationManager().authenticate(authenticationToken);
     }
 
     @Override
@@ -84,7 +78,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         super.successfulAuthentication(request, response, chain, authResult);
     }
 
-    //Credenciales incorrectas
+    // Credenciales incorrectas
     @Override
     protected void unsuccessfulAuthentication(
             HttpServletRequest request,
@@ -102,6 +96,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.getWriter().write(new ObjectMapper().writeValueAsString(body));
         response.getWriter().flush();
     }
-    
 
 }

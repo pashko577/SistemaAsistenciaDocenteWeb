@@ -4,12 +4,12 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.actividades_app.model.Entity.Rol;
 
-import java.util.Optional;
+import java.util.List;
+
 
 public interface RolRepository extends JpaRepository<Rol, Long> {
     //buscar rol por nombre
-    Optional<Rol> findByName(String name);
-
+    List<Rol> findByNombreRol(String nombreRol);
     //verificar si un rol existe por su nombre
-    boolean existsByName(String name);
+    boolean existsByNombreRol(String nombreRol);
 }
