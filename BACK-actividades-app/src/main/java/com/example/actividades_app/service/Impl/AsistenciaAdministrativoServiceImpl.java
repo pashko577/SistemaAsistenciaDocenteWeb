@@ -85,11 +85,7 @@ public class AsistenciaAdministrativoServiceImpl
             int mes,
             int anio) {
 
-        return repository.findByAdministrativoIdAndMes(
-                administrativoId,
-                mes,
-                anio
-        );
+        return null;
     }
 
     // =====================================================

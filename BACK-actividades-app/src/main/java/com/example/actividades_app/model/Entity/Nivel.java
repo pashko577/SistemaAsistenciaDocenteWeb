@@ -13,7 +13,7 @@ public class Nivel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "nivelID")
-    private Long nivelID;
+    private Long id;
 
     @Column(name = "nombre_nivel", nullable = false, length = 50, unique = true)
     private String nomNivel;

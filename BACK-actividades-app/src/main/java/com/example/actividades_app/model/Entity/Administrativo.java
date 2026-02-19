@@ -15,7 +15,7 @@ public class Administrativo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "administrativoID")
-    private Long administrativoID;
+    private Long id;
 
     @OneToOne
     @JoinColumn(name = "usuarioID", nullable = false, unique = true)

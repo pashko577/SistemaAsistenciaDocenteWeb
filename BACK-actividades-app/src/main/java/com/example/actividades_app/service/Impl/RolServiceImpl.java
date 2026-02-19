@@ -26,7 +26,7 @@ public class RolServiceImpl implements RolService {
     public Rol registrarRol(RegistrarRolRequestDTO dto) {
 
         // Regla: evitar duplicados
-        if (rolRepository.existsByName(dto.getName())) {
+        if (rolRepository.existsByNombreRol(dto.getName())) {
             throw new RoleAlreadyExistsException("El rol ya existe");
         }
 
@@ -40,7 +40,7 @@ public class RolServiceImpl implements RolService {
 
     @Override
     public Optional<Rol> buscarPorNombre(String name) {
-        return rolRepository.findByName(name);
+        return rolRepository.findByNombreRol(name);
     }
 
     @Override

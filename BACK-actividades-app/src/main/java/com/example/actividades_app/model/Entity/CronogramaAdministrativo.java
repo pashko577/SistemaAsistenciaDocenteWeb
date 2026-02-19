@@ -17,7 +17,7 @@ public class CronogramaAdministrativo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cronograma_AdministrativoID")
-    private Long cronogramaID;
+    private Long id;
 
     @Column(name = "hora_entrada", nullable = false)
     private LocalTime horaEntrada;

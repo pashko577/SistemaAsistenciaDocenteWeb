@@ -17,7 +17,7 @@ public class AsistenciaAdministrativo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "asistenciaID")
-    private Long asistenciaID;
+    private Long id;
 
     @Column(name = "hora_ingreso")
     private LocalTime horaIngreso;

@@ -31,7 +31,7 @@ public class Auditoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "auditoriaID")
-    private Long auditoriaID;
+    private Long id;
 
     @Column(name = "tabla_afectada", nullable = false, length = 100)
     private String tablaAfectada;
