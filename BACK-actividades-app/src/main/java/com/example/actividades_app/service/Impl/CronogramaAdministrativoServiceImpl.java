@@ -29,10 +29,10 @@ public class CronogramaAdministrativoServiceImpl implements CronogramaAdministra
         return repository.findByAdministrativoId(administrativoId);
     }
 
-@Override
-public CronogramaAdministrativo obtenerPorAdministrativoYFecha(Long administrativoId, LocalDate fecha) {
-    return repository.findByAdministrativoIdAndFecha(administrativoId, fecha)
-            .orElseThrow(() -> new RuntimeException("No existe cronograma"));
-}
+    @Override
+    public CronogramaAdministrativo obtenerPorAdministrativoYFecha(Long administrativoId, LocalDate fecha) {
+        return repository.findByAdministrativoIdAndFecha(administrativoId, fecha)
+                .orElseThrow(() -> new RuntimeException("No existe cronograma"));
+    }
 
 }

@@ -26,7 +26,7 @@ public interface AsistenciaAdministrativoRepository extends JpaRepository<Asiste
 List<AsistenciaAdministrativo> findByAdministrativoIdAndMes(
         @Param("administrativoId") Long administrativoId,
         @Param("mes") int mes,
-        @Param("anio") int anio);
+        @Param("anio") int anio); 
 
 */
 }
