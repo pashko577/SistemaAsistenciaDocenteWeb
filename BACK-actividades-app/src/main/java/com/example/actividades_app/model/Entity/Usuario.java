@@ -1,11 +1,9 @@
 package com.example.actividades_app.model.Entity;
 
 import jakarta.persistence.*;
-//import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
-//import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,22 +35,3 @@ public class Usuario {
     @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles;
 }
-/*
- * //Conexion ProyectoUsuario
- * 
- * @OneToMany(
- * mappedBy = "usuario",
- * cascade = CascadeType.ALL,
- * orphanRemoval = false
- * )
- * private List<ProyectoUsuario> proyectos;
- * 
- * //Conexion UsuarioActividad
- * 
- * @OneToMany(
- * mappedBy = "usuario",
- * cascade = CascadeType.ALL,
- * orphanRemoval = false
- * )
- * private List<UsuarioActividad> actividades;
- */

@@ -14,6 +14,7 @@ import com.example.actividades_app.config.JwtUtils;
 import com.example.actividades_app.dto.AuthResponseDTO;
 import com.example.actividades_app.dto.LoginRequestDTO;
 import com.example.actividades_app.dto.RegisterRequestDTO;
+import com.example.actividades_app.model.Entity.Persona;
 import com.example.actividades_app.model.Entity.Rol;
 import com.example.actividades_app.model.Entity.Usuario;
 import com.example.actividades_app.repository.RolRepository;
@@ -34,24 +35,22 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void register(RegisterRequestDTO request) {
-        if(usuarioRepository.existsByUsername(request.getUsername())){
-            throw new RuntimeException("USERNAME_ALREADY_EXISTS");
-        }
-        if (usuarioRepository.existsByEmail(request.getEmail())){
-            throw new RuntimeException("EMAIL_ALREADY_EXISTS");
+        if (usuarioRepository.existsByPersonaDni(request.getUsername())) {
+            throw new RuntimeException("DNI_ALREDY_REGISTERED");             
         }
 
-        // Roles deben existir previamente en la base de datos
+        Persona persona = 
+
         Set<Rol> roles = request.getRoles().stream()
-               .map(roleName -> rolRepository.findByName(roleName)
-                       .orElseThrow(() -> new RuntimeException("ROLE_NOT_FOUND: " + roleName)))
-                       .collect(Collectors.toSet());
+            .map(roleName -> rolRepository.findByNombreRol(roleName)
+                .orElseThrow(() ->new RuntimeException("ROLE_NOT_FOUND")))
+                .collect(Collectors.toSet());
         
         Usuario usuario = Usuario.builder()
+                .persona(persona)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(roles)
                 .build();
-        usuarioRepository.save(usuario);
     }
 
     @Override
