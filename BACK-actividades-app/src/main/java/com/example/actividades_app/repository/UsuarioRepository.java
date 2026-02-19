@@ -17,7 +17,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     //Verificar si un usuario existe por su nombre de usuario
     //boolean existsByUsername(String username);
 
-    @Query("SELECT u FROM Usuario u WHERE u.per")
+    // CORRECCIÓN
+    @Query("SELECT u FROM Usuario u WHERE u.persona.dni = :dni") 
     Optional<Usuario> findByDni(@Param("dni") String dni);
 
     boolean existsByPersonaDni(String dni);
