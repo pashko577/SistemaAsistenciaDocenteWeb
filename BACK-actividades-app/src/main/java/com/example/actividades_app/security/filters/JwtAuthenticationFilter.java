@@ -11,9 +11,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.example.actividades_app.config.JwtUtils;
 import com.example.actividades_app.dto.LoginRequestDTO;
-import com.example.actividades_app.model.Entity.Usuario;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;

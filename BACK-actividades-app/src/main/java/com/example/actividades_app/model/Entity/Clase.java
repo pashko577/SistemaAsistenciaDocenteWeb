@@ -14,7 +14,7 @@ public class Clase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "claseID")
-    private Long claseID;
+    private Long id;
 
     @Column(name = "tiempo_clase", nullable = false)
     private Integer tiempoClase;

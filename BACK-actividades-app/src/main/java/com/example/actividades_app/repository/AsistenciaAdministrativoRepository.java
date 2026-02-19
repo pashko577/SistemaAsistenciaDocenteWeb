@@ -14,11 +14,11 @@ import com.example.actividades_app.model.Entity.AsistenciaAdministrativo;
 @Repository
 public interface AsistenciaAdministrativoRepository extends JpaRepository<AsistenciaAdministrativo, Long> {
 
-        List<AsistenciaAdministrativo> findByAdministrativoId(Long administrativoId);
-
+    List<AsistenciaAdministrativo> findByAdministrativoId(Long AdministrativoId);
+    
         Optional<AsistenciaAdministrativo> findByAdministrativoIdAndFecha(Long id, LocalDate fecha);
 
-
+/*
         @Query("SELECT a FROM AsistenciaAdministrativo a " +
        "WHERE a.administrativo.administrativoID = :administrativoId " +
        "AND MONTH(a.fecha) = :mes " +
@@ -28,5 +28,5 @@ List<AsistenciaAdministrativo> findByAdministrativoIdAndMes(
         @Param("mes") int mes,
         @Param("anio") int anio);
 
-
+*/
 }

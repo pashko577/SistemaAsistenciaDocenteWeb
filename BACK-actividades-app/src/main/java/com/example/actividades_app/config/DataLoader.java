@@ -16,11 +16,11 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
-        if (!rolRepository.existsByName("USER")) {
+        if (!rolRepository.existsByNombreRol("USER")) {
             rolRepository.save(new Rol(null, "USER"));
         }
 
-        if (!rolRepository.existsByName("ADMIN")) {
+        if (!rolRepository.existsByNombreRol("ADMIN")) {
             rolRepository.save(new Rol(null, "ADMIN"));
         }
     }
