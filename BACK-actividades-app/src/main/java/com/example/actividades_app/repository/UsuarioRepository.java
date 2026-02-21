@@ -11,15 +11,11 @@ import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
-    //Buscar usuario por su nombre de usuario (para autenticación)
-    //Optional<Usuario> findByUsername(String username);
-
-    //Verificar si un usuario existe por su nombre de usuario
-    //boolean existsByUsername(String username);
-
-    // CORRECCIÓN
-    @Query("SELECT u FROM Usuario u WHERE u.persona.dni = :dni") 
-    Optional<Usuario> findByDni(@Param("dni") String dni);
+    @Query("SELECT u FROM Usuario u " +
+           "JOIN FETCH u.persona " +
+           "JOIN FETCH u.roles " +
+           "WHERE u.persona.dni = :dni")
+    Optional<Usuario> findByPersonaDni(@Param("dni") String dni);
 
     boolean existsByPersonaDni(String dni);
 }

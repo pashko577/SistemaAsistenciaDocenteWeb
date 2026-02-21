@@ -11,17 +11,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-
-
-
 @Entity
 @Table(name = "sede")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 public class Sede{
 
     @Id

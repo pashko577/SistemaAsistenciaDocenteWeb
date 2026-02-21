@@ -1,7 +1,7 @@
 package com.example.actividades_app.service;
 
-import com.example.actividades_app.dto.RegistrarRolRequestDTO;
 import com.example.actividades_app.model.Entity.Rol;
+import com.example.actividades_app.model.dto.ModuloUsuario.RegistrarRolRequestDTO;
 
 import java.util.Optional;
 
