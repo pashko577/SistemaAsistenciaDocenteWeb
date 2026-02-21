@@ -1,8 +1,8 @@
 package com.example.actividades_app.service;
 
-import com.example.actividades_app.dto.AuthResponseDTO;
-import com.example.actividades_app.dto.LoginRequestDTO;
-import com.example.actividades_app.dto.RegisterRequestDTO;
+import com.example.actividades_app.model.dto.ModuloUsuario.AuthResponseDTO;
+import com.example.actividades_app.model.dto.ModuloUsuario.LoginRequestDTO;
+import com.example.actividades_app.model.dto.ModuloUsuario.RegisterRequestDTO;
 
 public interface AuthService {
 

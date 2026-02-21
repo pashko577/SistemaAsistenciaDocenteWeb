@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.GrantedAuthority;
@@ -22,9 +23,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UsuarioRepository usuarioRepository;
 
     @Override
+    @Transactional
     public UserDetails loadUserByUsername(String dni) throws UsernameNotFoundException {
         
-        Usuario usuario = usuarioRepository.findByDni(dni)
+        Usuario usuario = usuarioRepository.findByPersonaDni(dni) // Agregado 'Persona' al nombre del método
             .orElseThrow(() -> new UsernameNotFoundException("No existe usuario con DNI: " + dni));
           
         Collection<? extends GrantedAuthority> authorities = usuario.getRoles()

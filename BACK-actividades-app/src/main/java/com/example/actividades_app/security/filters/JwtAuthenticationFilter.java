@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.example.actividades_app.config.JwtUtils;
-import com.example.actividades_app.dto.LoginRequestDTO;
+import com.example.actividades_app.model.dto.ModuloUsuario.LoginRequestDTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // Mapear al DTO de login, no a la entidad Usuario
             LoginRequestDTO loginRequest = new ObjectMapper().readValue(request.getInputStream(),
                     LoginRequestDTO.class);
-            String dni = loginRequest.getUsername(); // Aquí el usuario enviará su DNI
+            String dni = loginRequest.getDni(); // Aquí el usuario enviará su DNI
             String password = loginRequest.getPassword();
 
             UsernamePasswordAuthenticationToken authWithDni = new UsernamePasswordAuthenticationToken(dni, password);

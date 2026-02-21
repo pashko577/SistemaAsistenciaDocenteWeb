@@ -1,4 +1,4 @@
-package com.example.actividades_app.dto;
+package com.example.actividades_app.model.dto.ModuloUsuario;
 
 import java.util.List;
 

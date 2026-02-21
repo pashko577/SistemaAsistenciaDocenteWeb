@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.actividades_app.model.Entity.Sede;
+import com.example.actividades_app.model.dto.ModuloUsuario.SedeRequestDTO;
 import com.example.actividades_app.repository.SedeRepository;
 import com.example.actividades_app.service.SedeService;
 
@@ -20,14 +21,14 @@ public class SedeServiceImpl implements SedeService {
     private final SedeRepository sedeRepository;
 
     @Override
-    public Sede crearSede(String nombre) {
+    public Sede crearSede(SedeRequestDTO dto) {
 
-        if (sedeRepository.existsByNombreSede(nombre)) {
+        if (sedeRepository.existsByNombreSede(dto.getNombreSede())) {
             throw new RuntimeException("La sede ya existe");
         }
 
         Sede sede = Sede.builder()
-                .nombreSede(nombre)
+                .nombreSede(dto.getNombreSede())
                 .build();
 
         return sedeRepository.save(sede);
