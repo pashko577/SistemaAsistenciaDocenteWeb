@@ -12,5 +12,6 @@ public interface TipoDocumentoRepository extends JpaRepository<TipoDocumento, Lo
 
     Optional<TipoDocumento> findByNombreTD(String nombreTD);
 
+    boolean existsByNombreTD(String nombreTD);
 }
 

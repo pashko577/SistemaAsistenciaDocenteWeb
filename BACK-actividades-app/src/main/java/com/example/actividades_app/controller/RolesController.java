@@ -15,8 +15,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import com.example.actividades_app.dto.RegistrarRolRequestDTO;
+
 import com.example.actividades_app.model.Entity.Rol;
+import com.example.actividades_app.model.dto.ModuloUsuario.RegistrarRolRequestDTO;
 
 @RestController
 @RequestMapping("/z")

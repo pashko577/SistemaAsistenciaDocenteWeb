@@ -3,8 +3,9 @@ package com.example.actividades_app.service.Impl;
 import com.example.actividades_app.service.RolService;
 import com.example.actividades_app.repository.RolRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.example.actividades_app.dto.RegistrarRolRequestDTO;
+
 import com.example.actividades_app.model.Entity.Rol;
+import com.example.actividades_app.model.dto.ModuloUsuario.RegistrarRolRequestDTO;
 
 import org.springframework.stereotype.Service;
 
