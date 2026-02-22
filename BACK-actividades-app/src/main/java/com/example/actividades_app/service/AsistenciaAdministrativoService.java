@@ -21,10 +21,5 @@ public interface AsistenciaAdministrativoService {
             Long administrativoId
     );
 
-    List<AsistenciaAdministrativo> obtenerPorAdministrativoYMes(
-            Long administrativoId,
-            int mes,
-            int anio
-    );
 
 }

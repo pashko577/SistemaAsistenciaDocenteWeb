@@ -79,14 +79,6 @@ public class AsistenciaAdministrativoServiceImpl
         return repository.findByAdministrativoId(administrativoId);
     }
 
-    @Override
-    public List<AsistenciaAdministrativo> obtenerPorAdministrativoYMes(
-            Long administrativoId,
-            int mes,
-            int anio) {
-
-        return null;
-    }
 
     // =====================================================
     // REGLA NEGOCIO: calcular tardanza

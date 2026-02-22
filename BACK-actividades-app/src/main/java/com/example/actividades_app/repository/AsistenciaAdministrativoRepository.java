@@ -18,15 +18,4 @@ public interface AsistenciaAdministrativoRepository extends JpaRepository<Asiste
     
         Optional<AsistenciaAdministrativo> findByAdministrativoIdAndFecha(Long id, LocalDate fecha);
 
-/*
-        @Query("SELECT a FROM AsistenciaAdministrativo a " +
-       "WHERE a.administrativo.administrativoID = :administrativoId " +
-       "AND MONTH(a.fecha) = :mes " +
-       "AND YEAR(a.fecha) = :anio")
-List<AsistenciaAdministrativo> findByAdministrativoIdAndMes(
-        @Param("administrativoId") Long administrativoId,
-        @Param("mes") int mes,
-        @Param("anio") int anio); 
-
-*/
 }

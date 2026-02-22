@@ -6,7 +6,7 @@ import com.example.actividades_app.model.Entity.Pago;
 import com.example.actividades_app.model.dto.Pago.PagoCalculoRequestDTO;
 import com.example.actividades_app.model.dto.Pago.PagoCalculoResponseDTO;
 
-public interface PagoCalculoService {
+public interface DocentePagoCalculoService {
 BigDecimal calcularPagoPorHoras(
             BigDecimal horasTrabajadas,
             BigDecimal tarifaHora
