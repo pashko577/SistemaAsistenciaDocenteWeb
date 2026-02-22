@@ -10,13 +10,13 @@ import com.example.actividades_app.model.Entity.Usuario;
 import com.example.actividades_app.model.dto.Pago.PagoCalculoRequestDTO;
 import com.example.actividades_app.model.dto.Pago.PagoCalculoResponseDTO;
 import com.example.actividades_app.repository.UsuarioRepository;
-import com.example.actividades_app.service.PagoCalculoService;
+import com.example.actividades_app.service.DocentePagoCalculoService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class PagoCalculoServiceImpl implements PagoCalculoService {
+public class DocentePagoCalculoServiceImpl implements DocentePagoCalculoService {
 
     private final UsuarioRepository usuarioRepository;
 
