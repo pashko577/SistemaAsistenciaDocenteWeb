@@ -20,7 +20,7 @@ import com.example.actividades_app.model.Entity.Rol;
 import com.example.actividades_app.model.dto.ModuloUsuario.RegistrarRolRequestDTO;
 
 @RestController
-@RequestMapping("/z")
+@RequestMapping("/api/roles")
 public class RolesController {
 
     @Autowired

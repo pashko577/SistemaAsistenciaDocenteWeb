@@ -33,8 +33,6 @@ public class RegisterRequestDTO {
     @NotBlank(message = "Los apellidos son obligatorios")
     private String apellidos;
 
-    // CAMBIO: Si es Number debe ser @NotNull. 
-    // Recomendación: Cambia 'Number' a 'String' para usar @NotBlank
     @NotNull(message = "El celular es obligatorio")
     private Number celular;
 
