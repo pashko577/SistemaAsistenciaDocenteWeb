@@ -46,7 +46,9 @@ public class DocenteServiceImpl implements DocenteService {
                 if (usuarioRepository.existsByPersonaDni(request.getDni())) {
                         throw new RuntimeException("Ya existe un usuario registrado con el DNI: ");
                 }
-
+                if (personaRepository.existsByEmail(request.getEmail())) {
+                      throw new RuntimeException("El EMAIL se encuentra registrado a otro usuario");  
+                }
                 // 2. Obtener entidades relacionales
                 Sede sede = sedeRepository.findById(request.getSedeId())
                                 .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
