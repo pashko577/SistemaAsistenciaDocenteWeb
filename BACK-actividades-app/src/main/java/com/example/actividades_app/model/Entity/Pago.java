@@ -37,6 +37,10 @@ public class Pago {
     @JoinColumn(name = "usuarioID", nullable = false)
     private Usuario usuario;
 
+    // 🔥 ESTA ES LA RELACIÓN QUE FALTABA
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contratoID", nullable = false)
+    private Contrato contrato;
 
     @OneToMany(mappedBy = "pago", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Adelanto> adelantos;

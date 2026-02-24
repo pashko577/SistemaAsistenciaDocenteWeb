@@ -14,7 +14,7 @@ public class ReporteDocente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reporte_DocenteID")
+    @Column(name = "reporteDocenteID")
     private Long id;
 
     @Column(name = "fecha", nullable = false)
@@ -24,33 +24,27 @@ public class ReporteDocente {
     private String observaciones;
 
     @Column(name = "tardanza")
-    private Integer tardanza; // minutos
-
-    @Column(name = "publiWSS")
-    private Boolean publiWSS;
-
-    @Column(name = "publiWFS")
-    private Boolean publiWFS;
-
-    @Column(name = "agendaE")
-    private Boolean agendaE;
-
-    @Column(name = "tema", length = 200)
-    private String tema;
+    private Integer tardanza;
 
     // FK -> Docente
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "docenteID", nullable = false)
     private Docente docente;
 
-    // FK -> TipoAsistencia
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tipo_AsistenciaID", nullable = false)
-    private TipoAsistencia tipoAsistencia;
 
     // FK -> CronogramaDiario
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cronograma_DiarioID", nullable = false)
+    @JoinColumn(name = "cronogramaDiarioID", nullable = false)
     private CronogramaDiario cronogramaDiario;
 
+    // 🔥 NUEVA FK -> TipoReporte
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipoReporteID", nullable = false)
+    private TipoReporte tipoReporte;
+
+    // Relación 1 a 1 con Detalle
+    @OneToOne(mappedBy = "reporteDocente",
+              cascade = CascadeType.ALL,
+              orphanRemoval = true)
+    private DetalleReporteDocente detalle;
 }
