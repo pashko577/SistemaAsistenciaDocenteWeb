@@ -17,9 +17,10 @@ public class ResumenGeneralResponseDTO {
     private Double totalBonificaciones;
     private Double totalDescuentos;
 
-    private Double tarifaxHora;
+    //MENSUAL O XHORA
+    private Double monto;
 
-    //private /* me quede aqui bbs */
+
     private List<DetalleBonificacionResponseDTO> bonificaciones;
     private List<DetalleDescuentoResponseDTO> descuentos;
 }

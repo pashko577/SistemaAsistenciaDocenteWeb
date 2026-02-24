@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,4 +35,13 @@ public class Usuario {
     @ManyToMany(fetch = FetchType.EAGER, targetEntity = Rol.class, cascade = CascadeType.PERSIST)
     @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "usuario_id"), inverseJoinColumns = @JoinColumn(name = "rol_id"))
     private Set<Rol> roles;
+
+
+        // ======================
+    // NUEVA RELACIÓN
+    // ======================
+    @OneToMany(mappedBy = "usuario",
+               cascade = CascadeType.ALL,
+               orphanRemoval = true)
+    private List<Contrato> contratos;
 }

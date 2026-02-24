@@ -13,4 +13,7 @@ import lombok.Setter;
 @Setter
 public class DocenteResumenGeneralResponseDTO extends ResumenGeneralResponseDTO {
     private Double horasDictadas;
+    private Integer TipoAsistencia;
 }
+
+
