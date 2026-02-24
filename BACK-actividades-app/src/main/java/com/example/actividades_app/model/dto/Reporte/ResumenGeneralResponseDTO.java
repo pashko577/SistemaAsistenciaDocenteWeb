@@ -19,7 +19,7 @@ public class ResumenGeneralResponseDTO {
 
     private Double tarifaxHora;
 
-    private /* me quede aqui bbs */
+    //private /* me quede aqui bbs */
     private List<DetalleBonificacionResponseDTO> bonificaciones;
     private List<DetalleDescuentoResponseDTO> descuentos;
 }
