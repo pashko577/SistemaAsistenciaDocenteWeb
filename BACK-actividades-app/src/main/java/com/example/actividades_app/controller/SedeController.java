@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RequiredArgsConstructor 
 public class SedeController {
     
-    private final SedeService sedeService; // Usar 'final'
+    private final SedeService sedeService;
     
     @PostMapping
     public ResponseEntity<Sede> crearSede(@Valid @RequestBody SedeRequestDTO dto){

@@ -43,40 +43,6 @@ public class AuthServiceImpl implements AuthService {
         private final SedeRepository sedeRepository;
         private final TipoDocumentoRepository tipoDocumentoRepository;
 
-        /*
-         * @Override
-         * public void register(RegisterRequestDTO request) {
-         * // 1. Verificar si ya existe el usuario por DNI
-         * if (usuarioRepository.existsByPersonaDni(request.getDni())) {
-         * throw new RuntimeException("DNI_ALREADY_REGISTERED");
-         * }
-         * 
-         * // 2. Buscar o crear la Persona (necesitas PersonaRepository)
-         * Persona persona = personaRepository.findByDni(request.getDni())
-         * .orElseThrow(() -> new RuntimeException("PERSONA_NOT_FOUND"));
-         * 
-         * // Sede
-         * Sede sede = sedeRepository.findById(request.getSedeId())
-         * .orElseThrow(() -> new RuntimeException("SEDE_NO_ENCONTRADA"));
-         * 
-         * // 3. Mapear roles
-         * Set<Rol> roles = request.getRoles().stream()
-         * .map(roleName -> rolRepository.findByNombreRol(roleName)
-         * .orElseThrow(() -> new RuntimeException("ROLE_NOT_FOUND")))
-         * .collect(Collectors.toSet());
-         * 
-         * // 4. Construir Usuario
-         * Usuario usuario = Usuario.builder()
-         * .persona(persona)
-         * .password(passwordEncoder.encode(request.getPassword()))
-         * .roles(roles)
-         * .sede(sede)
-         * .build();
-         * 
-         * usuarioRepository.save(usuario);
-         * }
-         */
-
         @Override
         @Transactional
         public void register(RegisterRequestDTO request) {

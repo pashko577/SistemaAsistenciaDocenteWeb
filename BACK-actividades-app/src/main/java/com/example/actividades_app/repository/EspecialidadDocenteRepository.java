@@ -12,5 +12,7 @@ public interface EspecialidadDocenteRepository extends JpaRepository<Especialida
 
         Optional<EspecialidadDocente> findByNombreEspecialidad(String nombreEspecialidad);
 
+        boolean existsByNombreEspecialidad(String nombreEspecialidad);
+
         
 }
