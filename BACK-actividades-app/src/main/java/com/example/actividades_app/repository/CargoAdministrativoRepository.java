@@ -11,5 +11,6 @@ import com.example.actividades_app.model.Entity.CargoAdministrativo;
 public interface CargoAdministrativoRepository extends JpaRepository<CargoAdministrativo, Long> {
 
         Optional<CargoAdministrativo> findByNombreCargo(String nombreCargo);
+        boolean existsByNombreCargo(String nombreCargo);
 
 }
