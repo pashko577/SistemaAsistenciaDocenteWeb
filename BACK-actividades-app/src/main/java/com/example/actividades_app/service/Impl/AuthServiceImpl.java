@@ -9,6 +9,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import com.example.actividades_app.config.JwtUtils;
@@ -93,24 +95,28 @@ public class AuthServiceImpl implements AuthService {
         }
 
         @Override
-        @Transactional
         public AuthResponseDTO login(LoginRequestDTO request) {
-
+                // 1. Autenticar
                 Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(
-                                                request.getDni(),
-                                                request.getPassword()));
+                                new UsernamePasswordAuthenticationToken(request.getDni(), request.getPassword()));
 
-                String username = authentication.getName();
-
-                List<String> roles = authentication.getAuthorities()
-                                .stream()
-                                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                // 2. Extraer datos
+                User user = (User) authentication.getPrincipal();
+                String dni = user.getUsername();
+                List<String> roles = user.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .map(role -> role.replace("ROLE_", "")) // Limpiamos el prefijo para el token/front
                                 .toList();
-                String token = jwtUtils.generateAccessToken(username, roles);
 
-                return new AuthResponseDTO(token, username, roles);
+                // 3. Generar Token
+                String token = jwtUtils.generateAccessToken(dni, roles);
 
+                return AuthResponseDTO.builder()
+                                .token(token)
+                                .dni(dni)
+                                .roles(roles)
+                                .message("Login exitoso")
+                                .build();
         }
 
 }

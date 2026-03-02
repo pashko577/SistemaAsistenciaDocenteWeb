@@ -32,7 +32,7 @@ public class DocenteRequestDTO {
     private String apellidos;
 
     @NotNull(message = "El celular es obligatorio")
-    private Number celular;
+    private String celular;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Formato de email inválido")

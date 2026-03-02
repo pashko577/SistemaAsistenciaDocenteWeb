@@ -32,7 +32,7 @@ export class Login {
 
   private createForm(): void {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
+      dni: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
@@ -50,23 +50,27 @@ export class Login {
     .subscribe({
       next: (res) => {
         this.TokenService.saveToken(res.token);
-        this.TokenService.saveRoles(res.Roles);
-        this.TokenService.saveUser(res.Username);
+        this.TokenService.saveRoles(res.roles);
+        this.TokenService.saveUser(res.dni);
         this.loading = false;
 
-        if (res.Roles.includes('ADMIN')) {
+        if (res.roles.includes('ADMIN')) {
           this.router.navigate(['/admin']);
           console.log('Login ADMIN exitoso');
-        } else if (res.Roles.includes('USER')) {
-          this.router.navigate(['/user']);
-          console.log('Login USER exitoso');
-        } else {
+        } else if (res.roles.includes('DOCENTE')) {
+          this.router.navigate(['/DOCENTE']);
+          console.log('Login DOCENTE exitoso');
+        } else if (res.roles.includes('ADMINISTRATIVO')) {
+          this.router.navigate(['/ADMINISTRATIVO']);
+          console.log('Login ADMINISTRATIVO exitoso');
+        }
+         else {
           this.router.navigate(['/login']);
         }
       },
       error: err => {
         this.loading = false;
-        this.backendError.set('Usuario o contraseña incorrectos');
+        this.backendError.set('DNI o contraseña incorrectos');
       },
     });
   }
