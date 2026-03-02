@@ -12,12 +12,12 @@ import com.example.actividades_app.model.Entity.CronogramaAdministrativo;
 @Repository
 public interface CronogramaAdministrativoRepository extends JpaRepository<CronogramaAdministrativo, Long> {
 
-        List<CronogramaAdministrativo> findByAdministrativoId(Long administrativoId);
+    List<CronogramaAdministrativo> findByAdministrativoId(Long administrativoId);
 
     List<CronogramaAdministrativo> findByFecha(LocalDate fecha);
 
     Optional<CronogramaAdministrativo> findByAdministrativoIdAndFecha(Long administrativoId, LocalDate fecha);
 
+    boolean existsByAdministrativoIdAndFecha(Long administrativoId, LocalDate fecha);
 
-    
 }

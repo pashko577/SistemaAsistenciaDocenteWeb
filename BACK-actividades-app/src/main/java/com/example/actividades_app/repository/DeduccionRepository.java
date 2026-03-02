@@ -11,5 +11,6 @@ import com.example.actividades_app.model.Entity.Deduccion;
 public interface DeduccionRepository extends JpaRepository<Deduccion, Long> {
 
         List<Deduccion> findByPagoId(Long pagoId);
+        boolean existsByPagoId(Long pagoId);
 
 }

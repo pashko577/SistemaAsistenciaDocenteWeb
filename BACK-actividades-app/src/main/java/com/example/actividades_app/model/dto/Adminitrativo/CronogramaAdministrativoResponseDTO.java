@@ -13,12 +13,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 
-public class CronogramaAdministratiovResponseDTO {
+public class CronogramaAdministrativoResponseDTO {
 
 
 
     private Long id;
-
     private LocalTime horaEntrada;
     private LocalTime horaSalida;
     private LocalDate fecha;

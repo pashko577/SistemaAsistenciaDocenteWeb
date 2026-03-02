@@ -12,5 +12,7 @@ public interface BonificacionRepository extends JpaRepository<Bonificacion, Long
 
         List<Bonificacion> findByPagoId(Long pagoId);
 
+        boolean existsByPagoId(Long pagoid);
+
 }
 

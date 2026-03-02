@@ -10,5 +10,7 @@ import com.example.actividades_app.model.Entity.Adelanto;
 @Repository
 public interface AdelantoRepository extends JpaRepository<Adelanto, Long> {
 
-      List<Adelanto> findByPagoId(Long pagoId);
+    List<Adelanto> findByPagoId(Long pagoId);
+
+    boolean existsByPagoId(Long pagoId);
 }

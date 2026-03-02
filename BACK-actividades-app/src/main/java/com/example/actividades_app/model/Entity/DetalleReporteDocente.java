@@ -38,6 +38,6 @@ public class DetalleReporteDocente {
 
     // FK -> ReporteDocente
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reporteDocenteID", nullable = false)
+    @JoinColumn(name = "reporteDocenteID", nullable = false, unique = true)
     private ReporteDocente reporteDocente;
 }

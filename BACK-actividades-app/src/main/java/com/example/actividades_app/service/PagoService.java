@@ -3,32 +3,46 @@ package com.example.actividades_app.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.example.actividades_app.model.Entity.Pago;
+import com.example.actividades_app.model.dto.Pago.PagoRequestDTO;
+import com.example.actividades_app.model.dto.Pago.PagoResponseDTO;
+import com.example.actividades_app.model.dto.Reporte.ResumenGeneralResponseDTO;
 
 public interface PagoService {
 
-    
-    Pago crearPago(Pago pago);
+    // =========================
+    // CRUD
+    // =========================
+    PagoResponseDTO crear(PagoRequestDTO dto);
 
-    Pago actualizarPago(Long pagoId, Pago pago);
+    PagoResponseDTO actualizar(Long id, PagoRequestDTO dto);
 
-    void eliminarPago(Long pagoId);
+    void eliminar(Long id);
 
-    Pago obtenerPagoPorId(Long pagoId);
+    PagoResponseDTO buscarPorId(Long id);
 
-    List<Pago> listarTodos();
+    // =========================
+    // CONSULTAS
+    // =========================
+    List<PagoResponseDTO> listarPorUsuario(Long usuarioId);
 
-    List<Pago> listarPorUsuario(Long usuarioId);
+    List<PagoResponseDTO> listarPorFecha(LocalDate fecha);
 
-    List<Pago> listarPorFecha(LocalDate fecha);
+    List<PagoResponseDTO> listarPorRangoFechas(
+            LocalDate fechaInicio,
+            LocalDate fechaFin
+    );
 
-    List<Pago> listarPorRangoFechas(LocalDate inicio, LocalDate fin);
+    List<PagoResponseDTO> listarPorUsuarioYRangoFechas(
+            Long usuarioId,
+            LocalDate fechaInicio,
+            LocalDate fechaFin
+    );
 
-    List<Pago> listarPorUsuarioYRangoFechas(Long usuarioId, LocalDate inicio, LocalDate fin);
+    PagoResponseDTO obtenerUltimoPago(Long usuarioId);
 
-    List<Pago> listarPorTipoPago(Pago.TipoPago tipoPago);
+    // =========================
+    // EXTRA (PRO)
+    // =========================
+    ResumenGeneralResponseDTO obtenerResumenPago(Long pagoId);
 
-    List<Pago> listarPorUsuarioYTipoPago(Long usuarioId, Pago.TipoPago tipoPago);
-
-    Pago obtenerUltimoPago(Long usuarioId);
 }
