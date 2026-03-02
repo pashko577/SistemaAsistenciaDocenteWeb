@@ -5,14 +5,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.actividades_app.model.Entity.Docente;
 import com.example.actividades_app.model.dto.ModuloDocente.DocenteRequestDTO;
+import com.example.actividades_app.model.dto.ModuloDocente.DocenteResponseDTO;
 import com.example.actividades_app.service.DocenteService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -29,4 +33,10 @@ public class DocenteController {
         docenteService.registerDocente(dto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }    
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<DocenteResponseDTO>> listarDocentes(){
+        return ResponseEntity.ok(docenteService.listarTodos());
+    }
 }

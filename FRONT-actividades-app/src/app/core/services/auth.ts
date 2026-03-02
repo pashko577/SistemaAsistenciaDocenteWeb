@@ -16,7 +16,7 @@ export class Auth {
     private router: Router
   ){}
 
-  login(data: {username: string; password: string}): Observable<any> {
+  login(data: {dni: string; password: string}): Observable<any> {
     return this.http.post(`${this.API_URL}/login`, data);
   }
 
