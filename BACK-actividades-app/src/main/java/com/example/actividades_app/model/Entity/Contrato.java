@@ -8,6 +8,8 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.example.actividades_app.enums.Estado;
+
 @Entity
 @Table(name = "contrato")
 @Data
@@ -35,6 +37,9 @@ public class Contrato {
     @JoinColumn(name = "usuarioID", nullable = false)
     private Usuario usuario;
 
+        @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false, length = 20)
+    private Estado estado;
     // =========================
     // Relación con Pago
     // =========================

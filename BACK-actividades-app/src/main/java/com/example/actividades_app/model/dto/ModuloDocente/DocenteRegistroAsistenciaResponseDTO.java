@@ -14,6 +14,5 @@ public class DocenteRegistroAsistenciaResponseDTO {
     private String observaciones;
     private Integer tardanzaMinutos;
     private String estado;
-    private String tipoAsistencia; // FK a TipoAsistencia
     private String tipoReporte;
 }

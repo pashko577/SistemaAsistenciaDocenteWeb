@@ -23,10 +23,10 @@ public class CronogramaDiario {
     @Column(name = "cronograma_DiarioID")
     private Long id;
 
-    @Column(name = "horaInicioClase", nullable = false)
+    @Column(name = "horaInicioClase", nullable = false, columnDefinition = "TIME(0)")
     private LocalTime horaInicioClase;
 
-    @Column(name = "horaFinClase", nullable = false)
+    @Column(name = "horaFinClase", nullable = false, columnDefinition = "TIME(0)")
     private LocalTime horaFinClase;
 
     @Column(name = "fecha", nullable = false)
@@ -36,5 +36,4 @@ public class CronogramaDiario {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "claseID", nullable = false)
     private Clase clase;
-
 }

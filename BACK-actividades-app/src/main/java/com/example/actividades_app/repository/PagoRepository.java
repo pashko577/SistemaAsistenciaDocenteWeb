@@ -39,4 +39,6 @@ public interface PagoRepository extends JpaRepository<Pago, Long> {
             Long usuarioId,
             Pago.TipoPago tipoPago
     );
+        boolean existsByContratoIdAndFecha(Long contratoId, LocalDate fecha);
+
 }

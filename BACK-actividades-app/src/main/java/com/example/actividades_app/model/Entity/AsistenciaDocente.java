@@ -1,6 +1,5 @@
 package com.example.actividades_app.model.Entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalTime;
@@ -18,10 +17,10 @@ public class AsistenciaDocente {
     @Column(name = "asistencia_DocenteID")
     private Long id;
 
-    @Column(name = "horaEntradaDoc")
+    @Column(name = "horaEntradaDoc", columnDefinition = "TIME(0)")
     private LocalTime horaEntradaDoc;
 
-    @Column(name = "horaSalidaDoc")
+    @Column(name = "horaSalidaDoc", columnDefinition = "TIME(0)")
     private LocalTime horaSalidaDoc;
 
     @Column(name = "observacion", length = 250)
@@ -42,5 +41,4 @@ public class AsistenciaDocente {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cronograma_DiarioID", nullable = false)
     private CronogramaDiario cronogramaDiario;
-
 }

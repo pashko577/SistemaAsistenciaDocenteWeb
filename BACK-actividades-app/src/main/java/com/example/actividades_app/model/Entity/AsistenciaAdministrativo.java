@@ -19,16 +19,16 @@ public class AsistenciaAdministrativo {
     @Column(name = "asistenciaID")
     private Long id;
 
-    @Column(name = "hora_ingreso")
+    @Column(name = "hora_ingreso", columnDefinition = "TIME(0)")
     private LocalTime horaIngreso;
 
-    @Column(name = "hora_salida")
+    @Column(name = "hora_salida", columnDefinition = "TIME(0)")
     private LocalTime horaSalida;
 
-    @Column(name = "salida_almuerzo")
+    @Column(name = "salida_almuerzo", columnDefinition = "TIME(0)")
     private LocalTime salidaAlmuerzo;
 
-    @Column(name = "retorno_almuerzo")
+    @Column(name = "retorno_almuerzo", columnDefinition = "TIME(0)")
     private LocalTime retornoAlmuerzo;
 
     @Column(name = "fecha", nullable = false)

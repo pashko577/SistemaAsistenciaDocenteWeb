@@ -3,6 +3,8 @@ package com.example.actividades_app.model.Entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,10 +21,10 @@ public class CronogramaAdministrativo {
     @Column(name = "cronograma_AdministrativoID")
     private Long id;
 
-    @Column(name = "hora_entrada", nullable = false)
+    @Column(name = "hora_entrada", nullable = false, columnDefinition = "TIME(0)")
     private LocalTime horaEntrada;
 
-    @Column(name = "hora_salida", nullable = false)
+   @Column(name = "hora_salida", nullable = false, columnDefinition = "TIME(0)")
     private LocalTime horaSalida;
 
     @Column(name = "fecha", nullable = false)
