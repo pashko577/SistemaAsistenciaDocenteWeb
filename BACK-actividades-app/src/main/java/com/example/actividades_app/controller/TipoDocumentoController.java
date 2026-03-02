@@ -10,8 +10,14 @@ import com.example.actividades_app.service.TipoDocumentoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -24,8 +30,27 @@ public class TipoDocumentoController {
     private final TipoDocumentoService tipoDocumentoService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<TipoDocumento> crearTipoDocumento(@Valid @RequestBody TipoDocumentoRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(tipoDocumentoService.crearTipoDocumento(dto));
     }
     
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<TipoDocumento>> listar() {
+        return ResponseEntity.ok(tipoDocumentoService.listarTodas());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TipoDocumento> obtenerPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(tipoDocumentoService.obtenerPorId(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        tipoDocumentoService.eliminarTipoDocumento(id);
+        return ResponseEntity.noContent().build();
+    }
 }

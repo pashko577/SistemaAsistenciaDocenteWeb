@@ -10,7 +10,6 @@ import com.example.actividades_app.model.dto.ModuloUsuario.SedeRequestDTO;
 import com.example.actividades_app.repository.SedeRepository;
 import com.example.actividades_app.service.SedeService;
 
-
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -47,17 +46,20 @@ public class SedeServiceImpl implements SedeService {
 
     @Override
     public void eliminarSede(Long sedeId) {
-
         Sede sede = sedeRepository.findById(sedeId)
                 .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
 
-        sedeRepository.delete(sede);
+        try {
+            sedeRepository.delete(sede);
+        } catch (Exception e) {
+            // Lanzar una excepción personalizada si la sede está en uso
+            throw new RuntimeException("No se puede eliminar la sede porque tiene registros asociados");
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public Sede obtenerPorId(Long sedeId) {
-
         return sedeRepository.findById(sedeId)
                 .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
     }

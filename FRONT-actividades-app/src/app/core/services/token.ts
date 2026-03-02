@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 
 const TOKEN_KEY = 'access_token';
 const ROLES_KEY = 'roles';
-const USER_KEY = 'username';
+const DNI_KEY = 'dni';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Token {
 
-  saveUser(username: string){
-    localStorage.setItem(USER_KEY, username);
+  saveUser(dni: string){
+    localStorage.setItem(DNI_KEY, dni);
   }
 
   getUser(): string | null{
-    return localStorage.getItem(USER_KEY);
+    return localStorage.getItem(DNI_KEY);
   }
 
   saveToken(token: string): void {
@@ -37,7 +37,7 @@ export class Token {
   removeToken(): void{
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(ROLES_KEY);
-    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(DNI_KEY);
   }
 
   isLogged(): boolean{

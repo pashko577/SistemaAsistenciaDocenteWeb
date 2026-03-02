@@ -32,6 +32,11 @@ export const routes: Routes = [
                 loadComponent: () => import('./features/admin/pages/index-admin/index-admin')
                     .then(m => m.IndexAdmin)
             },
+            {
+                path: 'gestionDocente',
+                loadComponent: () => import('./features/admin/pages/gestion-docente/gestion-docente')
+                    .then(m => m.GestionDocente)
+            }
         ]
     },
 
@@ -54,8 +59,6 @@ export const routes: Routes = [
             },
         ]
     },
-
-
 
     {
         path: '**',
