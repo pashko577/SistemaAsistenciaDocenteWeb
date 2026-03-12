@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { UserHeader } from '../../pages/user-header/user-header';
+import { UserHeader } from "../../../pages/user-header/user-header";
+import { RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-user-layout',
-  imports: [RouterOutlet,UserHeader],
+  imports: [UserHeader, RouterOutlet],
   templateUrl: './user-layout.html',
   styleUrl: './user-layout.css',
 })
 export class UserLayout {
+
 }
