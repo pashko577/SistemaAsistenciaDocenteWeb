@@ -1,10 +1,11 @@
-package com.example.actividades_app.service.Impl;
+/* package com.example.actividades_app.service.Impl;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 
 import org.springframework.stereotype.Service;
 
+import com.example.actividades_app.model.Entity.Contrato;
 import com.example.actividades_app.model.Entity.Pago;
 import com.example.actividades_app.model.Entity.Usuario;
 import com.example.actividades_app.model.dto.Pago.PagoCalculoRequestDTO;
@@ -153,7 +154,7 @@ public class DocentePagoCalculoServiceImpl implements DocentePagoCalculoService 
 
         BigDecimal montoBase;
 
-        if (request.getTipoPago() == Pago.TipoPago.POR_HORA) {
+        if (request.getTipoPago() == Contrato.TipoPago.PAGO_HORA) {
 
             montoBase = calcularPagoPorHoras(
                     request.getHorasTrabajadas(),
@@ -230,3 +231,4 @@ public class DocentePagoCalculoServiceImpl implements DocentePagoCalculoService 
     }
 
 }
+ */

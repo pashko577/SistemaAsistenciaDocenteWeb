@@ -1,27 +1,29 @@
 package com.example.actividades_app.model.dto.ModuloDocente;
 
-
-
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class ClaseResponseDTO {
 
     private Long id;
 
-    private String curso;
-    private String grado;
-    private String seccion;
-    private String nivel;
-    private String docente;
-    private String aula;
+    private Integer tiempoClase;
 
     private String tema;
-    private String horaEfectiva;
-    private int tiempoClase;
+
+    private Integer horaEfectiva;
+
+    private String aula;
+
+    private Long cursoId;
+    private String cursoNombre;
+
+    private Long seccionId;
+    private String seccionNombre;
+
+    private Long periodoAcademicoId;
+    private String periodoNombre;
 
 }

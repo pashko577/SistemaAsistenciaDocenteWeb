@@ -1,10 +1,26 @@
 package com.example.actividades_app.model.Entity;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.example.actividades_app.enums.EstadoReemplazo;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "reemplazo_docente")
 @Data
@@ -15,7 +31,7 @@ public class ReemplazoDocente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reemplazo_DocenteID")
+    @Column(name = "reemplazoDocenteID")
     private Long id;
 
     // Docente titular
@@ -29,42 +45,29 @@ public class ReemplazoDocente {
     private Docente docenteReemplazo;
 
     // Cronograma diario
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cronograma_DiarioID", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cronogramaDiarioID", nullable = false)
     private CronogramaDiario cronogramaDiario;
-
-    @Column(name = "fecha", nullable = false)
-    private LocalDate fecha;
 
     @Column(name = "motivo", length = 250)
     private String motivo;
 
     // Tipo reemplazo
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tipo_ReemplazoID", nullable = false)
+    @JoinColumn(name = "tipoReemplazoID", nullable = false)
     private TipoReemplazo tipoReemplazo;
 
-    // Estado ENUM
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
     private EstadoReemplazo estado;
 
-    // Usuario que registra
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuarioRegistroID", nullable = false)
     private Usuario usuarioRegistro;
 
     @Column(name = "fechaRegistro", nullable = false)
-    private LocalDateTime fechaRegistro;
+    private LocalDate fechaRegistro;
 
-
-    public enum EstadoReemplazo {
-
-        PENDIENTE,
-        APROBADO,
-        RECHAZADO,
-        FINALIZADO
-
-    }
 
 }
+

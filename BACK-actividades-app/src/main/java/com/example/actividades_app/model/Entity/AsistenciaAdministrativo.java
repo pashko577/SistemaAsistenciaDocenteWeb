@@ -3,11 +3,20 @@ package com.example.actividades_app.model.Entity;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.example.actividades_app.enums.TipoAsistencia;
+
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "asistencia_administrativo")
+@Table(
+    name = "asistencia_administrativo",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            columnNames = {"administrativoID", "fecha"}
+        )
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -42,6 +51,10 @@ public class AsistenciaAdministrativo {
 
     @Column(name = "uso_terno")
     private Boolean terno;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_asistencia", nullable = false)
+    private TipoAsistencia tipoAsistencia;
 
     @ManyToOne
     @JoinColumn(name = "administrativoID", nullable = false)

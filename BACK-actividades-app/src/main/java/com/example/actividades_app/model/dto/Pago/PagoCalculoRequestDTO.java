@@ -2,7 +2,8 @@ package com.example.actividades_app.model.dto.Pago;
 
 import java.math.BigDecimal;
 
-import com.example.actividades_app.model.Entity.Pago.TipoPago;
+import com.example.actividades_app.model.Entity.Contrato;
+
 
 import lombok.Data;
 
@@ -11,7 +12,7 @@ public class PagoCalculoRequestDTO {
 
     private Long usuarioId;
 
-    private TipoPago tipoPago;
+    private Contrato.TipoPago tipoPago;
 
     // horas y tarifa
     private BigDecimal horasTrabajadas;

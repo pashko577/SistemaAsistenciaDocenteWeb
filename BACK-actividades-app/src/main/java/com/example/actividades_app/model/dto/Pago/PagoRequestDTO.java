@@ -19,8 +19,6 @@ public class PagoRequestDTO {
     @NotNull
     private Long contratoId;
 
-    private Integer horasTrabajadas;
-
     private List<AdelantoRequestDTO> adelantos;
     private List<BonificacionRequestDTO> bonificaciones;
     private List<DescuentoRequestDTO> deducciones;

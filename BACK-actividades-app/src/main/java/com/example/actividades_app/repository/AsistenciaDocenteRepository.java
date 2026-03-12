@@ -1,5 +1,6 @@
 package com.example.actividades_app.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +12,10 @@ import com.example.actividades_app.model.Entity.AsistenciaDocente;
 @Repository
 public interface AsistenciaDocenteRepository extends JpaRepository<AsistenciaDocente, Long> {
 
- List<AsistenciaDocente> findByDocenteId(Long docenteId);
+    Optional<AsistenciaDocente> findByCronogramaDiarioId(Long cronogramaDiarioId);
 
-    Optional<AsistenciaDocente> findByDocenteIdAndCronogramaDiarioId(Long docenteId, Long cronogramaId);
+    boolean existsByCronogramaDiarioId(Long cronogramaDiarioId);
+
+      List<AsistenciaDocente> findByCronogramaDiario_CronogramaDocente_AsignacionDocente_Docente_IdAndCronogramaDiario_FechaBetween(
+        Long docenteId, LocalDate inicio, LocalDate fin);
 }

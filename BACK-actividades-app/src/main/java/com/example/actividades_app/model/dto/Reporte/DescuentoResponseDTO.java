@@ -6,9 +6,9 @@ import lombok.Data;
 
 @Data
 public class DescuentoResponseDTO {
-    
-    private Long detalledescuentoId;
-    private String nombre;
+
+    private Long tipoDeduccionId;
+    private String observaciones;
     private BigDecimal monto;
 
 }

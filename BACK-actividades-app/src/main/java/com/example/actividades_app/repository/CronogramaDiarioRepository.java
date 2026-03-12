@@ -8,17 +8,17 @@ import org.springframework.stereotype.Repository;
 
 import com.example.actividades_app.model.Entity.CronogramaDiario;
 
+
 @Repository
 public interface CronogramaDiarioRepository extends JpaRepository<CronogramaDiario, Long> {
 
- List<CronogramaDiario> findByClaseId(Long claseId);
-
-    List<CronogramaDiario> findByClaseDocenteId(Long docenteId);
-
     List<CronogramaDiario> findByFecha(LocalDate fecha);
 
-    List<CronogramaDiario> findByClaseDocenteIdAndFecha(Long docenteId, LocalDate fecha);
+    List<CronogramaDiario> findByCronogramaDocenteId(Long cronogramaDocenteId);
 
-    List<CronogramaDiario> findByClaseDocenteIdOrderByFechaAscHoraInicioClaseAsc(Long docenteId);
+    boolean existsByCronogramaDocenteIdAndFecha(
+        Long cronogramaDocenteId,
+        LocalDate fecha
+);
 
 }

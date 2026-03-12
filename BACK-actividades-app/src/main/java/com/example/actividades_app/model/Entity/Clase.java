@@ -16,44 +16,31 @@ public class Clase {
     @Column(name = "claseID")
     private Long id;
 
-    @Column(name = "tiempo_clase", nullable = false)
+    @Column(name = "tiempoClase", nullable = false)
     private Integer tiempoClase;
-    // Ejemplo: 1, 2, 3 (hora académica)
 
     @Column(name = "tema", length = 255)
     private String tema;
 
-    @Column(name = "hora_efectiva")
+    @Column(name = "horaEfectiva")
     private Integer horaEfectiva;
-    // Ejemplo: cantidad real de horas dictadas
 
     @Column(name = "aula", length = 50)
     private String aula;
 
     // RELACIONES
 
-    // Muchos Clase pertenecen a un Docente
-    @ManyToOne
-    @JoinColumn(name = "docenteID", nullable = false)
-    private Docente docente;
-
-    // Muchos Clase pertenecen a un Curso
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cursoID", nullable = false)
     private Curso curso;
 
-    // Muchos Clase pertenecen a un Grado
-    @ManyToOne
-    @JoinColumn(name = "gradoID", nullable = false)
-    private Grado grado;
 
-    // Muchos Clase pertenecen a una Seccion
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seccionID", nullable = false)
     private Seccion seccion;
 
-    // Muchos Clase pertenecen a un Nivel
-    @ManyToOne
-    @JoinColumn(name = "nivelID", nullable = false)
-    private Nivel nivel;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "periodoAcademicoID", nullable = false)
+    private PeriodoAcademico periodoAcademico;
 }

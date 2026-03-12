@@ -2,7 +2,6 @@ package com.example.actividades_app.model.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "reporte_docente")
@@ -17,20 +16,11 @@ public class ReporteDocente {
     @Column(name = "reporteDocenteID")
     private Long id;
 
-    @Column(name = "fecha", nullable = false)
-    private LocalDate fecha;
-
     @Column(name = "observaciones", length = 300)
     private String observaciones;
 
     @Column(name = "tardanza")
     private Integer tardanza;
-
-    // FK -> Docente
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "docenteID", nullable = false)
-    private Docente docente;
-
 
     // FK -> CronogramaDiario
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,8 +33,6 @@ public class ReporteDocente {
     private TipoReporte tipoReporte;
 
     // Relación 1 a 1 con Detalle
-    @OneToOne(mappedBy = "reporteDocente",
-              cascade = CascadeType.ALL,
-              orphanRemoval = true)
+    @OneToOne(mappedBy = "reporteDocente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private DetalleReporteDocente detalle;
 }

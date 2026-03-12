@@ -27,10 +27,15 @@ public class CronogramaAdministrativo {
    @Column(name = "hora_salida", nullable = false, columnDefinition = "TIME(0)")
     private LocalTime horaSalida;
 
-    @Column(name = "fecha", nullable = false)
-    private LocalDate fecha;
+    @Column(name = "dia_semana", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private DiaSemana diaSemana;
 
     @ManyToOne
     @JoinColumn(name = "administrativoID", nullable = false)
     private Administrativo administrativo;
+
+    public enum DiaSemana {
+    LUNES, MARTES, MIERCOLES, JUEVES, VIERNES, SABADO, DOMINGO
+}
 }

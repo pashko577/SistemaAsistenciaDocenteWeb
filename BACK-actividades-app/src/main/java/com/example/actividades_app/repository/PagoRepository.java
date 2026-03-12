@@ -7,38 +7,49 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import com.example.actividades_app.model.Entity.Contrato;
 import com.example.actividades_app.model.Entity.Pago;
 
 @Repository
 public interface PagoRepository extends JpaRepository<Pago, Long> {
 
-     // Buscar pagos por usuario
-    List<Pago> findByUsuarioId(Long usuarioId);
+    // =============================
+    // CONSULTAS
+    // =============================
 
-    // Buscar pagos por fecha exacta
+    // 🔥 usuario viene desde contrato
+    List<Pago> findByContratoUsuarioId(Long usuarioId);
+
     List<Pago> findByFecha(LocalDate fecha);
 
-    // Buscar pagos entre fechas (para reportes mensuales)
-    List<Pago> findByFechaBetween(LocalDate fechaInicio, LocalDate fechaFin);
+    List<Pago> findByFechaBetween(
+            LocalDate fechaInicio,
+            LocalDate fechaFin);
 
-    // Buscar pagos por usuario y rango de fechas (MUY IMPORTANTE)
-    List<Pago> findByUsuarioIdAndFechaBetween(
+    List<Pago> findByContratoUsuarioIdAndFechaBetween(
             Long usuarioId,
             LocalDate fechaInicio,
             LocalDate fechaFin
     );
 
-    // Buscar último pago de un usuario
-    Optional<Pago> findTopByUsuarioIdOrderByFechaDesc(Long usuarioId);
+    Optional<Pago> findTopByContratoUsuarioIdOrderByFechaDesc(
+            Long usuarioId);
 
-    // Buscar pagos por tipo (POR_HORA o MENSUAL)
-    List<Pago> findByTipoPago(Pago.TipoPago tipoPago);
+    // 🔥 tipoPago ahora pertenece al contrato
+    List<Pago> findByContratoTipoPago(
+            Contrato.TipoPago tipoPago);
 
-    // Buscar pagos por usuario y tipo
-    List<Pago> findByUsuarioIdAndTipoPago(
+    List<Pago> findByContratoUsuarioIdAndContratoTipoPago(
             Long usuarioId,
-            Pago.TipoPago tipoPago
+            Contrato.TipoPago tipoPago
     );
-        boolean existsByContratoIdAndFecha(Long contratoId, LocalDate fecha);
 
+    // =============================
+    // ✅ VALIDACIÓN PLANILLA MENSUAL
+    // =============================
+    boolean existsByContratoIdAndFechaBetween(
+            Long contratoId,
+            LocalDate fechaInicio,
+            LocalDate fechaFin
+    );
 }

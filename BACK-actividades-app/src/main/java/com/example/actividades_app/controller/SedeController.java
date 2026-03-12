@@ -31,7 +31,7 @@ public class SedeController {
     private final SedeService sedeService;
     
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<Sede> crearSede(@Valid @RequestBody SedeRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(sedeService.crearSede(dto));
     }
