@@ -4,23 +4,22 @@ import java.time.LocalTime;
 
 import com.example.actividades_app.enums.EstadoAsistenciaDocente;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-public class RegistrarAsistenciaDocenteRequestDTO {
+@Data
+public class AsistenciaDocenteRequestDTO {
 
-    private Long docenteId;
-    private Long cronogramaDiaraioId;
     private LocalTime horaEntradaDoc;
     private LocalTime horaSalidaDoc;
+
     private String observacion;
     private Boolean materialClase;
+
     private Boolean usoTerno;
-    private EstadoAsistenciaDocente EstadoAsistencia;
+
+    private EstadoAsistenciaDocente estadoAsistencia;
+
+    private Long docenteId;
+    private Long cronogramaDiarioId;
+
 }

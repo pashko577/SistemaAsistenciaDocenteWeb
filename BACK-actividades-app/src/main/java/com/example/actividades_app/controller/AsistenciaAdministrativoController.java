@@ -1,86 +1,94 @@
 package com.example.actividades_app.controller;
 
-import com.example.actividades_app.model.dto.Adminitrativo.AsistenciaAdministrativoRequestDTO;
-import com.example.actividades_app.model.dto.Adminitrativo.AsistenciaAdministrativoResponseDTO;
-import com.example.actividades_app.service.AsistenciaAdministrativoService;
+import java.time.LocalDate;
+import java.util.List;
 
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-
-import org.springframework.http.HttpStatus;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
+
+import com.example.actividades_app.model.dto.Adminitrativo.AsistenciaAdministrativoRequestDTO;
+import com.example.actividades_app.model.dto.Adminitrativo.AsistenciaAdministrativoResponseDTO;
+import com.example.actividades_app.service.AsistenciaAdministrativoService;
 
 @RestController
 @RequestMapping("/api/asistencia-administrativo")
 @RequiredArgsConstructor
 public class AsistenciaAdministrativoController {
 
-    private final AsistenciaAdministrativoService service;
+    private final AsistenciaAdministrativoService asistenciaService;
 
+    // =========================
     // REGISTRAR ASISTENCIA
+    // =========================
     @PostMapping
     public ResponseEntity<AsistenciaAdministrativoResponseDTO> registrar(
-            @Valid @RequestBody AsistenciaAdministrativoRequestDTO dto) {
+            @RequestBody AsistenciaAdministrativoRequestDTO dto) {
 
-        AsistenciaAdministrativoResponseDTO response = service.registrar(dto);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(asistenciaService.registrar(dto));
     }
 
-    // ACTUALIZAR ASISTENCIA
+    // =========================
+    // ACTUALIZAR
+    // =========================
     @PutMapping("/{id}")
     public ResponseEntity<AsistenciaAdministrativoResponseDTO> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody AsistenciaAdministrativoRequestDTO dto) {
+            @RequestBody AsistenciaAdministrativoRequestDTO dto) {
 
-        AsistenciaAdministrativoResponseDTO response = service.actualizar(id, dto);
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(asistenciaService.actualizar(id, dto));
     }
 
+    // =========================
     // ELIMINAR
+    // =========================
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 
-        service.eliminar(id);
-
+        asistenciaService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
 
-    // =====================================
+    // =========================
     // BUSCAR POR ID
-    // =====================================
+    // =========================
     @GetMapping("/{id}")
     public ResponseEntity<AsistenciaAdministrativoResponseDTO> buscarPorId(
             @PathVariable Long id) {
 
-        return ResponseEntity.ok(service.buscarPorId(id));
+        return ResponseEntity.ok(asistenciaService.buscarPorId(id));
     }
 
-    // =====================================
+    // =========================
     // LISTAR POR ADMINISTRATIVO
-    // =====================================
+    // =========================
     @GetMapping("/administrativo/{administrativoId}")
-    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorAdministrativo(
-            @PathVariable Long administrativoId) {
+    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>>
+    listarPorAdministrativo(@PathVariable Long administrativoId) {
 
         return ResponseEntity.ok(
-                service.listarPorAdministrativo(administrativoId));
+                asistenciaService.listarPorAdministrativo(administrativoId)
+        );
     }
 
-    // =====================================
-    // BUSCAR POR ADMINISTRATIVO + FECHA
-    // =====================================
-    @GetMapping("/administrativo/{administrativoId}/fecha")
-    public ResponseEntity<AsistenciaAdministrativoResponseDTO> buscarPorAdministrativoYFecha(
+    // =========================
+    // LISTAR POR PERIODO
+    // =========================
+    @GetMapping("/periodo/{administrativoId}")
+    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>>
+    listarPorPeriodo(
             @PathVariable Long administrativoId,
-            @RequestParam LocalDate fecha) {
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate inicio,
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fin) {
 
         return ResponseEntity.ok(
-                service.buscarPorAdministrativoYFecha(administrativoId, fecha));
+                asistenciaService.listarPorPeriodo(administrativoId, inicio, fin)
+        );
     }
 }

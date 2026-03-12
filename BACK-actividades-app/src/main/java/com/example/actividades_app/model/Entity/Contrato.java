@@ -1,7 +1,5 @@
 package com.example.actividades_app.model.Entity;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +28,12 @@ public class Contrato {
     @Column(name = "montoBase", nullable = false, precision = 10, scale = 2)
     private BigDecimal montoBase;
 
+    @Column(name = "horasJornada", nullable = false)
+    private Integer horasJornada;
+
+    @Column(name = "diasLaboralesMes", nullable = false)
+    private Integer diasLaboralesMes;
+
     // =========================
     // FK -> Usuario
     // =========================
@@ -37,15 +41,17 @@ public class Contrato {
     @JoinColumn(name = "usuarioID", nullable = false)
     private Usuario usuario;
 
-        @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "tipoActividadID", nullable = false)
+    private TipoActividad tipoActividad;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false, length = 20)
     private Estado estado;
     // =========================
     // Relación con Pago
     // =========================
-    @OneToMany(mappedBy = "contrato",
-               cascade = CascadeType.ALL,
-               orphanRemoval = true)
+    @OneToMany(mappedBy = "contrato", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pago> pagos;
 
     public enum TipoPago {

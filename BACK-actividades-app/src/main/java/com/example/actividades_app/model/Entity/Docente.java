@@ -1,9 +1,10 @@
 package com.example.actividades_app.model.Entity;
 
 import com.example.actividades_app.enums.Estado;
-
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "docente")
@@ -12,6 +13,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Docente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "docenteID")
@@ -21,7 +23,7 @@ public class Docente {
     private String observaciones;
 
     @ManyToOne
-    @JoinColumn(name = "especialidad_DocenteID", nullable = false)
+    @JoinColumn(name = "especialidadDocenteID", nullable = false)
     private EspecialidadDocente especialidadDocente;
 
     @Enumerated(EnumType.STRING)
@@ -31,4 +33,13 @@ public class Docente {
     @OneToOne
     @JoinColumn(name = "usuarioID", nullable = false, unique = true)
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "docente", fetch = FetchType.LAZY)
+    private List<AsignacionDocente> asignaciones;
+
+    @OneToMany(mappedBy = "docenteTitular", fetch = FetchType.LAZY)
+    private List<ReemplazoDocente> reemplazosTitular;
+
+    @OneToMany(mappedBy = "docenteReemplazo", fetch = FetchType.LAZY)
+    private List<ReemplazoDocente> reemplazosRealizados;
 }

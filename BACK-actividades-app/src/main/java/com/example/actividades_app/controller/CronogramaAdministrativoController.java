@@ -1,96 +1,90 @@
 package com.example.actividades_app.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
+import com.example.actividades_app.model.Entity.CronogramaAdministrativo;
 import com.example.actividades_app.model.dto.Adminitrativo.CronogramaAdministrativoRequestDTO;
 import com.example.actividades_app.model.dto.Adminitrativo.CronogramaAdministrativoResponseDTO;
 import com.example.actividades_app.service.CronogramaAdministrativoService;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cronograma-administrativo")
+@RequestMapping("/api/cronogramas-administrativos")
 @RequiredArgsConstructor
 public class CronogramaAdministrativoController {
 
     private final CronogramaAdministrativoService service;
 
-    // Cronograma
+    // =========================
+    // CREAR
+    // =========================
     @PostMapping
-    public ResponseEntity<CronogramaAdministrativoResponseDTO> crear(
+    public CronogramaAdministrativoResponseDTO crear(
             @RequestBody CronogramaAdministrativoRequestDTO dto) {
-
-        CronogramaAdministrativoResponseDTO response = service.crear(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return service.crear(dto);
     }
 
-    // Actualizar
+    // =========================
+    // ACTUALIZAR
+    // =========================
     @PutMapping("/{id}")
-    public ResponseEntity<CronogramaAdministrativoResponseDTO> actualizar(
+    public CronogramaAdministrativoResponseDTO actualizar(
             @PathVariable Long id,
             @RequestBody CronogramaAdministrativoRequestDTO dto) {
-
-        CronogramaAdministrativoResponseDTO response = service.actualizar(id, dto);
-        return ResponseEntity.ok(response);
+        return service.actualizar(id, dto);
     }
 
-    // Eliminar
+    // =========================
+    // ELIMINAR
+    // =========================
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    public void eliminar(@PathVariable Long id) {
         service.eliminar(id);
-        return ResponseEntity.noContent().build();
     }
 
-    // buscar por id
+    // =========================
+    // BUSCAR POR ID
+    // =========================
     @GetMapping("/{id}")
-    public ResponseEntity<CronogramaAdministrativoResponseDTO> buscarPorId(@PathVariable Long id) {
-        CronogramaAdministrativoResponseDTO response = service.buscarPorId(id);
-        return ResponseEntity.ok(response);
+    public CronogramaAdministrativoResponseDTO buscarPorId(
+            @PathVariable Long id) {
+        return service.buscarPorId(id);
     }
 
-   
-    // LISTAR CRONOGRAMAS POR ADMINISTRATIVO
-    
+    // =========================
+    // LISTAR POR ADMINISTRATIVO
+    // =========================
     @GetMapping("/administrativo/{administrativoId}")
-    public ResponseEntity<List<CronogramaAdministrativoResponseDTO>> listarPorAdministrativo(
-            @PathVariable Long administrativoId) {
+    public List<CronogramaAdministrativoResponseDTO>
+    listarPorAdministrativo(@PathVariable Long administrativoId) {
 
-        List<CronogramaAdministrativoResponseDTO> responseList = 
-                service.listarPorAdministrativo(administrativoId);
-
-        return ResponseEntity.ok(responseList);
+        return service.listarPorAdministrativo(administrativoId);
     }
 
-   
-    // LISTAR CRONOGRAMAS POR FECHA
-   
-    @GetMapping("/fecha")
-    public ResponseEntity<List<CronogramaAdministrativoResponseDTO>> listarPorFecha(
-            @RequestParam LocalDate fecha) {
+    // =========================
+    // LISTAR POR DIA
+    // =========================
+    @GetMapping("/dia/{diaSemana}")
+    public List<CronogramaAdministrativoResponseDTO>
+    listarPorDiaSemana(
+            @PathVariable CronogramaAdministrativo.DiaSemana diaSemana) {
 
-        List<CronogramaAdministrativoResponseDTO> responseList = service.listarPorFecha(fecha);
-        return ResponseEntity.ok(responseList);
+        return service.listarPorDiaSemana(diaSemana);
     }
 
-    
-    // BUSCAR CRONOGRAMA POR ADMINISTRATIVO + FECHA
- 
-    @GetMapping("/administrativo/{administrativoId}/fecha")
-    public ResponseEntity<CronogramaAdministrativoResponseDTO> buscarPorAdministrativoYFecha(
+    // =========================
+    // BUSCAR ADMIN + DIA
+    // =========================
+    @GetMapping("/administrativo/{administrativoId}/dia/{diaSemana}")
+    public CronogramaAdministrativoResponseDTO
+    buscarPorAdministrativoYDiaSemana(
             @PathVariable Long administrativoId,
-            @RequestParam LocalDate fecha) {
+            @PathVariable CronogramaAdministrativo.DiaSemana diaSemana) {
 
-        CronogramaAdministrativoResponseDTO response = 
-                service.buscarPorAdministrativoYFecha(administrativoId, fecha);
-
-        return ResponseEntity.ok(response);
+        return service.buscarPorAdministrativoYDiaSemana(
+                administrativoId,
+                diaSemana);
     }
 }
-
-
- 

@@ -10,14 +10,22 @@ import org.springframework.stereotype.Repository;
 import com.example.actividades_app.model.Entity.CronogramaAdministrativo;
 
 @Repository
-public interface CronogramaAdministrativoRepository extends JpaRepository<CronogramaAdministrativo, Long> {
+public interface CronogramaAdministrativoRepository
+        extends JpaRepository<CronogramaAdministrativo, Long> {
 
     List<CronogramaAdministrativo> findByAdministrativoId(Long administrativoId);
 
-    List<CronogramaAdministrativo> findByFecha(LocalDate fecha);
+    List<CronogramaAdministrativo>
+        findByDiaSemana(CronogramaAdministrativo.DiaSemana diaSemana);
 
-    Optional<CronogramaAdministrativo> findByAdministrativoIdAndFecha(Long administrativoId, LocalDate fecha);
+    Optional<CronogramaAdministrativo>
+        findByAdministrativoIdAndDiaSemana(
+                Long administrativoId,
+                CronogramaAdministrativo.DiaSemana diaSemana);
 
-    boolean existsByAdministrativoIdAndFecha(Long administrativoId, LocalDate fecha);
+    boolean existsByAdministrativoIdAndDiaSemana(
+                Long administrativoId,
+                CronogramaAdministrativo.DiaSemana diaSemana);
 
-}
+
+        };

@@ -8,13 +8,35 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.stereotype.Repository;
 
+import com.example.actividades_app.enums.TipoAsistencia;
 import com.example.actividades_app.model.Entity.AsistenciaAdministrativo;
 
 @Repository
 public interface AsistenciaAdministrativoRepository extends JpaRepository<AsistenciaAdministrativo, Long> {
 
-    List<AsistenciaAdministrativo> findByAdministrativoId(Long AdministrativoId);
-    
-        Optional<AsistenciaAdministrativo> findByAdministrativoIdAndFecha(Long id, LocalDate fecha);
+    List<AsistenciaAdministrativo> findByAdministrativo_Id(Long administrativoId);
 
+    List<AsistenciaAdministrativo> findByAdministrativo_IdAndFechaBetween(
+            Long administrativoId,
+            LocalDate inicio,
+            LocalDate fin
+    );
+
+    boolean existsByAdministrativo_IdAndFecha(
+            Long administrativoId,
+            LocalDate fecha
+    );
+
+    int countByAdministrativo_IdAndFechaBetween(
+            Long administrativoId,
+            LocalDate inicio,
+            LocalDate fin
+    );
+
+    int countByAdministrativo_IdAndTipoAsistenciaAndFechaBetween(
+            Long administrativoId,
+            TipoAsistencia tipoAsistencia,
+            LocalDate inicio,
+            LocalDate fin
+    );
 }

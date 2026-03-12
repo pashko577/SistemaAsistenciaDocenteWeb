@@ -19,9 +19,6 @@ public class Pago {
     @Column(name = "pagoID")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipoPago", nullable = false)
-    private TipoPago tipoPago;
 
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
@@ -32,10 +29,6 @@ public class Pago {
     @Column(name = "netoPagar", nullable = false, precision = 10, scale = 2)
     private BigDecimal netoPagar;
 
-    // FK -> Usuario
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuarioID", nullable = false)
-    private Usuario usuario;
 
     // 🔥 ESTA ES LA RELACIÓN QUE FALTABA
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,8 +44,5 @@ public class Pago {
     @OneToMany(mappedBy = "pago", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bonificacion> bonificaciones;
 
-    public enum TipoPago {
-        POR_HORA,
-        MENSUAL
-    }
+
 }

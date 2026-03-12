@@ -3,15 +3,11 @@ package com.example.actividades_app.model.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Entity
-@Table(
-    name = "cronograma_diario",
-    uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"claseID", "fecha", "horaInicioClase"})
-    }
-)
+@Table(name = "cronograma_diario", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "cronogramaDocenteID", "fecha" })
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,20 +16,26 @@ public class CronogramaDiario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cronograma_DiarioID")
+    @Column(name = "cronogramaDiarioID")
     private Long id;
-
-    @Column(name = "horaInicioClase", nullable = false, columnDefinition = "TIME(0)")
-    private LocalTime horaInicioClase;
-
-    @Column(name = "horaFinClase", nullable = false, columnDefinition = "TIME(0)")
-    private LocalTime horaFinClase;
 
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    // FK -> Clase
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estadoClase", nullable = false)
+    private EstadoClase estadoClase = EstadoClase.PROGRAMADA;
+    // FK -> CronogramaDocente
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "claseID", nullable = false)
-    private Clase clase;
+    @JoinColumn(name = "cronogramaDocenteID", nullable = false)
+    private CronogramaDocente cronogramaDocente;
+
+    public enum EstadoClase {
+
+        PROGRAMADA, // Clase planificada pero aún no dictada
+        DICTADA, // Clase dictada normalmente
+        CANCELADA // Clase cancelada (feriado, suspensión, etc.)
+
+    }
 }

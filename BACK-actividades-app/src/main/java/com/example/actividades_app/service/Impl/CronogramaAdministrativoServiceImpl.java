@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.RequiredArgsConstructor;
 
 
@@ -16,134 +18,151 @@ import com.example.actividades_app.repository.AdministrativoRepository;
 import com.example.actividades_app.repository.CronogramaAdministrativoRepository;
 import com.example.actividades_app.service.CronogramaAdministrativoService;
 
+
 @Service
 @RequiredArgsConstructor
-public class CronogramaAdministrativoServiceImpl implements CronogramaAdministrativoService {
+@Transactional
+public class CronogramaAdministrativoServiceImpl
+        implements CronogramaAdministrativoService {
 
-    private final CronogramaAdministrativoRepository repository;
+    private final CronogramaAdministrativoRepository cronogramaRepository;
     private final AdministrativoRepository administrativoRepository;
 
-    // =======================
+    // ============================
     // CREAR
-    // =======================
+    // ============================
     @Override
-    public CronogramaAdministrativoResponseDTO crear(CronogramaAdministrativoRequestDTO dto) {
+    public CronogramaAdministrativoResponseDTO crear(
+            CronogramaAdministrativoRequestDTO dto) {
 
-        Administrativo admin = administrativoRepository.findById(dto.getAdministrativoId())
-                .orElseThrow(() -> new RuntimeException("Administrativo no encontrado"));
+        Administrativo admin = administrativoRepository
+                .findById(dto.getAdministrativoId())
+                .orElseThrow(() ->
+                        new RuntimeException("Administrativo no encontrado"));
 
-        // Validar duplicado
-        if (repository.existsByAdministrativoIdAndFecha(dto.getAdministrativoId(), dto.getFecha())) {
-            throw new RuntimeException("Ya existe cronograma para esa fecha");
+        CronogramaAdministrativo.DiaSemana dia =
+        CronogramaAdministrativo.DiaSemana
+                .valueOf(dto.getDiaSemana().toUpperCase());
+
+        // validar duplicados
+        if (cronogramaRepository
+                .existsByAdministrativoIdAndDiaSemana(admin.getId(), dia)) {
+            throw new RuntimeException(
+                    "Ya existe cronograma para ese día");
         }
 
-        // Validar horas
-        if (dto.getHoraEntrada().isAfter(dto.getHoraSalida())) {
-            throw new RuntimeException("Hora de entrada no puede ser mayor a hora de salida");
-        }
+        CronogramaAdministrativo cronograma =
+                CronogramaAdministrativo.builder()
+                        .horaEntrada(dto.getHoraEntrada())
+                        .horaSalida(dto.getHoraSalida())
+                        .diaSemana(dia)
+                        .administrativo(admin)
+                        .build();
 
-        CronogramaAdministrativo cronograma = CronogramaAdministrativo.builder()
-                .horaEntrada(dto.getHoraEntrada())
-                .horaSalida(dto.getHoraSalida())
-                .fecha(dto.getFecha())
-                .administrativo(admin)
-                .build();
+        cronogramaRepository.save(cronograma);
 
-        CronogramaAdministrativo saved = repository.save(cronograma);
-
-        return mapToResponseDTO(saved);
+        return mapToDTO(cronograma);
     }
 
-    // =======================
+    // ============================
     // ACTUALIZAR
-    // =======================
+    // ============================
     @Override
-    public CronogramaAdministrativoResponseDTO actualizar(Long id, CronogramaAdministrativoRequestDTO dto) {
+    public CronogramaAdministrativoResponseDTO actualizar(
+            Long id,
+            CronogramaAdministrativoRequestDTO dto) {
 
-        CronogramaAdministrativo cronograma = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cronograma no encontrado"));
-
-        if (dto.getHoraEntrada().isAfter(dto.getHoraSalida())) {
-            throw new RuntimeException("Hora de entrada no puede ser mayor a hora de salida");
-        }
+        CronogramaAdministrativo cronograma =
+                cronogramaRepository.findById(id)
+                        .orElseThrow(() ->
+                                new RuntimeException("Cronograma no encontrado"));
 
         cronograma.setHoraEntrada(dto.getHoraEntrada());
         cronograma.setHoraSalida(dto.getHoraSalida());
-        cronograma.setFecha(dto.getFecha());
+        cronograma.setDiaSemana(
+                CronogramaAdministrativo.DiaSemana
+                        .valueOf(dto.getDiaSemana().toUpperCase())
+        );
 
-        // Si se desea actualizar administrativo:
-        if (!cronograma.getAdministrativo().getId().equals(dto.getAdministrativoId())) {
-            Administrativo admin = administrativoRepository.findById(dto.getAdministrativoId())
-                    .orElseThrow(() -> new RuntimeException("Administrativo no encontrado"));
-            cronograma.setAdministrativo(admin);
-        }
-
-        return mapToResponseDTO(repository.save(cronograma));
+        return mapToDTO(cronograma);
     }
 
-    // =======================
+    // ============================
     // ELIMINAR
-    // =======================
+    // ============================
     @Override
     public void eliminar(Long id) {
-        CronogramaAdministrativo cronograma = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cronograma no encontrado"));
-        repository.delete(cronograma);
+        cronogramaRepository.deleteById(id);
     }
 
-    // =======================
+    // ============================
     // BUSCAR POR ID
-    // =======================
+    // ============================
     @Override
     public CronogramaAdministrativoResponseDTO buscarPorId(Long id) {
-        CronogramaAdministrativo cronograma = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cronograma no encontrado"));
-        return mapToResponseDTO(cronograma);
+
+        return cronogramaRepository.findById(id)
+                .map(this::mapToDTO)
+                .orElseThrow(() ->
+                        new RuntimeException("Cronograma no encontrado"));
     }
 
-    // =======================
+    // ============================
     // LISTAR POR ADMINISTRATIVO
-    // =======================
+    // ============================
     @Override
-    public List<CronogramaAdministrativoResponseDTO> listarPorAdministrativo(Long administrativoId) {
-        return repository.findByAdministrativoId(administrativoId)
+    public List<CronogramaAdministrativoResponseDTO>
+    listarPorAdministrativo(Long administrativoId) {
+
+        return cronogramaRepository
+                .findByAdministrativoId(administrativoId)
                 .stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
+                .map(this::mapToDTO)
+                .toList();
     }
 
-    // =======================
-    // LISTAR POR FECHA
-    // =======================
+    // ============================
+    // LISTAR POR DIA SEMANA
+    // ============================
     @Override
-    public List<CronogramaAdministrativoResponseDTO> listarPorFecha(LocalDate fecha) {
-        return repository.findByFecha(fecha)
+    public List<CronogramaAdministrativoResponseDTO>
+    listarPorDiaSemana(CronogramaAdministrativo.DiaSemana dia) {
+
+        return cronogramaRepository
+                .findByDiaSemana(dia)
                 .stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
+                .map(this::mapToDTO)
+                .toList();
     }
 
-        @Override
-public CronogramaAdministrativoResponseDTO buscarPorAdministrativoYFecha(Long administrativoId, LocalDate fecha) {
+    // ============================
+    // BUSCAR ADMIN + DIA
+    // ============================
+    @Override
+    public CronogramaAdministrativoResponseDTO
+    buscarPorAdministrativoYDiaSemana(
+            Long administrativoId,
+            CronogramaAdministrativo.DiaSemana dia) {
 
-    CronogramaAdministrativo cronograma = repository
-            .findByAdministrativoIdAndFecha(administrativoId, fecha)
-            .orElseThrow(() -> new RuntimeException("No existe cronograma para este administrativo en la fecha indicada"));
+        return cronogramaRepository
+                .findByAdministrativoIdAndDiaSemana(administrativoId, dia)
+                .map(this::mapToDTO)
+                .orElseThrow(() ->
+                        new RuntimeException("Cronograma no encontrado"));
+    }
 
-    return mapToResponseDTO(cronograma);
-}
-    // =======================
+    // ============================
     // MAPPER
-    // =======================
-    private CronogramaAdministrativoResponseDTO mapToResponseDTO(CronogramaAdministrativo cronograma) {
-        CronogramaAdministrativoResponseDTO dto = new CronogramaAdministrativoResponseDTO();
-        dto.setId(cronograma.getId());
-        dto.setHoraEntrada(cronograma.getHoraEntrada());
-        dto.setHoraSalida(cronograma.getHoraSalida());
-        dto.setFecha(cronograma.getFecha());
-        dto.setAdministrativoId(cronograma.getAdministrativo().getId());
-        return dto;
+    // ============================
+    private CronogramaAdministrativoResponseDTO mapToDTO(
+            CronogramaAdministrativo entity) {
+
+        return CronogramaAdministrativoResponseDTO.builder()
+                .id(entity.getId())
+                .horaEntrada(entity.getHoraEntrada())
+                .horaSalida(entity.getHoraSalida())
+                .diaSemana(entity.getDiaSemana().name())
+                .administrativoId(entity.getAdministrativo().getId())
+                .build();
     }
-
-
 }

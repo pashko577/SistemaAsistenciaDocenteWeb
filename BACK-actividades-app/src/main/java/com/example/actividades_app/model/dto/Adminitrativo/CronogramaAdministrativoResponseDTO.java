@@ -3,6 +3,8 @@ package com.example.actividades_app.model.dto.Adminitrativo;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.example.actividades_app.model.Entity.CronogramaAdministrativo;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +22,7 @@ public class CronogramaAdministrativoResponseDTO {
     private Long id;
     private LocalTime horaEntrada;
     private LocalTime horaSalida;
-    private LocalDate fecha;
+    private String diaSemana;
 
     private Long administrativoId;
 }

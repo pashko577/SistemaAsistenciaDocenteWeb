@@ -7,4 +7,7 @@ import com.example.actividades_app.model.Entity.TipoReemplazo;
 
 @Repository
 public interface TipoReemplazoRepository extends JpaRepository<TipoReemplazo, Long> {
+
+    boolean existsByNombreTipoReemplazo(String nombreTipoReemplazo);
+
 }

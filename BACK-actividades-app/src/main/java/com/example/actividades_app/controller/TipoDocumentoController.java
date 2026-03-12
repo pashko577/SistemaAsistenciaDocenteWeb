@@ -30,7 +30,7 @@ public class TipoDocumentoController {
     private final TipoDocumentoService tipoDocumentoService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<TipoDocumento> crearTipoDocumento(@Valid @RequestBody TipoDocumentoRequestDTO dto){
         return ResponseEntity.status(HttpStatus.CREATED).body(tipoDocumentoService.crearTipoDocumento(dto));
     }

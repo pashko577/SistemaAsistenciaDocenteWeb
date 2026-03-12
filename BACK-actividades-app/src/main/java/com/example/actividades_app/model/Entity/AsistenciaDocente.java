@@ -1,11 +1,16 @@
 package com.example.actividades_app.model.Entity;
 
+import com.example.actividades_app.enums.EstadoAsistenciaDocente;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalTime;
-
 @Entity
-@Table(name = "asistencia_docente")
+@Table(
+    name = "asistencia_docente",
+    uniqueConstraints = {
+        @UniqueConstraint(columnNames = "cronogramaDiarioID")
+    }
+)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -14,7 +19,7 @@ public class AsistenciaDocente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "asistencia_DocenteID")
+    @Column(name = "asistenciaDocenteID")
     private Long id;
 
     @Column(name = "horaEntradaDoc", columnDefinition = "TIME(0)")
@@ -32,13 +37,12 @@ public class AsistenciaDocente {
     @Column(name = "usoTerno")
     private Boolean usoTerno;
 
-    // FK -> Docente
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "docenteID", nullable = false)
-    private Docente docente;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estadoAsistencia", nullable = false)
+    private EstadoAsistenciaDocente estadoAsistencia;
 
-    // FK -> CronogramaDiario
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cronograma_DiarioID", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cronogramaDiarioID", nullable = false)
     private CronogramaDiario cronogramaDiario;
+
 }

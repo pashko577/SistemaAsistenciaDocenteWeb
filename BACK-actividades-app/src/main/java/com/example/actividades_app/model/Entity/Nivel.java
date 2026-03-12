@@ -1,5 +1,7 @@
 package com.example.actividades_app.model.Entity;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,6 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class Nivel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "nivelID")
@@ -17,4 +20,7 @@ public class Nivel {
 
     @Column(name = "nombre_nivel", nullable = false, length = 50, unique = true)
     private String nomNivel;
+
+    @OneToMany(mappedBy = "nivel", fetch = FetchType.LAZY)
+    private List<Grado> grados;
 }

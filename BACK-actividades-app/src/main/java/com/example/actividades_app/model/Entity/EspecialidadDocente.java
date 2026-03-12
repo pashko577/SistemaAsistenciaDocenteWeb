@@ -3,6 +3,8 @@ package com.example.actividades_app.model.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "especialidad_docente")
 @Data
@@ -10,11 +12,16 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class EspecialidadDocente {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "especialidad_DocenteID")
+    @Column(name = "especialidadDocenteID")
     private Long id;
 
-    @Column(name = "nombre_especialidad", nullable = false, length = 100)
+    @Column(name = "nombreEspecialidad", nullable = false, length = 100)
     private String nombreEspecialidad;
+
+    // Relación con docentes
+    @OneToMany(mappedBy = "especialidadDocente")
+    private List<Docente> docentes;
 }
