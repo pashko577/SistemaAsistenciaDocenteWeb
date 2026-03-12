@@ -58,10 +58,10 @@ export class Login {
           this.router.navigate(['/admin']);
           console.log('Login ADMIN exitoso');
         } else if (res.roles.includes('DOCENTE')) {
-          this.router.navigate(['/DOCENTE']);
+          this.router.navigate(['/user/docente']);
           console.log('Login DOCENTE exitoso');
         } else if (res.roles.includes('ADMINISTRATIVO')) {
-          this.router.navigate(['/ADMINISTRATIVO']);
+          this.router.navigate(['/user/administrativo']);
           console.log('Login ADMINISTRATIVO exitoso');
         }
          else {
