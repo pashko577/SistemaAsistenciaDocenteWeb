@@ -13,12 +13,9 @@ public class ClaseRequestDTO {
     @Positive
     private Integer tiempoClase;
 
-    @Size(max = 255)
-    private String tema;
 
-    @Min(value = 1, message = "La hora efectiva mínima es 1")
-    @Max(value = 8, message = "La hora efectiva máxima es 8")
-    private Integer horaEfectiva;
+
+
 
     @Size(max = 50, message = "El aula debe tener máximo 50 caracteres")
     private String aula;

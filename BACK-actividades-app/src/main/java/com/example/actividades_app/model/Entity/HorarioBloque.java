@@ -21,10 +21,10 @@ public class HorarioBloque {
     @Column(name = "horarioBloqueID")
     private Long id;
 
-    @Column(name = "horaInicio", nullable = false, columnDefinition = "TIME(0)")
+    @Column(name = "hora_inicio", columnDefinition = "TIME(0)")
     private LocalTime horaInicio;
 
-    @Column(name = "horaFin", nullable = false, columnDefinition = "TIME(0)")
+    @Column(name = "hora_fin", columnDefinition = "TIME(0)")
     private LocalTime horaFin;
 
     @Column(name = "ordenBloque", nullable = false)

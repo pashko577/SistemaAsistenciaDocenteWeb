@@ -15,6 +15,7 @@ import com.example.actividades_app.model.Entity.Contrato;
 import com.example.actividades_app.model.Entity.DetalleReporteDocente;
 import com.example.actividades_app.model.Entity.Docente;
 import com.example.actividades_app.model.Entity.Contrato.TipoPago;
+import com.example.actividades_app.model.Entity.CronogramaDiario;
 import com.example.actividades_app.model.dto.ModuloDocente.PlanillaDocenteDTO;
 import com.example.actividades_app.repository.AsistenciaDocenteRepository;
 import com.example.actividades_app.repository.ContratoRepository;
@@ -59,14 +60,18 @@ public class PlanillaDocenteServiceImpl implements PlanillaDocenteService {
                 .findByCronogramaDiario_CronogramaDocente_AsignacionDocente_Docente_IdAndCronogramaDiario_FechaBetween(
                         docenteId, inicio, fin);
 
+                        List<AsistenciaDocente> asistenciasValidas = asistencias.stream()
+            .filter(a -> a.getCronogramaDiario().getEstadoClase() != CronogramaDiario.EstadoClase.CANCELADA)
+            .toList();
+
         int faltas = (int) asistencias.stream()
                 .filter(a -> a.getEstadoAsistencia() == EstadoAsistenciaDocente.FALTA)
                 .count();
 
-        int horasDictadas = (int) asistencias.stream()
-                .filter(a -> a.getEstadoAsistencia() == EstadoAsistenciaDocente.PUNTUAL
-                        || a.getEstadoAsistencia() == EstadoAsistenciaDocente.TARDANZA) // Considerar tardanza como hora dictada
-                .count();
+        int horasDictadas = (int) asistenciasValidas.stream()
+            .filter(a -> a.getEstadoAsistencia() == EstadoAsistenciaDocente.PUNTUAL
+                    || a.getEstadoAsistencia() == EstadoAsistenciaDocente.TARDANZA)
+            .count();
 
         int minutosTardanza = asistencias.stream()
                 .map(this::calcularMinutosTardanza)

@@ -26,13 +26,11 @@ public class ClaseServiceImpl implements ClaseService {
     private final SeccionRepository seccionRepository;
     private final PeriodoAcademicoRepository periodoRepository;
 
+    // ===========================
+    // CREAR CLASE (sin validación de duplicado)
+    // ===========================
     @Override
     public ClaseResponseDTO crear(ClaseRequestDTO dto) {
-
-        if (claseRepository.existsByCursoIdAndSeccionIdAndPeriodoAcademicoId(
-                dto.getCursoId(), dto.getSeccionId(), dto.getPeriodoAcademicoId())) {
-            throw new RuntimeException("Ya existe una clase para ese curso, sección y periodo académico");
-        }
 
         Curso curso = cursoRepository.findById(dto.getCursoId())
                 .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
@@ -45,8 +43,6 @@ public class ClaseServiceImpl implements ClaseService {
 
         Clase clase = Clase.builder()
                 .tiempoClase(dto.getTiempoClase())
-                .tema(dto.getTema())
-                .horaEfectiva(dto.getHoraEfectiva())
                 .aula(dto.getAula())
                 .curso(curso)
                 .seccion(seccion)
@@ -58,6 +54,9 @@ public class ClaseServiceImpl implements ClaseService {
         return mapToResponse(clase);
     }
 
+    // ===========================
+    // LISTAR TODAS LAS CLASES
+    // ===========================
     @Override
     public List<ClaseResponseDTO> listar() {
         return claseRepository.findAll()
@@ -66,6 +65,9 @@ public class ClaseServiceImpl implements ClaseService {
                 .collect(Collectors.toList());
     }
 
+    // ===========================
+    // OBTENER CLASE POR ID
+    // ===========================
     @Override
     public ClaseResponseDTO obtenerPorId(Long id) {
         Clase clase = claseRepository.findById(id)
@@ -74,20 +76,13 @@ public class ClaseServiceImpl implements ClaseService {
         return mapToResponse(clase);
     }
 
+    // ===========================
+    // ACTUALIZAR CLASE (sin validación de duplicado)
+    // ===========================
     @Override
     public ClaseResponseDTO actualizar(Long id, ClaseRequestDTO dto) {
         Clase clase = claseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
-
-        if (!clase.getCurso().getId().equals(dto.getCursoId()) ||
-            !clase.getSeccion().getId().equals(dto.getSeccionId()) ||
-            !clase.getPeriodoAcademico().getId().equals(dto.getPeriodoAcademicoId())) {
-
-            if (claseRepository.existsByCursoIdAndSeccionIdAndPeriodoAcademicoId(
-                    dto.getCursoId(), dto.getSeccionId(), dto.getPeriodoAcademicoId())) {
-                throw new RuntimeException("Ya existe una clase para ese curso, sección y periodo académico");
-            }
-        }
 
         Curso curso = cursoRepository.findById(dto.getCursoId())
                 .orElseThrow(() -> new RuntimeException("Curso no encontrado"));
@@ -99,8 +94,6 @@ public class ClaseServiceImpl implements ClaseService {
                 .orElseThrow(() -> new RuntimeException("Periodo académico no encontrado"));
 
         clase.setTiempoClase(dto.getTiempoClase());
-        clase.setTema(dto.getTema());
-        clase.setHoraEfectiva(dto.getHoraEfectiva());
         clase.setAula(dto.getAula());
         clase.setCurso(curso);
         clase.setSeccion(seccion);
@@ -111,6 +104,9 @@ public class ClaseServiceImpl implements ClaseService {
         return mapToResponse(clase);
     }
 
+    // ===========================
+    // ELIMINAR CLASE
+    // ===========================
     @Override
     public void eliminar(Long id) {
         if (!claseRepository.existsById(id)) {
@@ -119,12 +115,14 @@ public class ClaseServiceImpl implements ClaseService {
         claseRepository.deleteById(id);
     }
 
+    // ===========================
+    // MAPPER DTO
+    // ===========================
     private ClaseResponseDTO mapToResponse(Clase clase) {
         return ClaseResponseDTO.builder()
                 .id(clase.getId())
                 .tiempoClase(clase.getTiempoClase())
-                .tema(clase.getTema())
-                .horaEfectiva(clase.getHoraEfectiva())
+        
                 .aula(clase.getAula())
                 .cursoId(clase.getCurso().getId())
                 .cursoNombre(clase.getCurso().getNombreCurso())

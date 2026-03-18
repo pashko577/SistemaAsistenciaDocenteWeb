@@ -9,6 +9,7 @@ import com.example.actividades_app.model.Entity.Sede;
 import com.example.actividades_app.model.Entity.TipoDocumento;
 import com.example.actividades_app.model.Entity.Usuario;
 import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoRequestDTO;
+import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoResponseDTO;
 import com.example.actividades_app.repository.AdministrativoRepository;
 import com.example.actividades_app.repository.CargoAdministrativoRepository;
 import com.example.actividades_app.repository.PersonaRepository;
@@ -21,6 +22,7 @@ import com.example.actividades_app.service.AdministrativoService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,28 +43,29 @@ public class AdministrativoServiceImpl implements AdministrativoService {
 
         @Override
         @Transactional
-        public void registrarAdministrativo(AdministrativoRequestDTO request){
-                // 1. Validar si ya existe el usuario por DNI
+        public AdministrativoResponseDTO registrarAdministrativo(AdministrativoRequestDTO request) {
+
+                // 1. Validaciones
                 if (usuarioRepository.existsByPersonaDni(request.getDni())) {
                         throw new RuntimeException("Ya existe un usuario registrado con ese DNI");
                 }
 
                 if (personaRepository.existsByEmail(request.getEmail())) {
-                      throw new RuntimeException("El EMAIL se encuentra registrado a otro usuario");  
+                        throw new RuntimeException("El EMAIL se encuentra registrado a otro usuario");
                 }
 
-                // 2. Obtener entidades relacionales
+                // 2. Obtener relaciones
                 Sede sede = sedeRepository.findById(request.getSedeId())
                                 .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
 
                 TipoDocumento tipoDoc = tipoDocumentoRepository.findById(request.getTipoDocumentoId())
                                 .orElseThrow(() -> new RuntimeException("Tipo de documento no encontrado"));
 
-                CargoAdministrativo cargoAdministrativo = cargoAdministrativoRepository.findById(request.getCargoAdministrativoID())
+                CargoAdministrativo cargoAdministrativo = cargoAdministrativoRepository
+                                .findById(request.getCargoAdministrativoId())
                                 .orElseThrow(() -> new RuntimeException("Cargo Administrativo no encontrado"));
 
-
-                // 3. Crear y persistir Persona
+                // 3. Crear Persona
                 Persona persona = Persona.builder()
                                 .dni(request.getDni())
                                 .nombres(request.getNombres())
@@ -72,27 +75,130 @@ public class AdministrativoServiceImpl implements AdministrativoService {
                                 .direccion(request.getDireccion())
                                 .tipoDocumento(tipoDoc)
                                 .build();
+
                 personaRepository.save(persona);
 
-                // 4. Buscar Rol DOCENTE y crear Usuario
+                // 4. Rol
                 Rol rolAdministrativo = rolRepository.findByNombreRol("ADMINISTRATIVO")
-                                .orElseThrow(() -> new RuntimeException(
-                                                "El rol ADMINISTRATIVO no existe en la base de datos"));
+                                .orElseThrow(() -> new RuntimeException("El rol ADMINISTRATIVO no existe"));
 
+                // 5. Usuario
                 Usuario usuario = Usuario.builder()
                                 .persona(persona)
                                 .password(passwordEncoder.encode(request.getPassword()))
                                 .roles(Set.of(rolAdministrativo))
                                 .sede(sede)
                                 .build();
+
                 usuarioRepository.save(usuario);
 
-                // 5. Crear y persistir Docente
+                // 6. Administrativo
                 Administrativo administrativo = Administrativo.builder()
                                 .usuario(usuario)
                                 .cargoAdministrativo(cargoAdministrativo)
-                                .estado(Estado.NUEVO)
+                                // CAMBIA ESTA LÍNEA:
+                                .estado(request.getEstado() != null ? request.getEstado() : Estado.NUEVO)
                                 .build();
-                administrativoRepository.save(administrativo);
+
+                Administrativo adminGuardado = administrativoRepository.save(administrativo);
+
+                // 7. MAPEAR A RESPONSE DTO
+                return mapToResponse(adminGuardado);
+        }
+
+        @Override
+        @Transactional
+        public AdministrativoResponseDTO actualizarAdministrativo(Long id, AdministrativoRequestDTO request) {
+                // 1. Buscar el Administrativo existente
+                Administrativo admin = administrativoRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Administrativo no encontrado"));
+
+                Usuario usuario = admin.getUsuario();
+                Persona persona = usuario.getPersona();
+
+                // 2. Actualizar Persona
+                persona.setNombres(request.getNombres());
+                persona.setApellidos(request.getApellidos());
+                persona.setCelular(request.getCelular());
+                persona.setEmail(request.getEmail());
+                persona.setDireccion(request.getDireccion());
+                // Actualizar TipoDocumento si es necesario
+                if (!persona.getTipoDocumento().getId().equals(request.getTipoDocumentoId())) {
+                        TipoDocumento tipoDoc = tipoDocumentoRepository.findById(request.getTipoDocumentoId())
+                                        .orElseThrow(() -> new RuntimeException("Tipo de documento no encontrado"));
+                        persona.setTipoDocumento(tipoDoc);
+                }
+                personaRepository.save(persona);
+
+                // 3. Actualizar Usuario (Sede y Password opcional)
+                Sede sede = sedeRepository.findById(request.getSedeId())
+                                .orElseThrow(() -> new RuntimeException("Sede no encontrada"));
+                usuario.setSede(sede);
+
+                if (request.getPassword() != null && !request.getPassword().isBlank()) {
+                        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+                }
+                usuarioRepository.save(usuario);
+
+                // 4. Actualizar Administrativo (Cargo y Estado)
+                CargoAdministrativo cargo = cargoAdministrativoRepository.findById(request.getCargoAdministrativoId())
+                                .orElseThrow(() -> new RuntimeException("Cargo no encontrado"));
+
+                admin.setCargoAdministrativo(cargo);
+                admin.setEstado(request.getEstado());
+
+                return mapToResponse(administrativoRepository.save(admin));
+        }
+
+        @Override
+        @Transactional
+        public void eliminarAdministrativo(Long id) {
+                Administrativo admin = administrativoRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Administrativo no encontrado"));
+
+
+                // Opción B: Borrado lógico (Recomendado para auditoría)
+                admin.setEstado(Estado.INACTIVO);
+                administrativoRepository.save(admin);
+        }
+
+        @Override
+        public List<AdministrativoResponseDTO> listarAdministrativos() {
+                return administrativoRepository.findAll()
+                                .stream()
+                                .map(this::mapToResponse) // <--- ¡Esto es lo que llena todos los campos!
+                                .toList();
+        }
+
+        private AdministrativoResponseDTO mapToResponse(Administrativo admin) {
+                // Extraemos la persona para facilitar el acceso a los datos
+                Persona persona = admin.getUsuario().getPersona();
+                Sede sede = admin.getUsuario().getSede();
+
+                return AdministrativoResponseDTO.builder()
+                                .id(admin.getId())
+                                .usuarioId(admin.getUsuario().getId())
+
+                                // Llenamos nombres y apellidos por separado
+                                .nombres(persona.getNombres())
+                                .apellidos(persona.getApellidos())
+
+                                // Nombre completo para el buscador o etiquetas
+                                .nombreUsuario(persona.getNombres() + " " + persona.getApellidos())
+
+                                .cargoAdministrativoId(admin.getCargoAdministrativo().getId())
+                                .nombreCargo(admin.getCargoAdministrativo().getNombreCargo())
+                                .estado(admin.getEstado())
+
+                                // Datos de contacto
+                                .dni(persona.getDni())
+                                .email(persona.getEmail())
+                                .celular(persona.getCelular())
+                                .direccion(persona.getDireccion())
+
+                                // Datos de la sede
+                                .sedeId(sede != null ? sede.getId() : null)
+                                .nombreSede(sede != null ? sede.getNombreSede() : "Sin Sede")
+                                .build();
         }
 }
