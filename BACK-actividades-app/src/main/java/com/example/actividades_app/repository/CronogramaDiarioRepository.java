@@ -21,4 +21,6 @@ public interface CronogramaDiarioRepository extends JpaRepository<CronogramaDiar
         LocalDate fecha
 );
 
+List<CronogramaDiario> findByCronogramaDocenteAsignacionDocenteIdAndFechaAfter(Long asignacionId, LocalDate fecha);
+
 }

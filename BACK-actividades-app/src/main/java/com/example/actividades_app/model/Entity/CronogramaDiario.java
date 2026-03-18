@@ -31,11 +31,17 @@ public class CronogramaDiario {
     @JoinColumn(name = "cronogramaDocenteID", nullable = false)
     private CronogramaDocente cronogramaDocente;
 
+    @Column(name = "tema", length = 255)
+    private String tema;
+
     public enum EstadoClase {
 
         PROGRAMADA, // Clase planificada pero aún no dictada
         DICTADA, // Clase dictada normalmente
-        CANCELADA // Clase cancelada (feriado, suspensión, etc.)
+        CANCELADA, // Clase cancelada (feriado, suspensión, etc.)
+        FALTO_DOCENTE,
+        SUSPENDIDA,
+        REPROGRAMADA,
 
     }
 }

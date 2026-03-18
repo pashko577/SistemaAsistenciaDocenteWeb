@@ -1,8 +1,10 @@
 package com.example.actividades_app.service.Impl;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.actividades_app.model.Entity.CronogramaDiario;
 import com.example.actividades_app.model.Entity.CronogramaDocente;
@@ -22,6 +24,7 @@ public class CronogramaDiarioServiceImpl implements CronogramaDiarioService {
     private final CronogramaDiarioRepository cronogramaDiarioRepository;
     private final CronogramaDocenteRepository cronogramaDocenteRepository;
 
+    @Transactional
     @Override
     public CronogramaDiarioResponseDTO crear(CronogramaDiarioRequestDTO dto) {
 
@@ -37,6 +40,7 @@ public class CronogramaDiarioServiceImpl implements CronogramaDiarioService {
         CronogramaDiario diario = CronogramaDiario.builder()
                 .cronogramaDocente(cronograma)
                 .fecha(dto.getFecha())
+                .tema(dto.getTema())
                 .estadoClase(EstadoClase.PROGRAMADA)
                 .build();
 
@@ -44,6 +48,20 @@ public class CronogramaDiarioServiceImpl implements CronogramaDiarioService {
 
         return mapToResponse(diario);
     }
+
+    @Transactional
+@Override
+public CronogramaDiarioResponseDTO actualizar(Long id, CronogramaDiarioRequestDTO dto) {
+
+    CronogramaDiario diario = cronogramaDiarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Cronograma diario no encontrado"));
+
+    diario.setTema(dto.getTema());
+
+    cronogramaDiarioRepository.save(diario);
+
+    return mapToResponse(diario);
+}
 
     @Override
     public List<CronogramaDiarioResponseDTO> listar() {
@@ -59,9 +77,14 @@ public class CronogramaDiarioServiceImpl implements CronogramaDiarioService {
         return CronogramaDiarioResponseDTO.builder()
                 .id(d.getId())
                 .fecha(d.getFecha())
+                .tema(d.getTema())
                 .estadoClase(d.getEstadoClase())
                 .cronogramaDocenteId(d.getCronogramaDocente().getId())
                 .build();
     }
+
+
+
+
 
 }

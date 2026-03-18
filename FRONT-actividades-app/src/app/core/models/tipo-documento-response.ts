@@ -1,4 +1,4 @@
 export interface TipoDocumentoResponse {
-  TipoDocumentoId: number;
+  id: number;
   nombreTD: string;
 }

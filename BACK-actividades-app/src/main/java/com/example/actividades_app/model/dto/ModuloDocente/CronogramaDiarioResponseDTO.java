@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.example.actividades_app.model.Entity.CronogramaDiario.EstadoClase;
 
+import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
@@ -16,6 +17,9 @@ public class CronogramaDiarioResponseDTO {
     private LocalDate fecha;
 
     private EstadoClase estadoClase;
+
+    
+    private String tema;
 
     private Long cronogramaDocenteId;
 

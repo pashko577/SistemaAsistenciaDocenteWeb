@@ -21,4 +21,10 @@ public interface CronogramaDocenteRepository extends JpaRepository<CronogramaDoc
         Long horarioBloqueId
 );
 List<CronogramaDocente> findByAsignacionDocenteDocenteId(Long docenteId);
+
+boolean existsByAsignacionDocenteDocenteIdAndDiaSemanaAndHorarioBloqueId(
+        Long docenteId,
+        DiaSemana diaSemana,
+        Long horarioBloqueId
+);
 }

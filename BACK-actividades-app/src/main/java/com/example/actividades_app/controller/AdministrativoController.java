@@ -5,20 +5,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.actividades_app.model.Entity.Administrativo;
 import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoRequestDTO;
+import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoResponseDTO;
 import com.example.actividades_app.service.AdministrativoService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RestController
-@RequestMapping("/api/Administrativos")
+@RequestMapping("/api/administrativos")
 @RequiredArgsConstructor
 public class AdministrativoController {
 
@@ -26,8 +32,32 @@ public class AdministrativoController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Administrativo> registrarAdministrativo(@Valid @RequestBody AdministrativoRequestDTO dto){
-        administrativoService.registrarAdministrativo(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
-    }   
+    public ResponseEntity<AdministrativoResponseDTO> registrarAdministrativo(
+            @Valid @RequestBody AdministrativoRequestDTO dto) {
+
+        AdministrativoResponseDTO response = administrativoService.registrarAdministrativo(dto);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<AdministrativoResponseDTO>> listarAdministrativos() {
+        return ResponseEntity.ok(administrativoService.listarAdministrativos());
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdministrativoResponseDTO> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody AdministrativoRequestDTO request) {
+        return ResponseEntity.ok(administrativoService.actualizarAdministrativo(id, request));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        administrativoService.eliminarAdministrativo(id);
+        return ResponseEntity.noContent().build();
+    }
 }

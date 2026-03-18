@@ -11,9 +11,8 @@ public class ClaseResponseDTO {
 
     private Integer tiempoClase;
 
-    private String tema;
 
-    private Integer horaEfectiva;
+
 
     private String aula;
 

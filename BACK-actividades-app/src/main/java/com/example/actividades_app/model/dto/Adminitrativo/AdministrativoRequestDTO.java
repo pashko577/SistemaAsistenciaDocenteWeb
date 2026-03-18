@@ -15,25 +15,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AdministrativoRequestDTO {
-     // Usuario:
+
     @NotBlank(message = "El DNI es obligatorio")
     private String dni;
 
-    @NotBlank(message = "La contraseña es obligatoria")
+  // @NotBlank(message = "La contraseña es obligatoria")
     private String password;
 
     @NotNull(message = "La sede es obligatoria")
     private Long sedeId;
 
-    // Persona:
     @NotBlank(message = "Los nombres son obligatorios")
     private String nombres;
 
     @NotBlank(message = "Los apellidos son obligatorios")
     private String apellidos;
 
-    @NotNull(message = "El celular es obligatorio")
-    private Number celular;
+    @NotBlank(message = "El celular es obligatorio")
+    private String celular;
 
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Formato de email inválido")
@@ -45,8 +44,9 @@ public class AdministrativoRequestDTO {
     @NotNull(message = "El tipo de documento es obligatorio")
     private Long tipoDocumentoId;
 
-    //Administrativod
     @NotNull(message = "El Cargo Administrativo es obligatorio")
-    private Long cargoAdministrativoID;
+    private Long cargoAdministrativoId;
+
+    @NotNull(message = "El estado  es obligatorio")
     private Estado estado;
 }

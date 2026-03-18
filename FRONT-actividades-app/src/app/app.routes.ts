@@ -30,6 +30,11 @@ export const routes: Routes = [
         path: 'gestionDocente',
         loadComponent: () => import('./features/admin/pages/gestion-docente/gestion-docente')
           .then(m => m.GestionDocente)
+      },
+      {
+        path: 'gestionAdministrativo',
+        loadComponent: () => import('./features/admin/pages/gestion-administrativo/gestion-administrativo')
+          .then(m => m.GestionAdministrativo)
       }
     ]
   },

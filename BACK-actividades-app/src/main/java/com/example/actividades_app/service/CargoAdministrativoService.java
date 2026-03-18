@@ -4,13 +4,14 @@ import java.util.List;
 
 import com.example.actividades_app.model.Entity.CargoAdministrativo;
 import com.example.actividades_app.model.dto.Adminitrativo.CargoAdministrativoRequestDTO;
+import com.example.actividades_app.model.dto.Adminitrativo.CargoAdministrativoResponseDTO;
 
 public interface CargoAdministrativoService {
-    CargoAdministrativo crearCargoAdministrativo(CargoAdministrativoRequestDTO dto);
+    CargoAdministrativoResponseDTO crearCargoAdministrativo(CargoAdministrativoRequestDTO dto);
 
-    CargoAdministrativo actualizarAdministrativo(Long cargoAdministrativoID, String nombreCargo);
+    CargoAdministrativoResponseDTO actualizarAdministrativo(Long cargoAdministrativoID, String nombreCargo);
 
     void eliminarCargoAdministrativo(Long cargoAdministrativoID);
 
-    List<CargoAdministrativo> listarTodosCargos();
+    List<CargoAdministrativoResponseDTO> listarTodosCargos();
 }

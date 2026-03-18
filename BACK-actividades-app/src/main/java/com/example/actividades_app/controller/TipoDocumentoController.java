@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.actividades_app.model.Entity.TipoDocumento;
 import com.example.actividades_app.model.dto.ModuloUsuario.TipoDocumentoRequestDTO;
+import com.example.actividades_app.model.dto.ModuloUsuario.TipoDocumentoResponseDTO;
 import com.example.actividades_app.service.TipoDocumentoService;
 
 import jakarta.validation.Valid;
@@ -21,29 +22,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-
 @RestController
-@RequestMapping("/api/TipoDocumento")
+@RequestMapping("/api/tipo-documento")
 @RequiredArgsConstructor
 public class TipoDocumentoController {
 
     private final TipoDocumentoService tipoDocumentoService;
 
     @PostMapping
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<TipoDocumento> crearTipoDocumento(@Valid @RequestBody TipoDocumentoRequestDTO dto){
-        return ResponseEntity.status(HttpStatus.CREATED).body(tipoDocumentoService.crearTipoDocumento(dto));
+   @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<TipoDocumentoResponseDTO> crearTipoDocumento(
+            @Valid @RequestBody TipoDocumentoRequestDTO dto) {
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(tipoDocumentoService.crearTipoDocumento(dto));
     }
-    
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<TipoDocumento>> listar() {
+    public ResponseEntity<List<TipoDocumentoResponseDTO>> listar() {
         return ResponseEntity.ok(tipoDocumentoService.listarTodas());
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TipoDocumento> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<TipoDocumentoResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(tipoDocumentoService.obtenerPorId(id));
     }
 

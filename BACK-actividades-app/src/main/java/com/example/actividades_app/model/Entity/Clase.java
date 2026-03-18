@@ -19,12 +19,6 @@ public class Clase {
     @Column(name = "tiempoClase", nullable = false)
     private Integer tiempoClase;
 
-    @Column(name = "tema", length = 255)
-    private String tema;
-
-    @Column(name = "horaEfectiva")
-    private Integer horaEfectiva;
-
     @Column(name = "aula", length = 50)
     private String aula;
 
@@ -34,11 +28,9 @@ public class Clase {
     @JoinColumn(name = "cursoID", nullable = false)
     private Curso curso;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seccionID", nullable = false)
     private Seccion seccion;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "periodoAcademicoID", nullable = false)
