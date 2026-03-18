@@ -22,7 +22,7 @@ export class SearchAdministrativo implements OnInit {
       busqueda: [''],
       sedeId: [null],
       cargoId: [null],
-      estado: ['ACTIVOS']
+      estado: ['']
     });
   }
 
