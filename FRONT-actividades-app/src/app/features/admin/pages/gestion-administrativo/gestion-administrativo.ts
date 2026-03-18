@@ -164,31 +164,45 @@ manejarFiltros(filtros: any) {
       disableClose: true
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Actualizamos la lista local con el objeto editado
-        const index = this.listaAdmins.findIndex(a => a.id === result.id);
-        if (index !== -1) {
-          this.listaAdmins[index] = {
-            ...result,
-            nombreSede: this.obtenerNombreSede(result.sedeId),
-            nombreCargo: this.obtenerNombreCargo(result.cargoAdministrativoId)
-          };
-          this.listaAdmins = [...this.listaAdmins]; // Disparar detección de cambios
-          this.cdr.detectChanges();
+   dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      // 1. Buscamos el índice en la lista maestra
+      const index = this.listaAdmins.findIndex(a => a.id === result.id);
+      
+      if (index !== -1) {
+        // 2. Reemplazamos el objeto con los nuevos datos mapeados
+        this.listaAdmins[index] = {
+          ...result,
+          nombreSede: this.obtenerNombreSede(result.sedeId),
+          nombreCargo: this.obtenerNombreCargo(result.cargoAdministrativoId)
+        };
+
+        // 3. Sincronizamos la lista filtrada para que el cambio se vea YA
+        // IMPORTANTE: Volvemos a aplicar los filtros actuales para que si
+        // cambiaste el estado a INACTIVO, la card desaparezca solita.
+        if (this.buscadorComponente) {
+           this.manejarFiltros(this.buscadorComponente.filtroForm.value);
+        } else {
+           this.listaFiltrada = [...this.listaAdmins];
         }
+
+        this.cdr.detectChanges();
       }
-    });
+    }
+  });
     
   }
 // Método para limpiar desde el botón "Ver todos" o "Limpiar" del padre
 limpiarFiltros() {
-    if (this.buscadorComponente) {
-      this.buscadorComponente.limpiar(); // Llama al método limpiar() del hijo
-    }
-    this.listaFiltrada = [...this.listaAdmins];
-    this.cdr.detectChanges();
+  if (this.buscadorComponente) {
+    this.buscadorComponente.limpiar(); // Esto debe poner el estado en 'ACTIVO' o null
   }
+  
+  // En lugar de copiar toda la listaAdmins, filtramos los inactivos
+  this.listaFiltrada = this.listaAdmins.filter(admin => admin.estado !== 'INACTIVO');
+  
+  this.cdr.detectChanges();
+}
   
   // --- MÉTODOS DE APOYO ---
 
@@ -219,20 +233,32 @@ limpiarFiltros() {
     return icons[estado] || 'help';
   }
 
-  eliminarAdmin(id: number) {
-    if (confirm('¿Estás seguro de que deseas eliminar este administrativo?')) {
-      this.adminService.eliminar(id).subscribe({
-        next: () => {
-          // Filtramos la lista local para que desaparezca la card de inmediato
-          this.listaAdmins = this.listaAdmins.filter(a => a.id !== id);
-          this.listaFiltrada = [...this.listaAdmins]; // Mantener sincronía
-          this.cdr.detectChanges();
-        },
-        error: (err) => console.error('Error al eliminar:', err)
-      });
-    }
-  }
+eliminarAdmin(id: number) {
+  if (confirm('¿Estás seguro de que deseas inactivar a este administrativo?')) {
+    this.adminService.eliminar(id).subscribe({
+      next: () => {
+        // Buscamos al administrativo en la lista maestra
+        const index = this.listaAdmins.findIndex(a => a.id === id);
+        
+        if (index !== -1) {
+          // Cambiamos el estado localmente
+          this.listaAdmins[index].estado = 'INACTIVO';
 
+          // Forzamos al filtro a ejecutarse de nuevo
+          // Esto hará que la card desaparezca de la vista si el filtro dice "Activos"
+          if (this.buscadorComponente) {
+            this.manejarFiltros(this.buscadorComponente.filtroForm.value);
+          } else {
+            this.listaFiltrada = this.listaAdmins.filter(a => a.estado !== 'INACTIVO');
+          }
+          
+          this.cdr.detectChanges();
+        }
+      },
+      error: (err) => console.error('Error:', err)
+    });
+  }
+}
 
 }
 
