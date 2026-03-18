@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdministrativoService } from '../../../../core/services/administrativo_services';
@@ -10,8 +10,9 @@ import { forkJoin } from 'rxjs';
 // Angular Material
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog'; 
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AdministrativoFormComponent } from './Modal-Administrativo/administrativo-form';
+import { SearchAdministrativo } from "./search-adminsitrativo/search-adminsitrativo";
 
 export interface AdministrativoCard {
   id: number;
@@ -36,12 +37,16 @@ export interface AdministrativoCard {
     ReactiveFormsModule,
     MatIconModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    SearchAdministrativo
   ],
   templateUrl: './gestion-administrativo.html'
 })
 export class GestionAdministrativo implements OnInit {
+  @ViewChild(SearchAdministrativo) buscadorComponente!: SearchAdministrativo;
   listaAdmins: AdministrativoCard[] = [];
+  listaFiltrada: AdministrativoCard[] = [];
+  buscadorHijo: AdministrativoCard[] = []
   sedes: SedeResponse[] = [];
   cargos: CargoAdministrativoResponse[] = [];
   tiposDoc: TipoDocumentoResponse[] = [];
@@ -50,37 +55,66 @@ export class GestionAdministrativo implements OnInit {
     private adminService: AdministrativoService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.cargarDatosIniciales();
+
+
   }
 
+
+  // En GestionAdministrativo.ts
+manejarFiltros(filtros: any) {
+  const { busqueda, sedeId, cargoId, estado } = filtros;
+
+  this.listaFiltrada = this.listaAdmins.filter(admin => {
+    const term = busqueda?.toLowerCase().trim() || '';
+    const cumpleBusqueda = !term || 
+      admin.nombres.toLowerCase().includes(term) || 
+      admin.apellidos.toLowerCase().includes(term) || 
+      admin.dni.includes(term);
+
+    const cumpleSede = !sedeId || Number(admin.sedeId) === Number(sedeId);
+    const cumpleCargo = !cargoId || Number(admin.cargoAdministrativoId) === Number(cargoId);
+
+    // LÓGICA DE ESTADO:
+    // Si el selector está en "Cualquier Estado" (null), se muestran todos.
+    // Si tiene un valor (ACTIVO, INACTIVO), se filtra estrictamente.
+    const cumpleEstado = !estado || admin.estado === estado;
+
+    return cumpleBusqueda && cumpleSede && cumpleCargo && cumpleEstado;
+  });
+
+  this.cdr.detectChanges();
+}
   cargarDatosIniciales() {
-    forkJoin({
-      sedes: this.adminService.listarSedes(),
-      cargos: this.adminService.listarCargos(),
-      tipos: this.adminService.listarTiposDocumento(),
-      admins: this.adminService.listar()
-    }).subscribe({
-      next: (res) => {
-        this.sedes = res.sedes;
-        this.cargos = res.cargos;
-        this.tiposDoc = res.tipos;
+  forkJoin({
+    sedes: this.adminService.listarSedes(),
+    cargos: this.adminService.listarCargos(),
+    tipos: this.adminService.listarTiposDocumento(),
+    admins: this.adminService.listar()
+  }).subscribe({
+    next: (res) => {
+      this.sedes = res.sedes;
+      this.cargos = res.cargos;
+      this.tiposDoc = res.tipos;
 
-        this.listaAdmins = res.admins.map((admin: any) => ({
-          ...admin,
-          nombreSede: admin.nombreSede || this.obtenerNombreSede(admin.sedeId),
-          nombreCargo: admin.nombreCargo || this.obtenerNombreCargo(admin.cargoAdministrativoId)
-        }));
+      // Guardamos la base de datos completa (incluyendo INACTIVOS)
+      this.listaAdmins = res.admins.map((admin: any) => ({
+        ...admin,
+        nombreSede: admin.nombreSede || this.obtenerNombreSede(admin.sedeId),
+        nombreCargo: admin.nombreCargo || this.obtenerNombreCargo(admin.cargoAdministrativoId)
+      }));
 
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('❌ Error al cargar datos:', err);
-      }
-    });
-  }
+      // FILTRO INICIAL: Solo mostrar los que NO están INACTIVOS al entrar
+      this.listaFiltrada = this.listaAdmins.filter(a => a.estado !== 'INACTIVO');
+      
+      this.cdr.detectChanges();
+    },
+    error: (err) => console.error('❌ Error:', err)
+  });
+}
 
   abrirModal() {
     const dialogRef = this.dialog.open(AdministrativoFormComponent, {
@@ -91,8 +125,13 @@ export class GestionAdministrativo implements OnInit {
         cargos: this.cargos,
         tiposDoc: this.tiposDoc
       },
-      disableClose: true 
-    });
+      disableClose: true
+
+
+    }
+
+    );
+
 
     dialogRef.afterClosed().subscribe(result => {
       // result contiene la respuesta del servidor enviada desde el modal
@@ -105,41 +144,52 @@ export class GestionAdministrativo implements OnInit {
 
         // Agregamos al inicio de la lista
         this.listaAdmins = [nuevoAdmin, ...this.listaAdmins];
+        this.listaFiltrada = [...this.listaAdmins]; // Actualizar vista
         this.cdr.detectChanges();
+      }
+    });
+
+  }
+  // Añade esta función para abrir el modal en modo edición
+  editarAdmin(admin: AdministrativoCard) {
+    const dialogRef = this.dialog.open(AdministrativoFormComponent, {
+      width: '100%',
+      maxWidth: '650px',
+      data: {
+        sedes: this.sedes,
+        cargos: this.cargos,
+        tiposDoc: this.tiposDoc,
+        adminSelected: admin // <--- Pasamos el administrativo a editar
+      },
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Actualizamos la lista local con el objeto editado
+        const index = this.listaAdmins.findIndex(a => a.id === result.id);
+        if (index !== -1) {
+          this.listaAdmins[index] = {
+            ...result,
+            nombreSede: this.obtenerNombreSede(result.sedeId),
+            nombreCargo: this.obtenerNombreCargo(result.cargoAdministrativoId)
+          };
+          this.listaAdmins = [...this.listaAdmins]; // Disparar detección de cambios
+          this.cdr.detectChanges();
+        }
       }
     });
     
   }
-// Añade esta función para abrir el modal en modo edición
-editarAdmin(admin: AdministrativoCard) {
-  const dialogRef = this.dialog.open(AdministrativoFormComponent, {
-    width: '100%',
-    maxWidth: '650px',
-    data: {
-      sedes: this.sedes,
-      cargos: this.cargos,
-      tiposDoc: this.tiposDoc,
-      adminSelected: admin // <--- Pasamos el administrativo a editar
-    },
-    disableClose: true 
-  });
-
-  dialogRef.afterClosed().subscribe(result => {
-    if (result) {
-      // Actualizamos la lista local con el objeto editado
-      const index = this.listaAdmins.findIndex(a => a.id === result.id);
-      if (index !== -1) {
-        this.listaAdmins[index] = {
-          ...result,
-          nombreSede: this.obtenerNombreSede(result.sedeId),
-          nombreCargo: this.obtenerNombreCargo(result.cargoAdministrativoId)
-        };
-        this.listaAdmins = [...this.listaAdmins]; // Disparar detección de cambios
-        this.cdr.detectChanges();
-      }
+// Método para limpiar desde el botón "Ver todos" o "Limpiar" del padre
+limpiarFiltros() {
+    if (this.buscadorComponente) {
+      this.buscadorComponente.limpiar(); // Llama al método limpiar() del hijo
     }
-  });
-}
+    this.listaFiltrada = [...this.listaAdmins];
+    this.cdr.detectChanges();
+  }
+  
   // --- MÉTODOS DE APOYO ---
 
   obtenerNombreCargo(cargoId: number): string {
@@ -160,9 +210,9 @@ editarAdmin(admin: AdministrativoCard) {
   }
 
   getEstadoIcon(estado: string): string {
-    const icons: { [key: string]: string } = { 
-      'ACTIVO': 'check_circle', 
-      'NUEVO': 'fiber_new', 
+    const icons: { [key: string]: string } = {
+      'ACTIVO': 'check_circle',
+      'NUEVO': 'fiber_new',
       'INACTIVO': 'cancel',
       'SUSPENDIDO': 'warning'
     };
@@ -170,16 +220,18 @@ editarAdmin(admin: AdministrativoCard) {
   }
 
   eliminarAdmin(id: number) {
-  if (confirm('¿Estás seguro de que deseas eliminar este administrativo?')) {
-    this.adminService.eliminar(id).subscribe({
-      next: () => {
-        // Filtramos la lista local para que desaparezca la card de inmediato
-        this.listaAdmins = this.listaAdmins.filter(a => a.id !== id);
-      },
-      error: (err) => console.error('Error al eliminar:', err)
-    });
+    if (confirm('¿Estás seguro de que deseas eliminar este administrativo?')) {
+      this.adminService.eliminar(id).subscribe({
+        next: () => {
+          // Filtramos la lista local para que desaparezca la card de inmediato
+          this.listaAdmins = this.listaAdmins.filter(a => a.id !== id);
+          this.listaFiltrada = [...this.listaAdmins]; // Mantener sincronía
+          this.cdr.detectChanges();
+        },
+        error: (err) => console.error('Error al eliminar:', err)
+      });
+    }
   }
-}
 
 
 }

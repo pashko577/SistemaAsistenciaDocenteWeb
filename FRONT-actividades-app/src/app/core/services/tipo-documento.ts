@@ -9,7 +9,7 @@ import { TipoDocumentoResponse } from '../models/tipo-documento-response';
 })
 export class TipoDocumentoService {
   // Usando la ruta exacta de tu Controller
-  private API_URL = 'http://localhost:8080/api/TipoDocumento';
+  private API_URL = 'http://localhost:8080/api/tipo-documento';
 
   constructor(private http: HttpClient) {}
 

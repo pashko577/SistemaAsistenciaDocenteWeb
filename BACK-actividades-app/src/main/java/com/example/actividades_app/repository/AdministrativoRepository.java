@@ -15,5 +15,6 @@ public interface AdministrativoRepository extends JpaRepository<Administrativo, 
     Optional<Administrativo> findByUsuarioId(Long usuarioId);
 
     List<Administrativo> findByEstado(Estado estado);
+    List<Administrativo> findByEstadoNot(Estado estado);
 
 }
