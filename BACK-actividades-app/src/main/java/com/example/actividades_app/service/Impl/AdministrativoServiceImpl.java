@@ -156,19 +156,23 @@ public class AdministrativoServiceImpl implements AdministrativoService {
                 Administrativo admin = administrativoRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Administrativo no encontrado"));
 
-
-                // Opción B: Borrado lógico (Recomendado para auditoría)
+                // 1. Inactivar al administrativo
                 admin.setEstado(Estado.INACTIVO);
+
+                // 2. Opcional: Si el Usuario también tiene un campo estado, inactívalo aquí
+                // admin.getUsuario().setActivo(false);
+
                 administrativoRepository.save(admin);
         }
 
-        @Override
-        public List<AdministrativoResponseDTO> listarAdministrativos() {
-                return administrativoRepository.findAll()
-                                .stream()
-                                .map(this::mapToResponse) // <--- ¡Esto es lo que llena todos los campos!
-                                .toList();
-        }
+       @Override
+public List<AdministrativoResponseDTO> listarAdministrativos() {
+    // Cambia findByEstadoNot por findAll() para enviar toda la data
+    return administrativoRepository.findAll() 
+            .stream()
+            .map(this::mapToResponse)
+            .toList();
+}
 
         private AdministrativoResponseDTO mapToResponse(Administrativo admin) {
                 // Extraemos la persona para facilitar el acceso a los datos
