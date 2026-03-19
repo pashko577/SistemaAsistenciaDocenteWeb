@@ -6,6 +6,8 @@ export interface DocenteResponse {
   email: string;
   celular: string;
   direccion: string;
+  sedeId: number;           
+  especialidadId: number;
   nombreSede: string;
   nombreEspecialidad: string;
   tipoDocumentoNombre: string;
