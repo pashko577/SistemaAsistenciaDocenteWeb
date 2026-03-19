@@ -1,0 +1,53 @@
+/* dashboard.css */
+
+/* Transiciones suaves */
+.transition-shadow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover\:shadow-md:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Estilos para la tabla */
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+/* Badges de estado */
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+.bg-yellow-100 {
+  background-color: #fef9c3;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .grid {
+    gap: 1rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.5rem;
+  }
+  
+  table {
+    font-size: 0.875rem;
+  }
+}
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}

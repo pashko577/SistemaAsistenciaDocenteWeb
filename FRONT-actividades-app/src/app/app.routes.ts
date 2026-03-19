@@ -18,13 +18,13 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'index-admin',
+        redirectTo: 'dashboard',
         pathMatch: 'full'
       },
       {
-        path: 'index-admin',
-        loadComponent: () => import('./features/admin/pages/index-admin/index-admin')
-          .then(m => m.IndexAdmin)
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/pages/dashboard/dashboard')
+          .then(m => m.Dashboard)
       },
       {
         path: 'gestionDocente',
