@@ -2,17 +2,18 @@ package com.example.actividades_app.service;
 
 import java.util.List;
 
-import com.example.actividades_app.model.Entity.EspecialidadDocente;
+
 import com.example.actividades_app.model.dto.ModuloDocente.EspecialidadDocenteRequestDTO;
+import com.example.actividades_app.model.dto.ModuloDocente.EspecialidadDocenteResponseDTO;
 
 public interface EspecialidadDocenteService {
-    EspecialidadDocente crearEspecialidadDocente(EspecialidadDocenteRequestDTO dto);
+    EspecialidadDocenteResponseDTO crearEspecialidadDocente(EspecialidadDocenteRequestDTO dto);
+    
+    EspecialidadDocenteResponseDTO actualizarEspecialidadDocente(Long id, String nombre);
 
-    EspecialidadDocente actualizarEspecialidadDocente(Long especialidadDocenteID, String nombreEspecialidad);
+    void eliminarEspecilidadDocente(Long id);
 
-    void eliminarEspecilidadDocente(Long especialidadDocenteID);
+    EspecialidadDocenteResponseDTO obtenerPorId(Long id);
 
-    EspecialidadDocente obtenerPorId(Long especialidadDocenteID);
-
-    List<EspecialidadDocente> listarEspecialidadDocente();
+    List<EspecialidadDocenteResponseDTO> listarEspecialidadDocente();
 }
