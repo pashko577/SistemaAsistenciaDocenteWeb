@@ -6,6 +6,15 @@ import com.example.actividades_app.model.dto.ModuloDocente.DocenteRequestDTO;
 import com.example.actividades_app.model.dto.ModuloDocente.DocenteResponseDTO;
 
 public interface DocenteService {
-    void registerDocente(DocenteRequestDTO request);
+    // Retornar el DTO permite confirmar al front qué se guardó exactamente
+    DocenteResponseDTO registerDocente(DocenteRequestDTO request);
+    
     List<DocenteResponseDTO> listarTodos();
+    
+    // Al actualizar, devuelves la nueva versión del docente
+    DocenteResponseDTO actualizarDocente(Long id, DocenteRequestDTO request);
+    
+    // Al cambiar estado, devuelves el objeto para ver el nuevo badge (ACTIVO/INACTIVO)
+void eliminarDocente(Long id);
+
 }

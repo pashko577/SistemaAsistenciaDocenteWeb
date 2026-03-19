@@ -1,3 +1,3 @@
 export interface EspecialidadDocenteRequest {
-  nombreEspecialidadDocente: String;
+  nombreEspecialidad: String;
 }

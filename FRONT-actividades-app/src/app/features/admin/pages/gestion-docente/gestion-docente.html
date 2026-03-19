@@ -1,165 +1,149 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">Gestión de Docentes</h1>
-
-    <button (click)="toggleModal()"
-            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all shadow-md flex items-center whitespace-nowrap">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-        <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
-      </svg>
-      Registrar Nuevo Docente
-    </button>
-  </div>
-
-  <div class="mb-6">
-    <div class="relative w-full md:w-64">
-      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-        </svg>
-      </div>
-      <input type="text"
-             (input)="onSearch($event)"
-             placeholder="Buscar nombre o DNI..."
-             class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all">
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-
-    <div *ngIf="loadingTable()" class="col-span-full p-8 text-center text-gray-500">
-      <div class="flex justify-center items-center">
-        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-             viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-          </path>
-        </svg>
-        Cargando docentes...
-      </div>
-    </div>
-
-    <div *ngFor="let doc of filteredDocentes()"
-         class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
-
-      <div>
-        <div class="flex justify-between items-start mb-4">
-          <h3 class="text-lg font-bold text-gray-900 truncate">{{ doc.nombres }} {{ doc.apellidos }}</h3>
-          <span class="px-3 py-1 rounded-full text-xs font-semibold" [ngClass]="{
-                  'bg-green-100 text-green-700': doc.estado === 'ACTIVO',
-                  'bg-yellow-100 text-yellow-700': doc.estado === 'NUEVO',
-                  'bg-red-100 text-red-700': doc.estado === 'INACTIVO'
-                }">
-            {{ doc.estado }}
-          </span>
+<div class="p-6 bg-gray-50 min-h-screen">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Gestión de Docentes</h1>
+            <p class="text-gray-500 text-sm mt-1">Administra el personal académico y sus especialidades</p>
         </div>
-        <p class="text-sm text-gray-600 mb-1">DNI:</p>
-        <p class="text-base font-mono text-gray-800 mb-4">{{ doc.dni }}</p>
-      </div>
 
-      <div class="mt-4 pt-4 border-t border-gray-100">
-        <a
-           class="block text-center w-full bg-gray-900 hover:bg-gray-700 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors">
-          Ver Perfil
-        </a>
-      </div>
-    </div>
-
-    <div *ngIf="!loadingTable() && filteredDocentes().length === 0"
-         class="col-span-full text-center p-10 bg-white rounded-2xl border border-gray-100">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-400 mb-4" fill="none"
-           viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1"
-              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-      <p class="text-gray-500 font-medium">No se encontraron docentes.</p>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="isModalOpen()"
-     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
-
-  <div class="bg-white w-full max-w-4xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
-
-    <div class="bg-gray-800 p-4 flex justify-between items-center text-white">
-      <h2 class="text-xl font-bold">Formulario de Registro: Docente</h2>
-      <button (click)="toggleModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
-    </div>
-
-    <form [formGroup]="docenteForm" (ngSubmit)="registerDocente()" class="p-6 space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">DNI:</label>
-          <input type="text" formControlName="dni" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none" (input)="backendError.set(null)">
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Contraseña:</label>
-          <input type="password" formControlName="password" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Email:</label>
-          <input type="email" formControlName="email" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none" (input)="backendError.set(null)">
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Nombres:</label>
-          <input type="text" formControlName="nombres" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Apellidos:</label>
-          <input type="text" formControlName="apellidos" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Celular:</label>
-          <input type="text" formControlName="celular" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="flex flex-col md:col-span-3">
-          <label class="text-sm font-semibold text-gray-600">Dirección:</label>
-          <input type="text" formControlName="direccion" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none">
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Tipo Documento:</label>
-          <select formControlName="tipoDocumentoId" class="border rounded-md p-2 bg-white outline-none">
-            <option [ngValue]="null">Seleccione...</option>
-            <option *ngFor="let t of tiposDocumento" [ngValue]="t.id">{{t.nombreTD}}</option>
-          </select>
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Sede:</label>
-          <select formControlName="sedeId" class="border rounded-md p-2 bg-white outline-none">
-            <option [ngValue]="null">Seleccione...</option>
-            <option *ngFor="let s of sedes" [ngValue]="s.id">{{s.nombreSede}}</option>
-          </select>
-        </div>
-        <div class="flex flex-col">
-          <label class="text-sm font-semibold text-gray-600">Especialidad:</label>
-          <select formControlName="especialidadId" class="border rounded-md p-2 bg-white outline-none">
-            <option [ngValue]="null">Seleccione...</option>
-            <option *ngFor="let e of especialidades" [ngValue]="e.id">{{e.nombreEspecialidad}}</option>
-          </select>
-        </div>
-        <div class="flex flex-col md:col-span-3">
-          <label class="text-sm font-semibold text-gray-600">Observaciones:</label>
-          <textarea formControlName="observaciones" rows="2" class="border rounded-md p-2 focus:ring-2 focus:ring-blue-500 outline-none"></textarea>
-        </div>
-      </div>
-      <div *ngIf="successMessage" class="p-3 bg-green-100 text-green-700 rounded-lg text-center font-bold">
-        {{ successMessage }}
-      </div>
-      <div *ngIf="backendError()" class="p-3 bg-red-100 text-red-700 rounded-lg text-center font-bold">
-        {{ backendError() }}
-      </div>
-      <div class="flex justify-end space-x-3 pt-4 border-t">
-        <button type="button" (click)="toggleModal()"
-                class="px-4 py-2 border rounded-md text-gray-600 hover:bg-gray-100">
-          Cancelar
+        <button (click)="abrirModal()"
+            class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center transition-all transform hover:scale-105 active:scale-95">
+            <mat-icon class="mr-2">person_add</mat-icon>
+            Registrar Nuevo Docente
         </button>
-        <button type="submit" [disabled]="loading || docenteForm.invalid"
-                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50">
-          {{ loading ? 'Enviando...' : 'Registrar Docente' }}
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 items-center mb-6">
+        <div class="relative w-full md:w-96">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <mat-icon class="text-gray-400">search</mat-icon>
+            </div>
+            <input type="text" (input)="onSearch($event)" placeholder="Buscar por nombre, DNI o especialidad..."
+                class="w-full pl-11 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-sm text-sm">
+        </div>
+        
+        <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100 hidden md:block">
+            <p class="text-blue-800 text-sm font-semibold">
+                Docentes encontrados: <span class="text-lg">{{ filteredDocentes().length }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        
+        <div *ngIf="loadingTable()" class="col-span-full py-20 text-center">
+            <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-white bg-blue-600">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Cargando panel de docentes...
+            </div>
+        </div>
+<div *ngFor="let doc of filteredDocentes()"
+        class="group relative bg-white rounded-xl shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 overflow-hidden hover:-translate-y-1">
+
+        <div class="absolute top-0 left-0 right-0 h-1" [ngClass]="{
+                'bg-green-500': doc.estado === 'ACTIVO',
+                'bg-yellow-500': doc.estado === 'NUEVO',
+                'bg-red-500': doc.estado === 'INACTIVO'
+             }">
+        </div>
+
+        <div class="absolute top-3 right-3 z-10">
+            <span class="px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm backdrop-blur-sm border"
+                [ngClass]="{
+                    'bg-green-50 text-green-700 border-green-100': doc.estado === 'ACTIVO',
+                    'bg-yellow-50 text-yellow-700 border-yellow-100': doc.estado === 'NUEVO',
+                    'bg-red-50 text-red-700 border-red-100': doc.estado === 'INACTIVO'
+                  }">
+                <mat-icon class="text-xs" style="font-size: 12px; width: 12px; height: 12px;">
+                    {{ doc.estado === 'ACTIVO' ? 'check_circle' : (doc.estado === 'NUEVO' ? 'fiber_new' : 'block') }}
+                </mat-icon>
+                <span class="hidden sm:inline">{{ doc.estado }}</span>
+            </span>
+        </div>
+
+        <div class="p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 border-b border-blue-100/50">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
+                    <span class="text-white font-bold text-base">
+                        {{ doc.nombres[0] }}{{ doc.apellidos[0] }}
+                    </span>
+                </div>
+
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-bold text-sm text-gray-800 truncate">{{ doc.nombres }} {{ doc.apellidos }}</h3>
+                    <p class="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                        <mat-icon class="text-[10px] text-blue-400" style="font-size: 10px; width: 10px; height: 10px;">badge</mat-icon>
+                        <span class="truncate">ID: {{ doc.id }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 space-y-3">
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-gray-50/80 p-2 rounded-lg">
+                    <div class="flex items-center gap-1 text-gray-500 mb-0.5">
+                        <mat-icon class="text-blue-400 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">phone_android</mat-icon>
+                        <span class="text-[9px] font-medium uppercase tracking-wider">Cel</span>
+                    </div>
+                    <p class="font-semibold text-gray-800 text-[11px] truncate">{{ doc.celular }}</p>
+                </div>
+                <div class="bg-gray-50/80 p-2 rounded-lg">
+                    <div class="flex items-center gap-1 text-gray-500 mb-0.5">
+                        <mat-icon class="text-blue-400 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">email</mat-icon>
+                        <span class="text-[9px] font-medium uppercase tracking-wider">Email</span>
+                    </div>
+                    <p class="font-semibold text-gray-800 text-[11px] truncate">{{ doc.email }}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div class="bg-gray-50/80 p-2 rounded-lg">
+                    <div class="flex items-center gap-1 text-gray-500 mb-0.5">
+                        <mat-icon class="text-blue-400 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">business</mat-icon>
+                        <span class="text-[9px] font-medium uppercase tracking-wider">Sede</span>
+                    </div>
+                    <p class="font-semibold text-gray-800 text-[11px] truncate">{{ doc.nombreSede || 'No asignada' }}</p>
+                </div>
+                <div class="bg-gray-50/80 p-2 rounded-lg">
+                    <div class="flex items-center gap-1 text-gray-500 mb-0.5">
+                        <mat-icon class="text-blue-400 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">school</mat-icon>
+                        <span class="text-[9px] font-medium uppercase tracking-wider">Especialidad</span>
+                    </div>
+                    <p class="font-semibold text-gray-800 text-[11px] truncate">{{ doc.nombreEspecialidad || 'Sin especialidad' }}</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-50/80 p-2 rounded-lg">
+                <div class="flex items-center gap-1 text-gray-500 mb-0.5">
+                    <mat-icon class="text-blue-400 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">location_on</mat-icon>
+                    <span class="text-[9px] font-medium uppercase tracking-wider">Dirección</span>
+                </div>
+                <p class="font-semibold text-gray-800 text-[11px] truncate">{{ doc.direccion || 'No registrada' }}</p>
+            </div>
+
+            <div class="flex items-center justify-between bg-blue-50/50 p-2 rounded-lg border border-blue-100/50">
+                <div class="flex items-center gap-1">
+                    <mat-icon class="text-blue-500 text-xs" style="font-size: 12px; width: 12px; height: 12px;">credit_card</mat-icon>
+                    <span class="text-[10px] font-medium text-gray-600">DNI:</span>
+                </div>
+                <span class="font-mono font-bold text-gray-800 text-xs tracking-wider">{{ doc.dni }}</span>
+            </div>
+        </div>
+
+        <div class="p-3 pt-0 flex gap-1.5">
+            <button (click)="abrirModal(doc)"
+                class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 border border-blue-200/50">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">edit</mat-icon>
+                <span>Editar</span>
+            </button>
+
+            <button (click)="eliminarDocente(doc.id)"
+                class="flex-1 bg-red-50 hover:bg-red-100 text-red-600 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 border border-red-200/50">
+                <mat-icon style="font-size: 14px; width: 14px; height: 14px;">delete</mat-icon>
+                <span>Eliminar</span>
+            </button>
+        </div>
+    </div>
