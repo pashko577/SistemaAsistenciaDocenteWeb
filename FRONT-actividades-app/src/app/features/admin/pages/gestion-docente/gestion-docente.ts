@@ -6,6 +6,7 @@ import { SedeService } from '../../../../core/services/sede-service';
 import { EspecialidadDocenteService } from '../../../../core/services/especialidad-docente';
 import { TipoDocumentoService } from '../../../../core/services/tipo-documento';
 import { DocenteResponse } from '../../../../core/models/docente-response';
+import { DocenteService } from '../../../../core/services/docente';
 import { forkJoin } from 'rxjs';
 
 // Angular Material
@@ -14,17 +15,18 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
 import { DocenteForm } from './Modal-Docente/docente-form'; 
-import { DocenteService } from '../../../../core/services/docente';
+import { SearchDocente } from "./search-docente/search-docente";
 
 @Component({
   selector: 'app-gestion-docente',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatDialogModule, 
-    MatIconModule, 
-    MatButtonModule
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatIconModule,
+    MatButtonModule,
+    SearchDocente
   ],
   templateUrl: './gestion-docente.html',
   styleUrl: './gestion-docente.css',
@@ -32,10 +34,17 @@ import { DocenteService } from '../../../../core/services/docente';
 export class GestionDocente implements OnInit {
   // Signals para estado reactivo
   docentes = signal<DocenteResponse[]>([]);
-  searchTerm = signal('');
   loadingTable = signal(false);
 
-  // Combos de datos (se llenan con forkJoin)
+  // Signal para manejar todos los filtros simultáneamente
+  filtros = signal({
+    busqueda: '',
+    sedeId: null as number | null,
+    especialidadId: null as number | null,
+    estado: null as string | null
+  });
+
+  // Combos de datos
   sedes: any[] = [];
   tiposDocumento: any[] = [];
   especialidades: any[] = [];
@@ -66,11 +75,11 @@ export class GestionDocente implements OnInit {
         this.tiposDocumento = res.tipos;
         this.especialidades = res.especialidades;
         
-        // Mapeo inicial para asegurar que todos tengan sus nombres de sede/especialidad
+        // Mapeo corregido: usamos sedeId y especialidadId del DTO para buscar los nombres
         const docentesMapeados = res.docentes.map(d => ({
           ...d,
-          nombreSede: d.nombreSede || this.obtenerNombreSede(d.id),
-          nombreEspecialidad: d.nombreEspecialidad || this.obtenerNombreEspecialidad(d.id)
+          nombreSede: d.nombreSede || this.obtenerNombreSede(d.sedeId),
+          nombreEspecialidad: d.nombreEspecialidad || this.obtenerNombreEspecialidad(d.especialidadId)
         }));
 
         this.docentes.set(docentesMapeados);
@@ -84,19 +93,43 @@ export class GestionDocente implements OnInit {
     });
   }
 
-  // Filtrado reactivo: oculta INACTIVOS y aplica búsqueda
+  // Lógica de filtrado multivariable
   filteredDocentes = computed(() => {
-    const term = this.searchTerm().toLowerCase().trim();
-    const lista = this.docentes().filter(d => d.estado !== 'INACTIVO'); 
-    
-    if (!term) return lista;
+    const f = this.filtros();
+    const lista = this.docentes();
 
-    return lista.filter(doc =>
-      doc.nombres.toLowerCase().includes(term) ||
-      doc.apellidos.toLowerCase().includes(term) ||
-      doc.dni.includes(term)
-    );
+    return lista.filter(doc => {
+      // 1. Filtro de búsqueda (DNI, Nombre o Apellido)
+      const term = f.busqueda.toLowerCase().trim();
+      const cumpleTexto = !term || 
+        doc.nombres.toLowerCase().includes(term) || 
+        doc.apellidos.toLowerCase().includes(term) || 
+        doc.dni.includes(term);
+
+      // 2. Filtro de Sede
+      const cumpleSede = !f.sedeId || Number(doc.sedeId) === Number(f.sedeId);
+
+      // 3. Filtro de Especialidad
+      const cumpleEspecialidad = !f.especialidadId || Number(doc.especialidadId) === Number(f.especialidadId);
+
+      // 4. Filtro de Estado: Si es null, mostramos todo menos INACTIVO por defecto
+      const cumpleEstado = f.estado 
+        ? doc.estado === f.estado 
+        : doc.estado !== 'INACTIVO';
+
+      return cumpleTexto && cumpleSede && cumpleEspecialidad && cumpleEstado;
+    });
   });
+
+  // Método que recibe los filtros desde el componente hijo (SearchDocente)
+  manejarFiltros(filtrosRecibidos: any) {
+    this.filtros.set({
+      busqueda: filtrosRecibidos.busqueda || '',
+      sedeId: filtrosRecibidos.sedeId,
+      especialidadId: filtrosRecibidos.especialidadId,
+      estado: filtrosRecibidos.estado
+    });
+  }
 
   abrirModal(docente?: DocenteResponse) {
     const dialogRef = this.dialog.open(DocenteForm, {
@@ -128,7 +161,6 @@ export class GestionDocente implements OnInit {
           }
           return [docenteConNombres, ...listaActual];
         });
-
         this.cdr.detectChanges();
       }
     });
@@ -136,31 +168,18 @@ export class GestionDocente implements OnInit {
 
   eliminarDocente(id: number) {
     if (confirm('¿Estás seguro de inactivar a este docente?')) {
-      // Cambio: Usamos el nuevo método 'eliminar' del Service
       this.docenteService.eliminarDocente(id).subscribe({
         next: () => {
-          // Actualización local para que el computed lo oculte
           this.docentes.update(lista => 
             lista.map(d => d.id === id ? { ...d, estado: 'INACTIVO' } : d)
           );
-          console.log('✅ Docente inactivado correctamente');
         },
         error: (err) => {
           console.error('❌ Error al inactivar:', err);
-          alert('No se pudo inactivar al docente. Verifique la conexión.');
+          alert('No se pudo inactivar al docente.');
         }
       });
     }
-  }
-
-  onSearch(event: Event) {
-    const element = event.target as HTMLInputElement;
-    this.searchTerm.set(element.value);
-  }
-
-  obtenerIniciales(nombres: string, apellidos: string): string {
-    if (!nombres || !apellidos) return '??';
-    return (nombres.charAt(0) + apellidos.charAt(0)).toUpperCase();
   }
 
   obtenerNombreSede(sedeId: number | string): string {
@@ -171,7 +190,6 @@ export class GestionDocente implements OnInit {
 
   obtenerNombreEspecialidad(especialidadId: number | string): string {
     if (!especialidadId) return 'No especificada';
-    // Ajustado para buscar por la propiedad correcta del objeto Especialidad
     const esp = this.especialidades.find(e => 
       Number(e.id) === Number(especialidadId) || 
       Number(e.especialidadDocenteId) === Number(especialidadId)

@@ -155,6 +155,7 @@ public void eliminarDocente(Long id) {
             .dni(p.getDni())
             // --- NUEVOS CAMPOS ---
             .sedeId(docente.getUsuario().getSede().getId())
+            .nombreSede(docente.getUsuario().getSede().getNombreSede())
             .especialidadId(docente.getEspecialidadDocente().getId())
             // ---------------------
             .nombres(p.getNombres())
@@ -162,7 +163,7 @@ public void eliminarDocente(Long id) {
             .email(p.getEmail())
             .celular(p.getCelular())
             .direccion(p.getDireccion())
-            .nombreSede(docente.getUsuario().getSede().getNombreSede())
+            
             .nombreEspecialidad(docente.getEspecialidadDocente().getNombreEspecialidad())
             .tipoDocumentoNombre(p.getTipoDocumento().getNombreTD())
             .estado(docente.getEstado().name())

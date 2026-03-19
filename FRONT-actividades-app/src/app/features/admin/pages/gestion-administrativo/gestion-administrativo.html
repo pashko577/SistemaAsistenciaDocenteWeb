@@ -1,10 +1,18 @@
+
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+
+     <div>
+      <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Gestión de Admisnitartivos</h1>
+      <p class="text-gray-500 text-sm mt-1">Administra el personal administrativo</p>
+    </div>
+
 <!-- Botón Registrar con Material Icon -->
 <button (click)="abrirModal()"
     class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg flex items-center transition-all transform hover:scale-105 mb-6">
     <mat-icon class="mr-2">person_add</mat-icon>
     Registrar Nuevo Administrativo
 </button>
-
+</div>
 <app-search-administrativo [sedes]="sedes" [cargos]="cargos" (onFilter)="manejarFiltros($event)">
 </app-search-administrativo>
 
