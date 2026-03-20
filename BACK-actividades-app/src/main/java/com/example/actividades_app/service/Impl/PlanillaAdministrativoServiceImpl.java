@@ -49,7 +49,7 @@ public class PlanillaAdministrativoServiceImpl implements PlanillaAdministrativo
         BigDecimal sueldoBase = contrato.getMontoBase();
 
         // --- Fallback si contrato no tiene datos ---
-        int diasMes = contrato.getDiasLaboralesMes() != null ? contrato.getDiasLaboralesMes() : 30;
+        int diasMes = contrato.getDiasLaborablesMes() != null ? contrato.getDiasLaborablesMes() : 30;
         int horasJornada = contrato.getHorasJornada() != null ? contrato.getHorasJornada() : 8;
 
         BigDecimal valorDia = sueldoBase.divide(BigDecimal.valueOf(diasMes), 2, RoundingMode.HALF_UP);

@@ -64,7 +64,7 @@ export class GestionAdministrativo implements OnInit {
   }
 
 
-  // En GestionAdministrativo.ts
+
 manejarFiltros(filtros: any) {
   const { busqueda, sedeId, cargoId, estado } = filtros;
 
@@ -78,10 +78,12 @@ manejarFiltros(filtros: any) {
     const cumpleSede = !sedeId || Number(admin.sedeId) === Number(sedeId);
     const cumpleCargo = !cargoId || Number(admin.cargoAdministrativoId) === Number(cargoId);
 
-    // LÓGICA DE ESTADO:
-    // Si el selector está en "Cualquier Estado" (null), se muestran todos.
-    // Si tiene un valor (ACTIVO, INACTIVO), se filtra estrictamente.
-    const cumpleEstado = !estado || admin.estado === estado;
+    // NUEVA LÓGICA DE ESTADO:
+    // 1. Si el usuario eligió un estado específico (ej. 'INACTIVO'), se muestra.
+    // 2. Si el selector está vacío (!estado), mostramos todo MENOS los inactivos.
+    const cumpleEstado = estado 
+      ? admin.estado === estado 
+      : admin.estado !== 'INACTIVO';
 
     return cumpleBusqueda && cumpleSede && cumpleCargo && cumpleEstado;
   });

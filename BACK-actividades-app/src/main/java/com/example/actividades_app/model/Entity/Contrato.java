@@ -31,8 +31,8 @@ public class Contrato {
     @Column(name = "horasJornada", nullable = false)
     private Integer horasJornada;
 
-    @Column(name = "diasLaboralesMes", nullable = false)
-    private Integer diasLaboralesMes;
+    @Column(name = "diasLaborablesMes", nullable = false)
+    private Integer diasLaborablesMes;
 
     // =========================
     // FK -> Usuario

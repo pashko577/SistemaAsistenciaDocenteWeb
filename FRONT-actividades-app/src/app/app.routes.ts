@@ -35,7 +35,12 @@ export const routes: Routes = [
         path: 'gestionAdministrativo',
         loadComponent: () => import('./features/admin/pages/gestion-administrativo/gestion-administrativo')
           .then(m => m.GestionAdministrativo)
-      }
+      },
+      {
+      path: 'gestionContrato', 
+      loadComponent: () => import('./features/admin/pages/gestion-contrato/gestion-contrato')
+         .then(m => m.GestionContrato)
+    }
     ]
   },
 

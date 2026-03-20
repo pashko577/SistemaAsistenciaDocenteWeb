@@ -44,7 +44,7 @@ public class AdministrativoServiceImpl implements AdministrativoService {
         @Override
         @Transactional
         public AdministrativoResponseDTO registrarAdministrativo(AdministrativoRequestDTO request) {
-
+System.out.println("DATOS RECIBIDOS: " + request.toString());
                 // 1. Validaciones
                 if (usuarioRepository.existsByPersonaDni(request.getDni())) {
                         throw new RuntimeException("Ya existe un usuario registrado con ese DNI");
