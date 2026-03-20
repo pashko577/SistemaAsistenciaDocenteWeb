@@ -59,7 +59,7 @@ public class ContratoServiceImpl implements ContratoService {
                 .tipoPago(dto.getTipoPago())
                 .montoBase(dto.getMontoBase())
                 .horasJornada(dto.getHorasJornada())
-                .diasLaboralesMes(dto.getDiasLaboralesMes())
+                .diasLaborablesMes(dto.getDiasLaborablesMes())
                 .estado(dto.getEstado())
                 .usuario(usuario)
                 .tipoActividad(tipoActividad)
@@ -86,7 +86,7 @@ public class ContratoServiceImpl implements ContratoService {
         contrato.setTipoPago(dto.getTipoPago());
         contrato.setMontoBase(dto.getMontoBase());
         contrato.setHorasJornada(dto.getHorasJornada());
-        contrato.setDiasLaboralesMes(dto.getDiasLaboralesMes());
+        contrato.setDiasLaborablesMes(dto.getDiasLaborablesMes());
         contrato.setEstado(dto.getEstado());
         contrato.setTipoActividad(tipoActividad);
 
@@ -140,20 +140,33 @@ public class ContratoServiceImpl implements ContratoService {
     // =========================
     // MAPPER
     // =========================
-    private ContratoResponseDTO mapToDTO(Contrato contrato) {
-
-        return ContratoResponseDTO.builder()
-                .id(contrato.getId())
-                .tipoPago(contrato.getTipoPago())
-                .montoBase(contrato.getMontoBase())
-                .horasJornada(contrato.getHorasJornada())
-                .diasLaboralesMes(contrato.getDiasLaboralesMes())
-                .usuarioId(contrato.getUsuario().getId())
-                .estado(contrato.getEstado())
-                .tipoActividadId(
-                        contrato.getTipoActividad() != null
-                                ? contrato.getTipoActividad().getId()
-                                : null)
-                .build();
+   private ContratoResponseDTO mapToDTO(Contrato contrato) {
+    // Extraemos info del usuario y su persona
+    String nombreCompleto = "";
+    String dni = "";
+    if (contrato.getUsuario() != null && contrato.getUsuario().getPersona() != null) {
+        nombreCompleto = contrato.getUsuario().getPersona().getNombres() + " " + 
+                         contrato.getUsuario().getPersona().getApellidos();
+        dni = contrato.getUsuario().getPersona().getDni();
     }
+
+    // Extraemos info de la actividad
+    String actividad = (contrato.getTipoActividad() != null) ? contrato.getTipoActividad().getNombre() : "N/A";
+    String planilla = (contrato.getTipoActividad() != null) ? contrato.getTipoActividad().getTipoPlanilla().name() : "N/A";
+
+    return ContratoResponseDTO.builder()
+            .id(contrato.getId())
+            .tipoPago(contrato.getTipoPago())
+            .montoBase(contrato.getMontoBase())
+            .horasJornada(contrato.getHorasJornada())
+            .diasLaborablesMes(contrato.getDiasLaborablesMes())
+            .usuarioId(contrato.getUsuario().getId())
+            .usuarioNombre(nombreCompleto) // <--- Nuevo
+            .usuarioDni(dni)               // <--- Nuevo
+            .nombreActividad(actividad)    // <--- Nuevo
+            .tipoPlanilla(planilla)        // <--- Nuevo
+            .estado(contrato.getEstado())
+            .tipoActividadId(contrato.getTipoActividad() != null ? contrato.getTipoActividad().getId() : null)
+            .build();
+}
 }

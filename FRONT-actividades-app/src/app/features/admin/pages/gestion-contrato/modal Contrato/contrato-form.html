@@ -1,0 +1,155 @@
+<div class="p-8 bg-white rounded-3xl max-w-2xl">
+  <div class="flex items-center gap-3 mb-8 border-b border-slate-100 pb-4">
+    <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+      <mat-icon>{{ data?.contratoSelected ? 'edit' : 'assignment' }}</mat-icon>
+    </div>
+    <div>
+      <h2 class="text-2xl font-black text-slate-800 tracking-tight">
+        {{ data?.contratoSelected ? 'Editar Contrato' : 'Nuevo Contrato' }}
+      </h2>
+      <p class="text-slate-500 text-xs font-medium uppercase tracking-wider">Detalles laborales del personal</p>
+    </div>
+  </div>
+
+<form [formGroup]="contratoForm" (ngSubmit)="guardar()" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+    
+<div class="md:col-span-2 relative">
+  <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Colaborador / Usuario</label>
+  
+  <div class="flex gap-2 relative">
+    <div class="flex-1 relative">
+      
+      <div *ngIf="!usuarioSeleccionado" class="relative">
+        <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" style="font-size: 18px;">search</mat-icon>
+        <input 
+          type="text"
+          [value]="textoBusqueda"
+          (input)="filtrarUsuarios($event)"
+          placeholder="Escriba nombre o DNI para buscar..."
+          class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium"
+        >
+      </div>
+
+      <div *ngIf="usuarioSeleccionado" 
+        class="flex items-center justify-between w-full px-4 py-2 bg-blue-50 border-2 border-blue-200 rounded-xl animate-in fade-in zoom-in duration-300">
+        <div class="flex items-center gap-3">
+          <div class="p-2 bg-blue-600 text-white rounded-lg">
+            <mat-icon style="font-size: 20px; width: 20px; height: 20px;">person</mat-icon>
+          </div>
+          <div>
+            <p class="text-sm font-black text-blue-900 leading-none">
+              {{ usuarioSeleccionado.persona?.nombres || usuarioSeleccionado.nombres }} {{ usuarioSeleccionado.persona?.apellidos || usuarioSeleccionado.apellidos }}
+            </p>
+            <p class="text-[10px] text-blue-600 font-bold uppercase tracking-tight">
+              DNI: {{ usuarioSeleccionado.persona?.dni || usuarioSeleccionado.dni }} • Seleccionado
+            </p>
+          </div>
+        </div>
+        <button type="button" (click)="limpiarSeleccion()" 
+          class="p-1 hover:bg-blue-200 text-blue-600 rounded-full transition-colors" title="Cambiar usuario">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div *ngIf="!usuarioSeleccionado && mostrarResultados && usuariosFiltrados.length > 0" 
+        class="absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-xl shadow-2xl max-h-48 overflow-y-auto border-t-4 border-t-blue-500">
+        <div 
+          *ngFor="let u of usuariosFiltrados"
+          (click)="seleccionarUsuario(u)"
+          class="px-4 py-3 hover:bg-blue-50 cursor-pointer border-b border-slate-50 last:border-none group"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col">
+              <span class="text-sm font-bold text-slate-700 group-hover:text-blue-700">
+                {{ u.persona?.nombres || u.nombres }} {{ u.persona?.apellidos || u.apellidos }}
+              </span>
+              <span class="text-[10px] text-slate-400 font-mono">DNI: {{ u.persona?.dni || u.dni }}</span>
+            </div>
+            <mat-icon class="text-slate-200 group-hover:text-blue-500">add_circle_outline</mat-icon>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <button *ngIf="!usuarioSeleccionado" type="button" (click)="agregarNuevoUsuario()" 
+      class="bg-blue-50 text-blue-600 p-3 rounded-xl hover:bg-blue-100 transition-colors">
+      <mat-icon>person_add</mat-icon>
+    </button>
+  </div>
+  
+  <input type="hidden" formControlName="usuarioId">
+</div>
+
+   <div>
+  <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Área / Actividad</label>
+  <div class="flex gap-2">
+    <select formControlName="tipoActividadId" (change)="onActividadChange()"
+      class="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium">
+      <option [value]="null" disabled>Seleccione área...</option>
+      <option *ngFor="let t of tiposActividad" [value]="t.id">
+        {{ t.nombre }}
+      </option>
+    </select>
+    <button type="button" class="bg-emerald-50 text-emerald-600 p-3 rounded-xl hover:bg-emerald-100 transition-colors">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Modalidad de Pago</label>
+      <select formControlName="tipoPago"
+        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-medium disabled:bg-slate-100 disabled:text-slate-400">
+        <option value="PAGO_MENSUAL">Sueldo Mensual (Fijo)</option>
+        <option value="PAGO_HORA">Pago por Hora (Variable)</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Monto Base (S/)</label>
+      <div class="relative">
+        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">S/</span>
+        <input type="number" formControlName="montoBase" 
+          class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-mono text-slate-700"
+          placeholder="0.00">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Horas Jornada Diaria</label>
+      <input type="number" formControlName="horasJornada" 
+        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
+        placeholder="Ej: 8">
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Días Laborables Mes</label>
+      <input type="number" formControlName="diasLaborablesMes" 
+        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-slate-700"
+        placeholder="Ej: 30">
+    </div>
+
+    <div>
+      <label class="block text-xs font-bold text-slate-500 uppercase mb-2 ml-1">Estado</label>
+      <select formControlName="estado"
+        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-700 font-bold">
+        <option value="ACTIVO">ACTIVO</option>
+        <option value="INACTIVO">INACTIVO</option>
+        <option value="TERMINADO">TERMINADO</option>
+      </select>
+    </div>
+
+    <div class="md:col-span-2 flex justify-end gap-3 mt-6 border-t border-slate-100 pt-6">
+      <button type="button" (click)="dialogRef.close()"
+        class="px-6 py-3 text-slate-500 font-bold text-sm hover:text-slate-800 transition-colors uppercase tracking-widest">
+        Cancelar
+      </button>
+      <button type="submit" [disabled]="contratoForm.invalid"
+        class="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-600/20 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all uppercase tracking-widest">
+        {{ data?.contratoSelected ? 'Actualizar Contrato' : 'Crear Contrato' }}
+      </button>
+    </div>
+  </form>
+</div>

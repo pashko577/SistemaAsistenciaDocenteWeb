@@ -55,6 +55,9 @@ export class AdministrativoFormComponent implements OnInit {
       this.adminForm.get('dni')?.disable();
       this.adminForm.get('password')?.clearValidators();
       this.adminForm.get('password')?.updateValueAndValidity();
+
+      // Si quieres que el estado no se pueda cambiar manualmente en el formulario:
+    // this.adminForm.get('estado')?.disable();
     }
   }
 
@@ -98,10 +101,10 @@ export class AdministrativoFormComponent implements OnInit {
   }
 
   guardar() {
-    if (this.adminForm.invalid) {
-      this.adminForm.markAllAsTouched();
-      return;
-    }
+  if (this.adminForm.invalid) {
+    this.adminForm.markAllAsTouched();
+    return;
+  }
 
     const formValues = this.adminForm.getRawValue();
     const payload = {
@@ -109,7 +112,8 @@ export class AdministrativoFormComponent implements OnInit {
       celular: String(formValues.celular),
       sedeId: Number(formValues.sedeId),
       tipoDocumentoId: Number(formValues.tipoDocumentoId),
-      cargoAdministrativoId: Number(formValues.cargoAdministrativoId)
+      cargoAdministrativoId: Number(formValues.cargoAdministrativoId),
+      estado: formValues.estado || 'ACTIVO'
     };
 
     const operacion = this.data.adminSelected 

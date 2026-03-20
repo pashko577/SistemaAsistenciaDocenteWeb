@@ -19,7 +19,7 @@ public class ContratoRequestDTO {
 
     private Integer horasJornada;
 
-    private Integer diasLaboralesMes;
+    private Integer diasLaborablesMes;
 
     private Long usuarioId;
 
