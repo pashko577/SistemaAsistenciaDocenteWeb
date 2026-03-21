@@ -1,5 +1,6 @@
 export interface DocenteResponse {
   id: number;
+  usuarioId: number;
   dni: string;
   nombres: string;
   apellidos: string;

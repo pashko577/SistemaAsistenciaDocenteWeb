@@ -30,6 +30,7 @@ export class ContratoFormComponent implements OnInit {
   contratoForm: FormGroup;
   tiposActividad: TipoActividadResponse[] = [];
   usuarios: any[] = [];
+  tiposActividadFiltrados: TipoActividadResponse[] = [];
 
   // --- PROPIEDADES PARA EL BUSCADOR ---
   usuariosFiltrados: any[] = [];
@@ -64,35 +65,22 @@ export class ContratoFormComponent implements OnInit {
   }
 
  cargarDatosIniciales() {
-    // 1. Cargar Áreas (Tipos de Actividad)
-    this.tipoActividadService.listar().subscribe({
-      next: (res) => {
-        this.tiposActividad = res;
-        this.verificarEdicion();
-        this.cd.detectChanges();
-      },
-      error: (err) => console.error('Error al cargar áreas:', err)
-    });
-    
-    // 2. Cargar Personal COMBINADO y FILTRADO
+    // Usamos forkJoin para asegurarnos de tener TODO antes de intentar filtrar o editar
     forkJoin({
+      actividades: this.tipoActividadService.listar(),
       admins: this.adminService.listar(),
       docentes: this.docenteService.listarDocentes(),
     }).subscribe({
-      next: ({ admins, docentes }) => {
-        // Unimos ambas listas
-        const todos = [...admins, ...docentes];
+      next: ({ actividades, admins, docentes }) => {
+        this.tiposActividad = actividades;
+        this.usuarios = [...admins, ...docentes].filter(u => u.estado === 'ACTIVO');
 
-        // FILTRO: Solo dejamos a los que tienen estado 'ACTIVO'
-        // Si en tu base de datos el string es diferente (ej. 'Activo' o '1'), cámbialo aquí.
-        this.usuarios = todos.filter(u => u.estado === 'ACTIVO');
-        
-        console.log('Personal Activo Cargado:', this.usuarios);
-        
+        // IMPORTANTE: Si estamos editando, los datos ya deben estar listos
         this.verificarEdicion();
+        
         this.cd.detectChanges();
       },
-      error: (err) => console.error('Error al cargar el personal:', err)
+      error: (err) => console.error('Error al cargar datos iniciales:', err)
     });
   }
 
@@ -114,36 +102,80 @@ export class ContratoFormComponent implements OnInit {
     }
   }
 
+// En seleccionarUsuario(u: any)
 seleccionarUsuario(u: any) {
-  this.usuarioSeleccionado = u;
-  const nombre = `${u.persona?.nombres || u.nombres} ${u.persona?.apellidos || u.apellidos}`;
-  this.textoBusqueda = nombre;
-  
-  this.contratoForm.get('usuarioId')?.setValue(u.usuarioId || u.id);
-  
-  this.mostrarResultados = false;
-  this.cd.detectChanges();
-}
-limpiarSeleccion() {
-  this.usuarioSeleccionado = null;
-  this.textoBusqueda = '';
-  this.contratoForm.get('usuarioId')?.setValue(null);
-  this.usuariosFiltrados = [];
-  this.cd.detectChanges();
-}
- private verificarEdicion() {
-  if (this.data?.contratoSelected) {
-    this.contratoForm.patchValue(this.data.contratoSelected);
+    this.usuarioSeleccionado = u;
+    this.textoBusqueda = `${u.nombres || u.persona?.nombres} ${u.apellidos || u.persona?.apellidos}`;
     
-    const usuario = this.usuarios.find(u => (u.usuarioId || u.id) === this.data.contratoSelected.usuarioId);
-    if (usuario) {
-      this.usuarioSeleccionado = usuario; // <--- Importante
-      this.textoBusqueda = `${usuario.persona?.nombres || usuario.nombres} ${usuario.persona?.apellidos || usuario.apellidos}`;
-    }
-    this.onActividadChange();
-  }
+    const idFinal = u.usuarioId || u.id; 
+    this.contratoForm.get('usuarioId')?.setValue(idFinal);
+
+    // DETERMINAR FILTRO INICIAL
+    // Si tiene especialidadId, es prioritariamente DOCENTE, sino ADMINISTRATIVO
+    const esDocente = !!(u.especialidadId || u.nombreEspecialidad);
+    const planillaSugerida = esDocente ? 'DOCENTE' : 'ADMINISTRATIVO';
+
+    // FILTRADO: Mostramos la planilla sugerida
+    this.tiposActividadFiltrados = this.tiposActividad.filter(t => t.tipoPlanilla === planillaSugerida);
+
+    // OPCIONAL: Si quieres que SIEMPRE aparezcan todas, simplemente comenta el filtro anterior y usa:
+    // this.tiposActividadFiltrados = [...this.tiposActividad];
+
+    this.contratoForm.get('tipoActividadId')?.enable();
+    this.contratoForm.get('tipoActividadId')?.setValue(null);
+    this.mostrarResultados = false;
+    this.cd.detectChanges();
 }
 
+// En limpiarSeleccion()
+limpiarSeleccion() {
+    this.usuarioSeleccionado = null;
+    this.textoBusqueda = '';
+    this.contratoForm.get('usuarioId')?.setValue(null);
+    this.contratoForm.get('tipoActividadId')?.setValue(null);
+    this.contratoForm.get('tipoActividadId')?.disable(); // Lo bloqueamos de nuevo
+    this.usuariosFiltrados = [];
+    this.cd.detectChanges();
+  }
+private verificarEdicion() {
+  if (this.data?.contratoSelected) {
+    const selected = this.data.contratoSelected;
+    
+    // 1. Buscamos al usuario usando el usuarioId del contrato
+    const usuario = this.usuarios.find(u => (u.usuarioId || u.id) === selected.usuarioId);
+    
+    if (usuario) {
+      this.usuarioSeleccionado = usuario;
+      this.textoBusqueda = `${usuario.nombres || usuario.persona?.nombres} ${usuario.apellidos || usuario.persona?.apellidos}`;
+      
+      // 2. FILTRO CRUCIAL: Generar la lista filtrada ANTES de parchar el formulario
+      // Verificamos si es docente por sus propiedades únicas
+      const esDocente = !!(usuario.especialidadId || usuario.nombreEspecialidad);
+      const planillaRequerida = esDocente ? 'DOCENTE' : 'ADMINISTRATIVO';
+
+      this.tiposActividadFiltrados = this.tiposActividad.filter(t => t.tipoPlanilla === planillaRequerida);
+      
+      // 3. Habilitar el control para que acepte el valor
+      this.contratoForm.get('tipoActividadId')?.enable();
+    }
+
+    // 4. Parchamos los valores. 
+    // IMPORTANTE: Asegúrate de que selected.tipoActividadId sea un número.
+    this.contratoForm.patchValue({
+      usuarioId: selected.usuarioId,
+      tipoActividadId: selected.tipoActividadId, // <--- Esto ahora funcionará porque la lista ya existe
+      tipoPago: selected.tipoPago,
+      montoBase: selected.montoBase,
+      horasJornada: selected.horasJornada,
+      diasLaborablesMes: selected.diasLaborablesMes,
+      estado: selected.estado
+    });
+
+    // Ejecutamos la lógica de bloqueo de pago si es administrativo
+    this.onActividadChange();
+    this.cd.detectChanges();
+  }
+}
   onActividadChange() {
     const selectedId = this.contratoForm.get('tipoActividadId')?.value;
     const actividad = this.tiposActividad.find(t => t.id == selectedId);
