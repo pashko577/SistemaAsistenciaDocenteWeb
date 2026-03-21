@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class DocenteResponseDTO {
     private Long id;
     private String dni;
+    private Long usuarioId; // <--- Agrega este campo
     private Long sedeId; // <--- AGREGAR ESTO
     private String nombreSede;
     private Long especialidadId; // <--- AGREGAR ESTO

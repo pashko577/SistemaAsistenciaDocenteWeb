@@ -11,6 +11,7 @@ import com.example.actividades_app.enums.Estado;
 import com.example.actividades_app.enums.TipoPlanilla;
 import com.example.actividades_app.model.Entity.Contrato;
 import com.example.actividades_app.model.Entity.Contrato.TipoPago;
+import com.example.actividades_app.model.Entity.Persona;
 import com.example.actividades_app.model.Entity.TipoActividad;
 import com.example.actividades_app.model.Entity.Usuario;
 import com.example.actividades_app.model.dto.Contrato.ContratoRequestDTO;
@@ -32,43 +33,41 @@ public class ContratoServiceImpl implements ContratoService {
     // =========================
     // CREAR
     // =========================
-    @Override
-    public ContratoResponseDTO crear(ContratoRequestDTO dto) {
+   @Override
+public ContratoResponseDTO crear(ContratoRequestDTO dto) {
+    Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+    TipoActividad tipoActividad = tipoActividadRepository.findById(dto.getTipoActividadId())
+            .orElseThrow(() -> new RuntimeException("Tipo actividad no encontrada"));
 
-        TipoActividad tipoActividad = tipoActividadRepository
-                .findById(dto.getTipoActividadId())
-                .orElseThrow(() -> new RuntimeException("Tipo actividad no encontrada"));
-
-                if (contratoRepository.existsByUsuarioIdAndTipoActividadIdAndEstado(
-        usuario.getId(),
-        tipoActividad.getId(),
-        Estado.ACTIVO)) {
-
-    throw new RuntimeException("El usuario ya tiene un contrato activo para esta actividad");
-}
-        if (tipoActividad.getTipoPlanilla() == TipoPlanilla.ADMINISTRATIVO
-                && dto.getTipoPago() == TipoPago.PAGO_HORA) {
-
-            throw new RuntimeException("Administrativo no puede tener pago por hora");
-        }
-
-        Contrato contrato = Contrato.builder()
-                .tipoPago(dto.getTipoPago())
-                .montoBase(dto.getMontoBase())
-                .horasJornada(dto.getHorasJornada())
-                .diasLaborablesMes(dto.getDiasLaborablesMes())
-                .estado(dto.getEstado())
-                .usuario(usuario)
-                .tipoActividad(tipoActividad)
-                .build();
-
-        contratoRepository.save(contrato);
-
-        return mapToDTO(contrato);
+    // CAMBIO: Ahora solo bloqueamos si intenta registrar la MISMA actividad dos veces como ACTIVA
+    if (contratoRepository.existsByUsuarioIdAndTipoActividadIdAndEstado(
+            usuario.getId(),
+            tipoActividad.getId(),
+            Estado.ACTIVO)) {
+        throw new RuntimeException("El usuario ya tiene un contrato activo para la actividad: " + tipoActividad.getNombre());
     }
+
+    // Validaciones de negocio (Administrativo no pago por hora) se mantienen...
+    if (tipoActividad.getTipoPlanilla() == TipoPlanilla.ADMINISTRATIVO
+            && dto.getTipoPago() == TipoPago.PAGO_HORA) {
+        throw new RuntimeException("Un administrativo no puede tener pago por hora.");
+    }
+
+    Contrato contrato = Contrato.builder()
+            .tipoPago(dto.getTipoPago())
+            .montoBase(dto.getMontoBase())
+            .horasJornada(dto.getHorasJornada())
+            .diasLaborablesMes(dto.getDiasLaborablesMes())
+            .estado(dto.getEstado())
+            .usuario(usuario)
+            .tipoActividad(tipoActividad)
+            .build();
+
+    contratoRepository.save(contrato);
+    return mapToDTO(contrato);
+}
 
     // =========================
     // ACTUALIZAR
@@ -140,19 +139,19 @@ public class ContratoServiceImpl implements ContratoService {
     // =========================
     // MAPPER
     // =========================
-   private ContratoResponseDTO mapToDTO(Contrato contrato) {
-    // Extraemos info del usuario y su persona
-    String nombreCompleto = "";
-    String dni = "";
+private ContratoResponseDTO mapToDTO(Contrato contrato) {
+    String nombreCompleto = "Sin Nombre Corregido";
+    String dni = "---";
+    
+    // Accedemos a la cadena: Contrato -> Usuario -> Persona
     if (contrato.getUsuario() != null && contrato.getUsuario().getPersona() != null) {
-        nombreCompleto = contrato.getUsuario().getPersona().getNombres() + " " + 
-                         contrato.getUsuario().getPersona().getApellidos();
-        dni = contrato.getUsuario().getPersona().getDni();
+        Persona p = contrato.getUsuario().getPersona();
+        nombreCompleto = p.getNombres() + " " + p.getApellidos();
+        dni = p.getDni();
+    } else if (contrato.getUsuario() != null) {
+        // Fallback: Si no tiene persona vinculada por algún error de datos
+        dni = "ID Usuario: " + contrato.getUsuario().getId();
     }
-
-    // Extraemos info de la actividad
-    String actividad = (contrato.getTipoActividad() != null) ? contrato.getTipoActividad().getNombre() : "N/A";
-    String planilla = (contrato.getTipoActividad() != null) ? contrato.getTipoActividad().getTipoPlanilla().name() : "N/A";
 
     return ContratoResponseDTO.builder()
             .id(contrato.getId())
@@ -160,11 +159,11 @@ public class ContratoServiceImpl implements ContratoService {
             .montoBase(contrato.getMontoBase())
             .horasJornada(contrato.getHorasJornada())
             .diasLaborablesMes(contrato.getDiasLaborablesMes())
-            .usuarioId(contrato.getUsuario().getId())
-            .usuarioNombre(nombreCompleto) // <--- Nuevo
-            .usuarioDni(dni)               // <--- Nuevo
-            .nombreActividad(actividad)    // <--- Nuevo
-            .tipoPlanilla(planilla)        // <--- Nuevo
+            .usuarioId(contrato.getUsuario() != null ? contrato.getUsuario().getId() : null)
+            .usuarioNombre(nombreCompleto) // <--- Se llena con nombres y apellidos de Persona
+            .usuarioDni(dni)              // <--- Se llena con el DNI de Persona
+            .nombreActividad(contrato.getTipoActividad() != null ? contrato.getTipoActividad().getNombre() : "N/A")
+            .tipoPlanilla(contrato.getTipoActividad() != null ? contrato.getTipoActividad().getTipoPlanilla().name() : "N/A")
             .estado(contrato.getEstado())
             .tipoActividadId(contrato.getTipoActividad() != null ? contrato.getTipoActividad().getId() : null)
             .build();

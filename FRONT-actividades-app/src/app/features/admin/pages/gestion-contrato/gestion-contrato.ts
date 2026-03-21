@@ -27,21 +27,22 @@ export class GestionContrato implements OnInit {
     this.cargarContratos();
   }
 
-  cargarContratos() {
-    this.loading = true;
-    this.contratoService.listar().subscribe({
-      next: (res) => {
-        this.contratos = [...res]; // 3. Usar el operador spread para crear una nueva referencia
-        this.loading = false;
-        this.cdr.detectChanges(); // 4. Forzar la detección de cambios
-      },
-      error: (err) => {
-        console.error('Error al cargar contratos', err);
-        this.loading = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
+cargarContratos() {
+  this.loading = true;
+  this.contratoService.listar().subscribe({
+    next: (res) => {
+      // Forzamos una nueva referencia para que Angular detecte el cambio de contenido
+      this.contratos = [...res]; 
+      this.loading = false;
+      this.cdr.detectChanges(); // Refresca la vista inmediatamente
+    },
+    error: (err) => {
+      console.error('Error al cargar contratos', err);
+      this.loading = false;
+      this.cdr.detectChanges();
+    }
+  });
+}
   abrirFormulario(contrato?: ContratoResponse) {
     const dialogRef = this.dialog.open(ContratoFormComponent, {
       width: '650px',
