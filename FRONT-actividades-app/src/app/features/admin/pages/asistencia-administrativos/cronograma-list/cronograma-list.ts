@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core'; // Añadimos OnInit
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -6,7 +6,10 @@ import { CronogramaAdministrativoRequest } from '../../../../../core/models/Admi
 import { CronogramaAdministrativoResponse } from '../../../../../core/models/Administrativos/cronogramaadministrativo-response';
 import { DiaSemana } from '../../../../../core/models/enums/dia-semana';
 import { CronogramaAdministrativoService } from '../../../../../core/services/cronograma-administrativo';
+// IMPORTANTE: Importa tu servicio de administrativos y el modelo de respuesta
 
+import { AdministrativoResponse } from '../../../../../core/models/Administrativos/administrativo-response';
+import { AdministrativoService } from '../../../../../core/services/administrativo_services';
 
 @Component({
   selector: 'app-cronograma-list',
@@ -14,10 +17,13 @@ import { CronogramaAdministrativoService } from '../../../../../core/services/cr
   imports: [CommonModule, FormsModule],
   templateUrl: './cronograma-list.html'
 })
-export class CronogramaList {
+export class CronogramaList implements OnInit { // Implementamos OnInit
   cronogramas: CronogramaAdministrativoResponse[] = [];
   
-  // Usamos el Enum para inicializar
+  // NUEVAS PROPIEDADES PARA EL BUSCADOR
+  administrativos: AdministrativoResponse[] = [];
+  nombreBusqueda: string = ''; 
+
   nuevo: CronogramaAdministrativoRequest = {
     administrativoId: 0,
     diaSemana: DiaSemana.LUNES,
@@ -25,12 +31,40 @@ export class CronogramaList {
     horaSalida: '17:00'
   };
 
-  // Para el combo de días en el HTML
   listaDias = Object.values(DiaSemana);
 
-  constructor(private service: CronogramaAdministrativoService) {}
+  constructor(
+    private service: CronogramaAdministrativoService,
+    private adminService: AdministrativoService // Inyectamos el servicio
+  ) {}
 
-  // Buscar cronogramas cuando se cambia el ID
+  ngOnInit() {
+    this.cargarAdministrativos();
+  }
+
+  // Carga la lista inicial para el Datalist
+  cargarAdministrativos() {
+    this.adminService.listar().subscribe({
+      next: (data) => this.administrativos = data,
+      error: () => console.error('Error al cargar personal')
+    });
+  }
+
+  // Se ejecuta cuando el usuario selecciona o escribe en el buscador
+  onAdminChange() {
+    const encontrado = this.administrativos.find(
+      a => `${a.nombres} ${a.apellidos}` === this.nombreBusqueda
+    );
+
+    if (encontrado) {
+      this.nuevo.administrativoId = encontrado.id;
+      this.buscarCronogramas();
+    } else {
+      this.nuevo.administrativoId = 0;
+      this.cronogramas = []; // Limpiamos la tabla si no hay selección válida
+    }
+  }
+
   buscarCronogramas() {
     if (this.nuevo.administrativoId > 0) {
       this.service.listarPorAdministrativo(this.nuevo.administrativoId).subscribe(data => {
@@ -40,10 +74,15 @@ export class CronogramaList {
   }
 
   guardar() {
+    if (this.nuevo.administrativoId === 0) {
+      alert('Por favor, seleccione un administrativo válido de la lista.');
+      return;
+    }
+
     this.service.crear(this.nuevo).subscribe({
       next: () => {
         alert('Turno registrado correctamente');
-        this.buscarCronogramas(); // Refrescar tabla
+        this.buscarCronogramas();
       },
       error: (err) => alert(err.error?.message || 'Error al guardar')
     });

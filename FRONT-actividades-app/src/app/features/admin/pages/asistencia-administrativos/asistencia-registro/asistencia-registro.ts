@@ -49,27 +49,29 @@ export class AsistenciaRegistro implements OnInit {
     });
   }
 
-  private cruzarDatos(cronos: any[], asistencias: any[]) {
-    this.asistenciasView = cronos.map(c => {
-      const asis = asistencias.find(a => a.administrativoId === c.administrativoId);
+private cruzarDatos(cronos: any[], asistencias: any[]) {
+  this.asistenciasView = cronos.map(c => {
+    const asis = asistencias.find(a => a.administrativoId === c.administrativoId);
 
-      return {
-        id: asis?.id || null,
-        administrativoId: c.administrativoId,
-        cronogramaId: c.id,
-        nombre: c.nombreAdministrativo || `Admin ID: ${c.administrativoId}`,
-        horaEntradaProg: c.horaEntrada,
-        horaIngreso: asis?.horaIngreso || '',
-        salidaAlmuerzo: asis?.salidaAlmuerzo || '',
-        retornoAlmuerzo: asis?.retornoAlmuerzo || '',
-        horaSalida: asis?.horaSalida || '',
-        terno: asis ? asis.terno : true,
-        observaciones: asis?.observaciones || '',
-        tardanza: asis?.tardanza || 0,
-        editado: false
-      };
-    });
-  }
+    return {
+      id: asis?.id || null,
+      administrativoId: c.administrativoId,
+      cronogramaId: c.id,
+      // Usamos los campos que acabas de mapear en Java
+      nombre: `${c.nombres} ${c.apellidos}`, 
+      horaEntradaProg: c.horaEntrada,
+      horaIngreso: asis?.horaIngreso || '',
+      salidaAlmuerzo: asis?.salidaAlmuerzo || '',
+      retornoAlmuerzo: asis?.retornoAlmuerzo || '',
+      horaSalida: asis?.horaSalida || '',
+      terno: asis ? asis.terno : true,
+      // Importante: mapear observaciones para que se vean en la tabla
+      observaciones: asis?.observaciones || '', 
+      tardanza: asis?.tardanza || 0,
+      editado: false
+    };
+  });
+}
 
   guardarFila(fila: any) {
     const dto = {
