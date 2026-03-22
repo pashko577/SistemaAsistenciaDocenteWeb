@@ -65,30 +65,33 @@ public class AsistenciaAdministrativoController {
     // LISTAR POR ADMINISTRATIVO
     // =========================
     @GetMapping("/administrativo/{administrativoId}")
-    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>>
-    listarPorAdministrativo(@PathVariable Long administrativoId) {
+    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorAdministrativo(
+            @PathVariable Long administrativoId) {
 
         return ResponseEntity.ok(
-                asistenciaService.listarPorAdministrativo(administrativoId)
-        );
+                asistenciaService.listarPorAdministrativo(administrativoId));
+    }
+
+    // Agrega esto a AsistenciaAdministrativoController.java
+
+    @GetMapping("/fecha/{fecha}")
+    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorFecha(
+            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        // Nota: Necesitas agregar este método a tu Service y Repository de Java
+        return ResponseEntity.ok(asistenciaService.listarPorFecha(fecha));
     }
 
     // =========================
     // LISTAR POR PERIODO
     // =========================
     @GetMapping("/periodo/{administrativoId}")
-    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>>
-    listarPorPeriodo(
+    public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorPeriodo(
             @PathVariable Long administrativoId,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate inicio,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate fin) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fin) {
 
         return ResponseEntity.ok(
-                asistenciaService.listarPorPeriodo(administrativoId, inicio, fin)
-        );
+                asistenciaService.listarPorPeriodo(administrativoId, inicio, fin));
     }
+
 }

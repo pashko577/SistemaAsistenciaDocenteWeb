@@ -2,9 +2,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AdministrativoResponse } from '../models/administrativo-response';
-import { AdministrativoRequest } from '../models/administrativo-request';
-import { CargoAdministrativoResponse } from '../models/cargo-administrativo-response';
+import { AdministrativoResponse } from '../models/Administrativos/administrativo-response';
+import { AdministrativoRequest } from '../models/Administrativos/administrativo-request';
+import { CargoAdministrativoResponse } from '../models/Administrativos/cargo-administrativo-response';
 import { TipoDocumentoResponse } from '../models/tipo-documento-response';
 import { SedeResponse } from '../models/sede-response';
 

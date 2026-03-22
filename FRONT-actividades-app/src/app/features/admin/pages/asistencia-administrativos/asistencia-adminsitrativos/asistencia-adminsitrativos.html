@@ -1,0 +1,38 @@
+<div class="min-h-screen bg-gray-50 p-4 sm:p-8">
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="bg-white rounded-t-xl shadow-sm border-b border-gray-200 p-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800 italic tracking-tight">Módulo de Asistencia</h1>
+          <p class="text-xs text-gray-400 uppercase font-black tracking-widest">Personal Administrativo</p>
+        </div>
+
+        <div class="flex bg-gray-100 p-1 rounded-xl w-fit">
+          <button (click)="tab = 'registro'"
+            [ngClass]="tab === 'registro' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+            class="px-6 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+            <span class="text-base">📝</span> REGISTRO DIARIO
+          </button>
+          <button (click)="tab = 'horarios'"
+            [ngClass]="tab === 'horarios' ? 'bg-white text-indigo-700 shadow-sm' : 'text-gray-500 hover:text-gray-700'"
+            class="px-6 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-2">
+            <span class="text-base">⚙️</span> CONFIGURAR HORARIOS
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded-b-xl overflow-hidden min-h-[500px]">
+      
+      <div *ngIf="tab === 'registro'" class="animate-in fade-in duration-300">
+        <app-asistencia-registro></app-asistencia-registro>
+      </div>
+
+      <div *ngIf="tab === 'horarios'" class="animate-in slide-in-from-bottom-2 duration-300">
+        <app-cronograma-list></app-cronograma-list>
+      </div>
+
+    </div>
+  </div>
+</div>

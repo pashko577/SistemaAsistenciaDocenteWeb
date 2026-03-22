@@ -20,6 +20,8 @@ public interface AsistenciaAdministrativoService {
 
     List<AsistenciaAdministrativoResponseDTO> listarPorAdministrativo(Long administrativoId);
 
+     List<AsistenciaAdministrativoResponseDTO> listarPorFecha(LocalDate fecha);
+
     List<AsistenciaAdministrativoResponseDTO> listarPorPeriodo(
             Long administrativoId,
             LocalDate inicio,
