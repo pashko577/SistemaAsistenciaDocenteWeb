@@ -154,15 +154,16 @@ public class CronogramaAdministrativoServiceImpl
     // ============================
     // MAPPER
     // ============================
-    private CronogramaAdministrativoResponseDTO mapToDTO(
-            CronogramaAdministrativo entity) {
-
-        return CronogramaAdministrativoResponseDTO.builder()
-                .id(entity.getId())
-                .horaEntrada(entity.getHoraEntrada())
-                .horaSalida(entity.getHoraSalida())
-                .diaSemana(entity.getDiaSemana().name())
-                .administrativoId(entity.getAdministrativo().getId())
-                .build();
-    }
+private CronogramaAdministrativoResponseDTO mapToDTO(CronogramaAdministrativo entity) {
+    return CronogramaAdministrativoResponseDTO.builder()
+            .id(entity.getId())
+            .horaEntrada(entity.getHoraEntrada())
+            .horaSalida(entity.getHoraSalida())
+            .diaSemana(entity.getDiaSemana().name())
+            .administrativoId(entity.getAdministrativo().getId())
+            // Navegamos al objeto administrativo para traer los datos reales
+            .nombres(entity.getAdministrativo().getUsuario().getPersona().getNombres()) 
+            .apellidos(entity.getAdministrativo().getUsuario().getPersona().getApellidos())
+            .build();
+}
 }

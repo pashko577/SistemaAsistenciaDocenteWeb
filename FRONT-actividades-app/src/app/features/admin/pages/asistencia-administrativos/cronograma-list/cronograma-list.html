@@ -7,11 +7,30 @@
         <p class="text-xs text-indigo-100">Configura los turnos base para el control de asistencia.</p>
       </div>
 
-      <div class="p-6 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-        <div>
-          <label class="block text-[10px] font-black text-gray-500 uppercase mb-1 tracking-wider">ID Empleado</label>
-          <input type="number" [(ngModel)]="nuevo.administrativoId" (change)="buscarCronogramas()"
-                 class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+      <div class="p-6 grid grid-cols-1 md:grid-cols-6 gap-4 items-end">
+        
+        <div class="md:col-span-2">
+          <label class="block text-[10px] font-black text-gray-500 uppercase mb-1 tracking-wider">Personal Administrativo</label>
+          <div class="relative">
+            <input 
+              type="text"
+              list="adminList" 
+              [(ngModel)]="nombreBusqueda" 
+              (change)="onAdminChange()"
+              placeholder="Buscar por nombre..."
+              class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+              [ngClass]="{'border-emerald-500 ring-1 ring-emerald-500': nuevo.administrativoId > 0}"
+            >
+            <datalist id="adminList">
+              <option *ngFor="let admin of administrativos" [value]="admin.nombres + ' ' + admin.apellidos">
+                {{ admin.nombreCargo }}
+              </option>
+            </datalist>
+            
+            <span *ngIf="nuevo.administrativoId > 0" class="absolute right-3 top-2.5 text-emerald-500">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            </span>
+          </div>
         </div>
 
         <div>
@@ -35,7 +54,8 @@
         </div>
 
         <button (click)="guardar()" 
-                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-md">
+                [disabled]="nuevo.administrativoId === 0"
+                class="bg-indigo-600 hover:bg-indigo-700 disabled:bg-gray-400 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-md">
           AÑADIR TURNO
         </button>
       </div>

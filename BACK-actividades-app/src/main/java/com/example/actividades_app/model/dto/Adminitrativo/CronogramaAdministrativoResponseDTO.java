@@ -25,4 +25,7 @@ public class CronogramaAdministrativoResponseDTO {
     private String diaSemana;
 
     private Long administrativoId;
+
+    private String nombres;
+    private String apellidos;
 }
