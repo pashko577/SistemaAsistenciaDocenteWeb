@@ -11,7 +11,7 @@ import com.example.actividades_app.service.CronogramaAdministrativoService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/cronogramas-administrativos")
+@RequestMapping("/api/cronograma-administrativo")
 @RequiredArgsConstructor
 public class CronogramaAdministrativoController {
 

@@ -1,4 +1,4 @@
-import { Estado } from "./enums/estado";
+import { Estado } from "../enums/estado";
 
 export interface AdministrativoResponse {
   id: number;

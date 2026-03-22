@@ -1,0 +1,73 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto space-y-6">
+    
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div class="bg-indigo-700 p-4 text-white">
+        <h2 class="text-lg font-bold">Gestión de Horarios Administrativos</h2>
+        <p class="text-xs text-indigo-100">Configura los turnos base para el control de asistencia.</p>
+      </div>
+
+      <div class="p-6 grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase mb-1 tracking-wider">ID Empleado</label>
+          <input type="number" [(ngModel)]="nuevo.administrativoId" (change)="buscarCronogramas()"
+                 class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase mb-1 tracking-wider">Día de Semana</label>
+          <select [(ngModel)]="nuevo.diaSemana" 
+                  class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+            <option *ngFor="let dia of listaDias" [value]="dia">{{ dia }}</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase mb-1 tracking-wider">Hora Entrada</label>
+          <input type="time" [(ngModel)]="nuevo.horaEntrada" 
+                 class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-gray-500 uppercase mb-1 tracking-wider">Hora Salida</label>
+          <input type="time" [(ngModel)]="nuevo.horaSalida" 
+                 class="w-full bg-gray-50 border border-gray-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none">
+        </div>
+
+        <button (click)="guardar()" 
+                class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition-all shadow-md">
+          AÑADIR TURNO
+        </button>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden" *ngIf="cronogramas.length > 0">
+      <table class="w-full text-sm text-left">
+        <thead class="bg-gray-50 border-b border-gray-100">
+          <tr>
+            <th class="px-6 py-4 font-bold text-gray-600">DÍA</th>
+            <th class="px-6 py-4 font-bold text-gray-600">ENTRADA</th>
+            <th class="px-6 py-4 font-bold text-gray-600">SALIDA</th>
+            <th class="px-6 py-4 text-right font-bold text-gray-600">GESTIÓN</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+          <tr *ngFor="let c of cronogramas" class="hover:bg-indigo-50/30 transition-colors">
+            <td class="px-6 py-4 font-bold text-indigo-700">{{ c.diaSemana }}</td>
+            <td class="px-6 py-4 font-mono text-gray-600">{{ c.horaEntrada }}</td>
+            <td class="px-6 py-4 font-mono text-gray-600">{{ c.horaSalida }}</td>
+            <td class="px-6 py-4 text-right">
+              <button (click)="eliminar(c.id)" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-tighter">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="cronogramas.length === 0 && nuevo.administrativoId > 0" class="text-center p-12 bg-white rounded-xl border-2 border-dashed border-gray-200">
+      <p class="text-gray-400 text-sm italic">Este administrativo no tiene horarios registrados para esta semana.</p>
+    </div>
+  </div>
+</div>

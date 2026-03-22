@@ -1,6 +1,6 @@
 package com.example.actividades_app.model.Entity;
 
-import java.time.LocalDate;
+
 import java.time.LocalTime;
 
 

@@ -27,6 +27,11 @@ export const routes: Routes = [
           .then(m => m.Dashboard)
       },
       {
+        path: 'asistencia-administrativo',
+        loadComponent: () => import('./features/admin/pages/asistencia-administrativos/asistencia-adminsitrativos/asistencia-adminsitrativos')
+          .then(m => m.AsistenciaAdministrativosMain)
+      },
+      {
         path: 'gestionDocente',
         loadComponent: () => import('./features/admin/pages/gestion-docente/gestion-docente')
           .then(m => m.GestionDocente)
@@ -37,10 +42,10 @@ export const routes: Routes = [
           .then(m => m.GestionAdministrativo)
       },
       {
-      path: 'gestionContrato', 
-      loadComponent: () => import('./features/admin/pages/gestion-contrato/gestion-contrato')
-         .then(m => m.GestionContrato)
-    }
+        path: 'gestionContrato',
+        loadComponent: () => import('./features/admin/pages/gestion-contrato/gestion-contrato')
+          .then(m => m.GestionContrato)
+      }
     ]
   },
 

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdministrativoService } from '../../../../core/services/administrativo_services';
 import { SedeResponse } from '../../../../core/models/sede-response';
-import { CargoAdministrativoResponse } from '../../../../core/models/cargo-administrativo-response';
+import { CargoAdministrativoResponse } from '../../../../core/models/Administrativos/cargo-administrativo-response';
 import { TipoDocumentoResponse } from '../../../../core/models/tipo-documento-response';
 import { forkJoin } from 'rxjs';
 

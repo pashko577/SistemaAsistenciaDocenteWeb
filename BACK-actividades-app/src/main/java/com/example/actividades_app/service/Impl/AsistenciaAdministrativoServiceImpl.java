@@ -168,6 +168,18 @@ public class AsistenciaAdministrativoServiceImpl implements AsistenciaAdministra
     }
 
     // =========================
+    // LISTAR POR FECHAS
+    // =========================
+
+    @Override
+    public List<AsistenciaAdministrativoResponseDTO> listarPorFecha(LocalDate fecha) {
+        return asistenciaRepository.findByFecha(fecha)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+
+    // =========================
     // ELIMINAR
     // =========================
     @Override
