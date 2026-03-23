@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'; // Añadimos OnInit
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core'; // Inyectamos CDR
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -6,8 +6,6 @@ import { CronogramaAdministrativoRequest } from '../../../../../core/models/Admi
 import { CronogramaAdministrativoResponse } from '../../../../../core/models/Administrativos/cronogramaadministrativo-response';
 import { DiaSemana } from '../../../../../core/models/enums/dia-semana';
 import { CronogramaAdministrativoService } from '../../../../../core/services/cronograma-administrativo';
-// IMPORTANTE: Importa tu servicio de administrativos y el modelo de respuesta
-
 import { AdministrativoResponse } from '../../../../../core/models/Administrativos/administrativo-response';
 import { AdministrativoService } from '../../../../../core/services/administrativo_services';
 
@@ -17,12 +15,11 @@ import { AdministrativoService } from '../../../../../core/services/administrati
   imports: [CommonModule, FormsModule],
   templateUrl: './cronograma-list.html'
 })
-export class CronogramaList implements OnInit { // Implementamos OnInit
+export class CronogramaList implements OnInit {
   cronogramas: CronogramaAdministrativoResponse[] = [];
-  
-  // NUEVAS PROPIEDADES PARA EL BUSCADOR
   administrativos: AdministrativoResponse[] = [];
   nombreBusqueda: string = ''; 
+  cargando: boolean = false; // Propiedad necesaria para el spinner
 
   nuevo: CronogramaAdministrativoRequest = {
     administrativoId: 0,
@@ -35,22 +32,24 @@ export class CronogramaList implements OnInit { // Implementamos OnInit
 
   constructor(
     private service: CronogramaAdministrativoService,
-    private adminService: AdministrativoService // Inyectamos el servicio
+    private adminService: AdministrativoService,
+    private cdr: ChangeDetectorRef // Inyectamos el detector de cambios
   ) {}
 
   ngOnInit() {
     this.cargarAdministrativos();
   }
 
-  // Carga la lista inicial para el Datalist
   cargarAdministrativos() {
     this.adminService.listar().subscribe({
-      next: (data) => this.administrativos = data,
+      next: (data) => {
+        this.administrativos = data;
+        this.cdr.detectChanges(); // Asegura que el datalist se llene de inmediato
+      },
       error: () => console.error('Error al cargar personal')
     });
   }
 
-  // Se ejecuta cuando el usuario selecciona o escribe en el buscador
   onAdminChange() {
     const encontrado = this.administrativos.find(
       a => `${a.nombres} ${a.apellidos}` === this.nombreBusqueda
@@ -61,14 +60,24 @@ export class CronogramaList implements OnInit { // Implementamos OnInit
       this.buscarCronogramas();
     } else {
       this.nuevo.administrativoId = 0;
-      this.cronogramas = []; // Limpiamos la tabla si no hay selección válida
+      this.cronogramas = [];
+      this.cdr.detectChanges();
     }
   }
 
   buscarCronogramas() {
     if (this.nuevo.administrativoId > 0) {
-      this.service.listarPorAdministrativo(this.nuevo.administrativoId).subscribe(data => {
-        this.cronogramas = data;
+      this.cargando = true;
+      this.service.listarPorAdministrativo(this.nuevo.administrativoId).subscribe({
+        next: (data) => {
+          this.cronogramas = data;
+          this.cargando = false;
+          this.cdr.detectChanges(); // <--- Aquí eliminamos el "lag" visual
+        },
+        error: () => {
+          this.cargando = false;
+          this.cdr.detectChanges();
+        }
       });
     }
   }
@@ -82,7 +91,7 @@ export class CronogramaList implements OnInit { // Implementamos OnInit
     this.service.crear(this.nuevo).subscribe({
       next: () => {
         alert('Turno registrado correctamente');
-        this.buscarCronogramas();
+        this.buscarCronogramas(); // Refresca y detecta cambios
       },
       error: (err) => alert(err.error?.message || 'Error al guardar')
     });
@@ -90,7 +99,9 @@ export class CronogramaList implements OnInit { // Implementamos OnInit
 
   eliminar(id: number) {
     if(confirm('¿Seguro que desea eliminar este turno?')) {
-      this.service.eliminar(id).subscribe(() => this.buscarCronogramas());
+      this.service.eliminar(id).subscribe(() => {
+        this.buscarCronogramas();
+      });
     }
   }
 }

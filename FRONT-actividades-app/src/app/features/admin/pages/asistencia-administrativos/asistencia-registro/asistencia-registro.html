@@ -3,108 +3,118 @@
     <div class="bg-white rounded-t-xl shadow-sm border-b border-gray-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
         <h1 class="text-2xl font-bold text-gray-800">Control de Asistencia</h1>
-        <p class="text-sm text-gray-500">Personal Administrativo - Transcripción de registros</p>
+        <p class="text-sm text-gray-500">Personal Administrativo - Transcripción diaria</p>
       </div>
-      
-      <div class="flex items-center gap-3 bg-gray-100 p-2 rounded-lg">
-        <label class="text-sm font-semibold text-gray-600 px-2">Fecha:</label>
-        <input 
-          type="date" 
-          [(ngModel)]="fechaSeleccionada" 
-          (change)="cargarDatos()"
-          class="bg-white border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block w-full p-2"
-        >
+      <div class="flex items-center gap-3 bg-gray-100 p-2 rounded-lg border border-gray-200">
+        <label class="text-xs font-bold text-gray-500 px-2 uppercase tracking-tighter">Fecha de Proceso:</label>
+        <input type="date" [(ngModel)]="fechaSeleccionada" (ngModelChange)="cargarDatos()"
+          class="bg-white border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-blue-500 outline-none p-2 shadow-sm">
       </div>
     </div>
 
-    <div class="bg-white shadow-md rounded-b-xl overflow-hidden">
+    <div class="bg-white shadow-xl rounded-b-xl overflow-hidden border border-gray-100">
       <div class="overflow-x-auto">
-       <table class="w-full text-sm text-left text-gray-500">
-  <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
-    <tr>
-      <th class="px-6 py-4 font-bold">Personal</th>
-      <th class="px-2 py-4 text-center">Horario</th>
-      <th class="px-2 py-4">Ingreso</th>
-      <th class="px-2 py-4">S. Almuerzo</th>
-      <th class="px-2 py-4">R. Almuerzo</th>
-      <th class="px-2 py-4">Salida</th>
-      <th class="px-2 py-4 text-center">Terno</th>
-      <th class="px-4 py-4">Observaciones</th> 
-      <th class="px-6 py-4 text-right">Acciones</th>
-    </tr>
-  </thead>
-  <tbody class="divide-y divide-gray-100">
-    <tr *ngFor="let f of asistenciasView" 
-        [ngClass]="{'bg-blue-50/30': f.editado, 'bg-white': !f.editado}"
-        class="hover:bg-gray-50 transition-colors">
-      
-      <td class="px-6 py-4">
-        <div class="flex flex-col">
-          <span class="font-bold text-gray-900 uppercase leading-tight">{{ f.nombre }}</span>
-          <span class="text-[10px] text-gray-400 font-mono">ID: {{ f.administrativoId }}</span>
-        </div>
-      </td>
+        <table class="w-full text-sm text-left">
+          <thead class="text-[11px] text-gray-400 uppercase bg-gray-50/50 border-b font-black tracking-widest">
+            <tr>
+              <th class="px-6 py-4">Personal Administrativo</th>
+              <th class="px-2 py-4 text-center">Horario</th>
+              <th class="px-2 py-4">Ingreso</th>
+              <th class="px-2 py-4 text-center">Almuerzo (S/R)</th>
+              <th class="px-2 py-4 text-center">Salida</th>
+              <th class="px-2 py-4 text-center">Terno</th>
+              <th class="px-2 py-4 text-center">Estado</th>
+              <th class="px-6 py-4 text-right">Acciones</th>
+            </tr>
+          </thead>
 
-      <td class="px-2 py-4 text-center">
-        <span class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-[10px] font-bold">
-          {{ f.horaEntradaProg }}
-        </span>
-      </td>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let f of asistenciasView" 
+                [ngClass]="{'bg-indigo-50/30': f.editado, 'bg-white': !f.editado}"
+                class="hover:bg-gray-50/80 transition-all duration-200">
+              
+              <td class="px-6 py-4">
+                <div class="flex flex-col">
+                  <span class="font-extrabold text-gray-800 uppercase text-xs mb-1">{{ f.nombre }}</span>
+                  <span class="text-[10px] text-gray-400 font-mono tracking-tighter">CÓDIGO: {{ f.administrativoId }}</span>
+                </div>
+              </td>
 
-      <td class="px-2 py-4">
-        <div class="relative">
-          <input type="time" [(ngModel)]="f.horaIngreso" (change)="f.editado=true"
-                 class="w-full p-1 border rounded-md text-xs focus:ring-2 focus:ring-blue-400 outline-none"
-                 [ngClass]="f.tardanza > 0 ? 'border-red-500 bg-red-50 text-red-700' : 'border-gray-300'">
-          <span *ngIf="f.tardanza > 0" class="absolute -top-3 right-0 text-[9px] font-black text-red-600 bg-white px-1">
-            +{{ f.tardanza }}m
-          </span>
-        </div>
-      </td>
+              <td class="px-2 py-4 text-center">
+                <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-[10px] font-bold border border-slate-200">
+                  {{ f.horaEntradaProg }}
+                </span>
+              </td>
 
-      <td class="px-2 py-4">
-        <input type="time" [(ngModel)]="f.salidaAlmuerzo" (change)="f.editado=true"
-               class="w-full p-1 border border-gray-300 rounded-md text-xs outline-none">
-      </td>
-      <td class="px-2 py-4">
-        <input type="time" [(ngModel)]="f.retornoAlmuerzo" (change)="f.editado=true"
-               class="w-full p-1 border border-gray-300 rounded-md text-xs outline-none">
-      </td>
-      <td class="px-2 py-4">
-        <input type="time" [(ngModel)]="f.horaSalida" (change)="f.editado=true"
-               class="w-full p-1 border border-gray-300 rounded-md text-xs outline-none">
-      </td>
+              <td class="px-2 py-4">
+                <div class="relative">
+                  <input type="time" [(ngModel)]="f.horaIngreso" (ngModelChange)="onIngresoChange(f)"
+                         class="w-full p-1.5 border rounded-lg text-xs font-medium focus:ring-2 outline-none transition-all shadow-sm"
+                         [ngClass]="{
+                           'border-red-300 bg-red-50 text-red-700 focus:ring-red-400': f.tardanza > 0,
+                           'border-emerald-200 bg-emerald-50 text-emerald-700 focus:ring-emerald-400': f.horaIngreso && f.tardanza === 0,
+                           'border-gray-200 focus:ring-blue-400': !f.horaIngreso
+                         }">
+                  <span *ngIf="f.tardanza > 0" 
+                        class="absolute -top-2.5 -right-1 text-[9px] font-black text-white bg-red-500 px-1.5 rounded-full border-2 border-white shadow-sm">
+                    +{{ f.tardanza }}m
+                  </span>
+                </div>
+              </td>
 
-      <td class="px-2 py-4 text-center">
-        <input type="checkbox" [(ngModel)]="f.terno" (change)="f.editado=true"
-               class="w-4 h-4 text-blue-600 border-gray-300 rounded">
-      </td>
+              <td class="px-2 py-4">
+                <div class="flex gap-1">
+                  <input type="time" [(ngModel)]="f.salidaAlmuerzo" (ngModelChange)="marcarEditado(f)"
+                         class="w-1/2 p-1 border border-gray-200 rounded-md text-[10px] outline-none hover:border-gray-400 focus:ring-1 focus:ring-indigo-400">
+                  <input type="time" [(ngModel)]="f.retornoAlmuerzo" (ngModelChange)="marcarEditado(f)"
+                         class="w-1/2 p-1 border border-gray-200 rounded-md text-[10px] outline-none hover:border-gray-400 focus:ring-1 focus:ring-indigo-400">
+                </div>
+              </td>
 
-      <td class="px-4 py-4">
-        <input type="text" [(ngModel)]="f.observaciones" (change)="f.editado=true"
-               placeholder="Notas..."
-               class="w-full p-1 border border-gray-200 rounded text-[11px] italic focus:bg-white bg-gray-50/50 outline-none">
-      </td>
+              <td class="px-2 py-4">
+                <input type="time" [(ngModel)]="f.horaSalida" (ngModelChange)="marcarEditado(f)"
+                       class="w-full p-1.5 border border-gray-200 rounded-lg text-xs outline-none hover:border-gray-400 focus:ring-1 focus:ring-indigo-400">
+              </td>
 
-      <td class="px-6 py-4 text-right">
-        <button (click)="guardarFila(f)" [disabled]="!f.editado"
-                class="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-bold transition-all"
-                [ngClass]="f.editado ? 'bg-emerald-500 text-white shadow-sm' : 'bg-gray-100 text-gray-400 cursor-not-allowed'">
-          {{ f.id ? 'ACTUALIZAR' : 'REGISTRAR' }}
-        </button>
-      </td>
-    </tr>
-  </tbody>
-</table>
+              <td class="px-2 py-4 text-center">
+                <input type="checkbox" [(ngModel)]="f.terno" (ngModelChange)="marcarEditado(f)"
+                       class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer">
+              </td>
+
+              <td class="px-2 py-4 text-center">
+                <select [(ngModel)]="f.tipoAsistencia" (ngModelChange)="marcarEditado(f)"
+                        [ngClass]="{
+                          'bg-emerald-100 text-emerald-700 border-emerald-200': f.tipoAsistencia === TipoAsistencia.ASISTIO,
+                          'bg-amber-100 text-amber-700 border-amber-200': f.tipoAsistencia === TipoAsistencia.TARDANZA,
+                          'bg-red-100 text-red-700 border-red-200': f.tipoAsistencia === TipoAsistencia.FALTA,
+                          'bg-blue-100 text-blue-700 border-blue-200': f.tipoAsistencia === TipoAsistencia.PERMISO
+                        }"
+                        class="text-[10px] font-black rounded-full px-2 py-1 border outline-none appearance-none cursor-pointer text-center w-24 shadow-sm hover:scale-105 transition-transform">
+                  <option *ngFor="let tipo of listaTipos" [value]="tipo">{{ tipo }}</option>
+                </select>
+              </td>
+
+              <td class="px-6 py-4 text-right">
+                <button (click)="guardarFila(f)" [disabled]="!f.editado || f.guardando"
+                        class="inline-flex items-center justify-center px-4 py-2 rounded-lg text-[10px] font-black transition-all tracking-tighter shadow-md min-w-[100px]"
+                        [ngClass]="f.editado ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200' : 'bg-gray-100 text-gray-300 cursor-not-allowed'">
+                  <span *ngIf="!f.guardando">{{ f.id ? 'ACTUALIZAR' : 'REGISTRAR' }}</span>
+                  <div *ngIf="f.guardando" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div *ngIf="cargando" class="p-8 text-center bg-white">
-        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-        <p class="mt-2 text-sm text-gray-500 font-medium">Cargando cronogramas...</p>
+      <div *ngIf="cargando" class="p-12 text-center bg-white/80 backdrop-blur-sm">
+        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
+        <p class="mt-4 text-xs text-gray-400 font-bold uppercase tracking-widest">Sincronizando registros...</p>
       </div>
 
-      <div *ngIf="!cargando && asistenciasView.length === 0" class="p-12 text-center bg-white text-gray-400 uppercase tracking-widest text-xs">
-        No se encontraron cronogramas para este día.
+      <div *ngIf="!cargando && asistenciasView.length === 0" class="p-20 text-center bg-white">
+        <div class="text-gray-200 mb-4 text-5xl">📅</div>
+        <p class="text-gray-400 uppercase tracking-widest text-[10px] font-bold">No hay cronogramas asignados para este día.</p>
       </div>
     </div>
   </div>
