@@ -1,0 +1,30 @@
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+  #printable-area {
+    border: none;
+    box-shadow: none;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Elimina el espacio o "corte" no deseado en el borde superior del outline */
+::ng-deep .mdc-notched-outline__notch {
+  border-right: none !important;
+}
+
+/* Opcional: Si prefieres que el label no flote para evitar el corte visual */
+mat-form-field {
+  width: 100%;
+}
+
+@media print {
+  .no-print { display: none !important; }
+  #printable-area { border: none !important; box-shadow: none !important; }
+}
