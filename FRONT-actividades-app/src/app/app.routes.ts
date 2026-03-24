@@ -31,6 +31,12 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/pages/asistencia-administrativos/asistencia-adminsitrativos/asistencia-adminsitrativos')
           .then(m => m.AsistenciaAdministrativosMain)
       },
+
+      {
+        path: 'reporte-administrativo',
+        loadComponent: () => import('./features/admin/pages/reporte-administrativos/reporte-administrativos')
+          .then(m => m.ReporteAdministrativos)
+      },
       {
         path: 'gestionDocente',
         loadComponent: () => import('./features/admin/pages/gestion-docente/gestion-docente')

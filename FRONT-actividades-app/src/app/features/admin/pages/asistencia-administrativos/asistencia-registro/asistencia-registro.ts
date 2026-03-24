@@ -71,7 +71,7 @@ export class AsistenciaRegistro implements OnInit {
 
     forkJoin({
       cronogramas: this.cronogramaService.listarPorDiaSemana(diaSemana),
-      asistencias: this.asistenciaService.listarAsistenciasPorFecha(this.fechaSeleccionada)
+      asistencias: this.asistenciaService.listarPorFecha(this.fechaSeleccionada)
     }).subscribe({
       next: (res) => {
         this.cruzarDatos(res.cronogramas, res.asistencias);
