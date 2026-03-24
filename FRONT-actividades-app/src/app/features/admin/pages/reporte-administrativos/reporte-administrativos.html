@@ -33,15 +33,25 @@
           </mat-select>
         </mat-form-field>
 
-        <div class="md:col-span-3 flex gap-2 h-[56px] items-center">
-          <button mat-flat-button color="primary" class="flex-1 !h-full !rounded-xl !font-bold"
-                  [disabled]="!administrativoId" (click)="consultarReporte()">
-            GENERAR
-          </button>
-          <button mat-stroked-button class="!h-full !rounded-xl !border-slate-300" (click)="imprimir()">
-            <mat-icon>print</mat-icon>
-          </button>
-        </div>
+       <div class="md:col-span-3 flex gap-2 h-[56px] items-center">
+  <button mat-flat-button color="primary" class="flex-1 !h-full !rounded-xl !font-bold"
+          [disabled]="!administrativoId" (click)="consultarReporte()">
+    GENERAR
+  </button>
+
+  <button mat-stroked-button class="!h-full !rounded-xl !border-slate-300" 
+          (click)="imprimir()" matTooltip="Imprimir PDF">
+    <mat-icon class="text-slate-600">print</mat-icon>
+  </button>
+
+  <button mat-flat-button 
+          class="!h-full !rounded-xl !bg-emerald-600 !text-white hover:!bg-emerald-700 disabled:!bg-slate-200"
+          [disabled]="reporte.length === 0"
+          (click)="exportarExcel()" 
+          matTooltip="Descargar Excel">
+    <mat-icon>description</mat-icon>
+  </button>
+</div>
       </div>
     </mat-card-content>
   </mat-card>
