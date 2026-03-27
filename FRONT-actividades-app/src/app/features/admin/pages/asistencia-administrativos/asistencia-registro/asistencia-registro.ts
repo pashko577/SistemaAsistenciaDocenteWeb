@@ -16,7 +16,7 @@ export class AsistenciaRegistro implements OnInit {
   fechaSeleccionada: string = new Date().toISOString().split('T')[0];
   asistenciasView: any[] = [];
   cargando = false;
-  
+
   public TipoAsistencia = TipoAsistencia;
   listaTipos = Object.values(TipoAsistencia);
 
@@ -24,7 +24,7 @@ export class AsistenciaRegistro implements OnInit {
     private asistenciaService: AsistenciaAdministrativoService,
     private cronogramaService: CronogramaAdministrativoService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.cargarDatos();
@@ -38,11 +38,11 @@ export class AsistenciaRegistro implements OnInit {
   // Lógica de tiempo con 5 minutos de tolerancia
   onIngresoChange(f: any) {
     f.editado = true;
-    
+
     if (f.horaIngreso && f.horaEntradaProg) {
       const [hI, mI] = f.horaIngreso.split(':').map(Number);
       const [hP, mP] = f.horaEntradaProg.split(':').map(Number);
-      
+
       const totalMinIngreso = (hI * 60) + mI;
       const totalMinProg = (hP * 60) + mP;
       const tolerancia = 5;
@@ -52,7 +52,7 @@ export class AsistenciaRegistro implements OnInit {
         f.tardanza = 0;
       } else {
         f.tipoAsistencia = TipoAsistencia.TARDANZA;
-        f.tardanza = totalMinIngreso - totalMinProg;
+        f.tardanza = totalMinIngreso - totalMinProg - tolerancia;
       }
     } else if (!f.horaIngreso) {
       f.tipoAsistencia = TipoAsistencia.FALTA;
@@ -64,7 +64,7 @@ export class AsistenciaRegistro implements OnInit {
   cargarDatos() {
     this.cargando = true;
     this.asistenciasView = [];
-    
+
     const fechaObj = new Date(this.fechaSeleccionada + 'T00:00:00');
     const dias = ['DOMINGO', 'LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO'];
     const diaSemana = dias[fechaObj.getDay()];
@@ -92,14 +92,14 @@ export class AsistenciaRegistro implements OnInit {
         id: asis?.id || null,
         administrativoId: c.administrativoId,
         cronogramaId: c.id,
-        nombre: `${c.nombres} ${c.apellidos}`, 
+        nombre: `${c.nombres} ${c.apellidos}`,
         horaEntradaProg: c.horaEntrada,
         horaIngreso: asis?.horaIngreso || '',
         salidaAlmuerzo: asis?.salidaAlmuerzo || '',
         retornoAlmuerzo: asis?.retornoAlmuerzo || '',
         horaSalida: asis?.horaSalida || '',
         terno: asis ? asis.terno : true,
-        observaciones: asis?.observaciones || '', 
+        observaciones: asis?.observaciones || '',
         tardanza: asis?.tardanza || 0,
         tipoAsistencia: asis?.tipoAsistencia || TipoAsistencia.FALTA,
         editado: false,
@@ -123,7 +123,7 @@ export class AsistenciaRegistro implements OnInit {
       tipoAsistencia: f.tipoAsistencia
     };
 
-    const request = f.id 
+    const request = f.id
       ? this.asistenciaService.actualizar(f.id, dto)
       : this.asistenciaService.registrar(dto);
 
