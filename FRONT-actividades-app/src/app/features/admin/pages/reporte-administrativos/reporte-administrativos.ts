@@ -58,6 +58,8 @@ export class ReporteAdministrativos implements OnInit {
   anios: number[] = [];
   administrativoId: number | null = null;
   nombreSeleccionado: string = '';
+  cargoAdministrativo: string = '';
+  dniAdministrativo: string= ''
 
   // Datos del reporte
   reporte: AsistenciaAdministrativoResponse[] = [];
@@ -85,7 +87,7 @@ export class ReporteAdministrativos implements OnInit {
 
   generarListaAnios() {
     const anioActual = new Date().getFullYear();
-    const anioInicio = 2024; // Año de inicio del sistema
+    const anioInicio = 2026; // Año de inicio del sistema
     this.anios = [];
     // Genera desde el inicio hasta el año actual + 1 para previsión
     for (let i = anioInicio; i <= anioActual + 1; i++) {
@@ -111,10 +113,15 @@ export class ReporteAdministrativos implements OnInit {
       : this.listaAdministrativos;
   }
 
+  adminSeleccionado: AdministrativoResponse | null = null;
+
   seleccionarAdministrativo(admin: AdministrativoResponse) {
+
     this.administrativoId = admin.id;
     this.terminoBusqueda = `${admin.apellidos}, ${admin.nombres}`;
     this.nombreSeleccionado = this.terminoBusqueda;
+    this.cargoAdministrativo = admin.nombreCargo;
+  this.dniAdministrativo = admin.dni;
     this.consultarReporte();
   }
 
@@ -148,6 +155,10 @@ async exportarExcel() {
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet('Reporte Asistencia');
 
+  const VERDE_OSCURO = 'FF064E3B';
+  const VERDE_MEDIO = 'FF065F46';
+  const VERDE_CLARO_BG = 'FFF0FDF4';
+
   // --- CONFIGURACIÓN DE COLUMNAS ---
   worksheet.columns = [
     { header: 'DÍA / FECHA', key: 'fecha', width: 25 },
@@ -155,83 +166,82 @@ async exportarExcel() {
     { header: 'ALMUERZO (S|R)', key: 'almuerzo', width: 20 },
     { header: 'SALIDA', key: 'salida', width: 15 },
     { header: 'TERNO', key: 'terno', width: 12 },
-    { header: 'TARDANZA', key: 'tardanza', width: 15 },
-    { header: '', key: 'gap', width: 5 }, // Columna de separación
-    { header: 'RESUMEN', key: 'resumen', width: 25 }
+    { header: 'TARDANZA', key: 'tardanza', width: 15 }
   ];
 
-  // --- ESTILOS DE ENCABEZADO TIPO CARD (A1:F2) ---
+  // 1. TÍTULO (Fila 1)
   worksheet.mergeCells('A1:F1');
   const titleCell = worksheet.getCell('A1');
   titleCell.value = 'REPORTE DE ASISTENCIA - COLEGIO JAMES BALDWIN';
-  titleCell.font = { bold: true, size: 14, color: { argb: 'FF1E293B' } }; // Slate 800
+  titleCell.font = { bold: true, size: 14, color: { argb: VERDE_OSCURO } };
   titleCell.alignment = { horizontal: 'center' };
 
+  // 2. NOMBRE (Fila 2)
   worksheet.mergeCells('A2:F2');
   const nameCell = worksheet.getCell('A2');
   nameCell.value = this.nombreSeleccionado.toUpperCase();
-  nameCell.font = { bold: true, size: 12, color: { argb: 'FF2563EB' } }; // Blue 600
+  nameCell.font = { bold: true, size: 12, color: { argb: VERDE_MEDIO } };
   nameCell.alignment = { horizontal: 'center' };
 
-  // --- ETIQUETA DE MES (AMARILLO) ---
+  // 3. CARGO Y DNI (Fila 3) - ¡NUEVO!
   worksheet.mergeCells('A3:F3');
-  const periodCell = worksheet.getCell('A3');
+  const infoCell = worksheet.getCell('A3');
+  infoCell.value = `CARGO: ${this.cargoAdministrativo}  |  DNI: ${this.dniAdministrativo}`;
+  infoCell.font = { size: 10, color: { argb: 'FF64748B' }, italic: true };
+  infoCell.alignment = { horizontal: 'center' };
+
+  // 4. MES (Fila 4) - Bajamos una fila
+  worksheet.mergeCells('A4:F4');
+  const periodCell = worksheet.getCell('A4');
   const nombreMes = this.meses[this.mesSeleccionado - 1].nombre;
   periodCell.value = `${nombreMes} ${this.anioSeleccionado}`;
-  periodCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFACC15' } }; // Yellow 400
-  periodCell.font = { bold: true, color: { argb: 'FF000000' } };
+  periodCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: VERDE_OSCURO } };
+  periodCell.font = { bold: true, color: { argb: 'FFFFFFFF' } };
   periodCell.alignment = { horizontal: 'center' };
 
-  // --- CABECERA DE TABLA (Fila 5) ---
-  const headerRow = worksheet.getRow(5);
+  // 5. CABECERA DE TABLA (Fila 6) - Dejamos la fila 5 de espacio (gap)
+  const headerRow = worksheet.getRow(6);
   const headers = ['DÍA / FECHA', 'INGRESO', 'ALMUERZO', 'SALIDA', 'TERNO', 'TARDANZA'];
   
   headers.forEach((h, i) => {
     const cell = headerRow.getCell(i + 1);
     cell.value = h;
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } }; // Slate 50
-    cell.font = { bold: true, size: 10, color: { argb: 'FF64748B' } }; // Slate 500
-    cell.border = { bottom: { style: 'medium', color: { argb: 'FFE2E8F0' } } };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } };
+    cell.font = { bold: true, size: 10, color: { argb: 'FF64748B' } };
+    cell.border = { bottom: { style: 'medium', color: { argb: VERDE_MEDIO } } };
     cell.alignment = { horizontal: 'center' };
   });
 
-  // --- CUERPO DE LA TABLA ---
+  // 6. CUERPO DE LA TABLA (Empieza en Fila 7)
   this.reporte.forEach((item, index) => {
-    const rowIndex = index + 6;
+    const rowIndex = index + 7; // Ajustamos el índice
     const row = worksheet.getRow(rowIndex);
 
-    // Formatear Fecha y Día
     const fechaDoc = new Date(item.fecha);
     const diaNombre = fechaDoc.toLocaleDateString('es-ES', { weekday: 'long' }).toUpperCase();
     const fechaCorta = fechaDoc.toLocaleDateString('es-ES');
 
     row.getCell(1).value = `${diaNombre}\n${fechaCorta}`;
     row.getCell(1).alignment = { wrapText: true, vertical: 'middle' };
-    
     row.getCell(2).value = item.horaIngreso || '--:--';
-    
     row.getCell(3).value = `${item.salidaAlmuerzo || '--'} | ${item.retornoAlmuerzo || '--'}`;
-    
     row.getCell(4).value = item.horaSalida || '--:--';
-    
     row.getCell(5).value = item.terno ? '👔 SÍ' : '-';
-    
     row.getCell(6).value = item.tardanza > 0 ? `+${item.tardanza} min` : '-';
 
-    // Estilos de fila
     row.eachCell((cell, colNumber) => {
       cell.alignment = { horizontal: 'center', vertical: 'middle' };
       cell.border = { bottom: { style: 'thin', color: { argb: 'FFF1F5F9' } } };
-      
-      // Tardanza en rojo (como en tu HTML)
+      if (colNumber <= 6 && item.terno) {
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: VERDE_CLARO_BG } };
+      }
       if (colNumber === 6 && item.tardanza > 0) {
         cell.font = { color: { argb: 'FFDC2626' }, bold: true };
         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } };
       }
     });
   });
-
-  // --- CUADROS DE TOTALES (ESTILO CARD DERECHA) ---
+// --- CUADROS DE TOTALES (A la derecha de la tabla) ---
   // Tardanza Total
   const tardanzaTitle = worksheet.getCell('H6');
   tardanzaTitle.value = 'TARDANZA TOTAL';
@@ -243,19 +253,18 @@ async exportarExcel() {
   tardanzaValue.value = `${this.totalMinutosTardanza} min`;
   tardanzaValue.font = { bold: true, size: 14, color: { argb: 'FFDC2626' } };
 
-  // Descuento (Estilo Dark Card)
+  // Descuento Total
   const descTitle = worksheet.getCell('H9');
   descTitle.value = 'DESCUENTO TOTAL';
-  descTitle.font = { bold: true, size: 9, color: { argb: 'FFA1A1AA' } };
-  descTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF18181B' } }; // Zinc 900
+  descTitle.font = { bold: true, size: 9, color: { argb: 'FFECFDF5' } };
+  descTitle.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: VERDE_OSCURO } };
 
   const descValue = worksheet.getCell('H10');
   descValue.value = `S/ ${this.montoDescuento.toFixed(2)}`;
   descValue.font = { bold: true, size: 16, color: { argb: 'FFFFFFFF' } };
-  descValue.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF18181B' } };
+  descValue.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: VERDE_OSCURO } };
   descValue.alignment = { horizontal: 'center' };
-
-  // --- FIRMAS (AL FINAL) ---
+    // --- FIRMAS ---
   const lastRow = this.reporte.length + 10;
   worksheet.getCell(`B${lastRow}`).value = '__________________________';
   worksheet.getCell(`B${lastRow + 1}`).value = 'FIRMA DEL EMPLEADO';
@@ -264,10 +273,9 @@ async exportarExcel() {
   
   [worksheet.getCell(`B${lastRow + 1}`), worksheet.getCell(`E${lastRow + 1}`)].forEach(c => {
     c.alignment = { horizontal: 'center' };
-    c.font = { size: 8, color: { argb: 'FF94A3B8' }, bold: true };
+    c.font = { size: 8, color: { argb: VERDE_MEDIO }, bold: true };
   });
 
-  // --- DESCARGAR ---
   const buffer = await workbook.xlsx.writeBuffer();
   const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
   saveAs(blob, `Asistencia_${this.nombreSeleccionado}_${nombreMes}.xlsx`);

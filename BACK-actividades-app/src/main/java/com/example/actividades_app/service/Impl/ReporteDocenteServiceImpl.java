@@ -9,6 +9,7 @@ import com.example.actividades_app.model.Entity.ReporteDocente;
 import com.example.actividades_app.model.Entity.TipoReporte;
 import com.example.actividades_app.model.dto.ModuloDocente.ReporteDocenteRequestDTO;
 import com.example.actividades_app.model.dto.ModuloDocente.ReporteDocenteResponseDTO;
+import com.example.actividades_app.repository.AsistenciaDocenteRepository;
 import com.example.actividades_app.repository.CronogramaDiarioRepository;
 import com.example.actividades_app.repository.ReporteDocenteRepository;
 import com.example.actividades_app.repository.TipoReporteRepository;
@@ -23,6 +24,7 @@ public class ReporteDocenteServiceImpl implements ReporteDocenteService {
     private final ReporteDocenteRepository reporteRepository;
     private final CronogramaDiarioRepository cronogramaDiarioRepository;
     private final TipoReporteRepository tipoReporteRepository;
+    private final AsistenciaDocenteRepository asistenciaRepository; // <--- Inyectar esto
 
     @Override
     public ReporteDocenteResponseDTO registrar(ReporteDocenteRequestDTO dto) {
@@ -37,9 +39,9 @@ public class ReporteDocenteServiceImpl implements ReporteDocenteService {
         TipoReporte tipoReporte = tipoReporteRepository.findById(dto.getTipoReporteId())
                 .orElseThrow(() -> new RuntimeException("Tipo de reporte no encontrado"));
 
+        // Ya no seteamos ni fecha ni tardanza, el objeto es más ligero
         ReporteDocente reporte = ReporteDocente.builder()
                 .observaciones(dto.getObservaciones())
-                .tardanza(dto.getTardanza())
                 .cronogramaDiario(cronograma)
                 .tipoReporte(tipoReporte)
                 .build();
@@ -48,7 +50,6 @@ public class ReporteDocenteServiceImpl implements ReporteDocenteService {
 
         return mapToResponse(reporte);
     }
-
     @Override
     public List<ReporteDocenteResponseDTO> listar() {
 
@@ -67,16 +68,22 @@ public class ReporteDocenteServiceImpl implements ReporteDocenteService {
         return mapToResponse(reporte);
     }
 
-    private ReporteDocenteResponseDTO mapToResponse(ReporteDocente r) {
+ private ReporteDocenteResponseDTO mapToResponse(ReporteDocente r) {
+        // Buscamos la tardanza en la tabla de asistencia vinculada al mismo cronograma
+        Integer minutosTardanza = asistenciaRepository.findByCronogramaDiarioId(r.getCronogramaDiario().getId())
+                .map(asistencia -> asistencia.getMinutosTardanza())
+                .orElse(0);
 
         return ReporteDocenteResponseDTO.builder()
                 .id(r.getId())
+                // JALAMOS LA FECHA DEL CRONOGRAMA
+                .fecha(r.getCronogramaDiario().getFecha()) 
                 .observaciones(r.getObservaciones())
-                .tardanza(r.getTardanza())
+                // JALAMOS LA TARDANZA DE LA ASISTENCIA
+                .tardanza(minutosTardanza) 
                 .cronogramaDiarioId(r.getCronogramaDiario().getId())
                 .tipoReporteId(r.getTipoReporte().getId())
                 .tipoReporteNombre(r.getTipoReporte().getNombreTipoReporte())
                 .build();
     }
-
 }

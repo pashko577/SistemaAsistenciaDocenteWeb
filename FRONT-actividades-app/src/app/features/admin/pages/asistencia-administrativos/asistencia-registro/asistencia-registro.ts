@@ -5,11 +5,12 @@ import { forkJoin } from 'rxjs';
 import { AsistenciaAdministrativoService } from '../../../../../core/services/asistencia-administrativos';
 import { CronogramaAdministrativoService } from '../../../../../core/services/cronograma-administrativo';
 import { TipoAsistencia } from '../../../../../core/models/enums/tipo-asistencia-enum';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-asistencia-registro',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIcon],
   templateUrl: './asistencia-registro.html'
 })
 export class AsistenciaRegistro implements OnInit {

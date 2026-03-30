@@ -39,6 +39,7 @@ public class AsignacionDocente {
 
     @Column(name = "observaciones", length = 250)
     private String observaciones;
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "docenteID", nullable = false)

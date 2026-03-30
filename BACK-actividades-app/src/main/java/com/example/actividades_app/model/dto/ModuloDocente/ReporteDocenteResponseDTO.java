@@ -8,19 +8,11 @@ import lombok.Data;
 @Data
 @Builder
 public class ReporteDocenteResponseDTO {
-
     private Long id;
-
-    private LocalDate fecha;
-
+    private LocalDate fecha; 
     private String observaciones;
-
-    private Integer tardanza;
-
+    private Integer tardanza; // <--- Asegúrate de que esta línea esté aquí
     private Long cronogramaDiarioId;
-
     private Long tipoReporteId;
-
     private String tipoReporteNombre;
-
 }
