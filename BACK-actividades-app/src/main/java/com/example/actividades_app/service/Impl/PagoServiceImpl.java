@@ -1,5 +1,6 @@
 package com.example.actividades_app.service.Impl;
 
+import com.example.actividades_app.enums.EstadoAdelanto;
 import com.example.actividades_app.enums.TipoAsistencia;
 import com.example.actividades_app.model.Entity.*;
 import com.example.actividades_app.model.dto.ModuloDocente.PlanillaDocenteDTO;
@@ -14,6 +15,7 @@ import com.example.actividades_app.model.dto.Reporte.DescuentoRequestDTO;
 import com.example.actividades_app.model.dto.Reporte.DescuentoResponseDTO;
 import com.example.actividades_app.model.dto.Reporte.ResumenGeneralResponseDTO;
 import com.example.actividades_app.repository.*;
+import com.example.actividades_app.service.AdelantoService;
 import com.example.actividades_app.service.PagoService;
 import com.example.actividades_app.service.PlanillaAdministrativoService;
 import com.example.actividades_app.service.PlanillaDocenteService;
@@ -38,195 +40,205 @@ public class PagoServiceImpl implements PagoService {
 
         private final PagoRepository pagoRepository;
         private final ContratoRepository contratoRepository;
- 
+
         private final TipoDeduccionRepository tipoDeduccionRepository;
         private final AdministrativoRepository administrativoRepository;
-       
+
         private final DocenteRepository docenteRepository;
         private final AsistenciaAdministrativoRepository asistenciaAdministrativoRepository;
         private final PlanillaAdministrativoService planillaAdministrativoService;
         private final PlanillaDocenteService planillaDocenteService;
 
+        private final AdelantoRepository adelantoRepository;
+        private final AdelantoService adelantoService;
+
         // =====================================================
         // CREAR PAGO
         // =====================================================
         @Override
-public PagoResponseDTO crear(PagoRequestDTO dto) {
+        public PagoResponseDTO crear(PagoRequestDTO dto) {
 
-    // ----------------------------- 
-    // OBTENER CONTRATO
-    // -----------------------------
-    Contrato contrato = contratoRepository.findById(dto.getContratoId())
-            .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
+                // -----------------------------
+                // OBTENER CONTRATO
+                // -----------------------------
+                Contrato contrato = contratoRepository.findById(dto.getContratoId())
+                                .orElseThrow(() -> new RuntimeException("Contrato no encontrado"));
 
-    // Validar pago mensual único
-    if (contrato.getTipoPago() == Contrato.TipoPago.PAGO_MENSUAL) {
-        validarPagoMensualUnico(contrato.getId(), dto.getFecha());
-    }
+                // Validar pago mensual único
+                if (contrato.getTipoPago() == Contrato.TipoPago.PAGO_MENSUAL) {
+                        validarPagoMensualUnico(contrato.getId(), dto.getFecha());
+                }
 
-    Usuario usuario = contrato.getUsuario();
+                Usuario usuario = contrato.getUsuario();
 
-    // -----------------------------
-    // CREAR OBJETO PAGO
-    // -----------------------------
-    Pago pago = Pago.builder()
-            .fecha(dto.getFecha())
-            .contrato(contrato)
-            .build();
+                // -----------------------------
+                // CREAR OBJETO PAGO
+                // -----------------------------
+                Pago pago = Pago.builder()
+                                .fecha(dto.getFecha())
+                                .contrato(contrato)
+                                .montoActividad(BigDecimal.ZERO)
+                                .netoPagar(BigDecimal.ZERO)
+                                .build();
 
-    // -----------------------------
-    // LISTAS RELACIONADAS
-    // -----------------------------
-    List<Adelanto> listaAdelantos = new ArrayList<>();
-    List<Bonificacion> listaBonificaciones = new ArrayList<>();
-    List<Deduccion> listaDeducciones = new ArrayList<>();
+                // 🔥 PASO VITAL: Guardar el pago para generar el ID (pagoid)
+                // Esto evita el TransientObjectException
+                pago = pagoRepository.saveAndFlush(pago);
+                // -----------------------------
+                // LISTAS RELACIONADAS
+                // -----------------------------
+                List<Adelanto> listaAdelantos = new ArrayList<>();
+                List<Bonificacion> listaBonificaciones = new ArrayList<>();
+                List<Deduccion> listaDeducciones = new ArrayList<>();
 
-    BigDecimal totalAdelantos = BigDecimal.ZERO;
-    BigDecimal totalBonificaciones = BigDecimal.ZERO;
-    BigDecimal totalDeducciones = BigDecimal.ZERO;
+                BigDecimal totalAdelantos = BigDecimal.ZERO;
+                BigDecimal totalBonificaciones = BigDecimal.ZERO;
+                BigDecimal totalDeducciones = BigDecimal.ZERO;
 
-    // -----------------------------
-    // CALCULAR MONTO ACTIVIDAD (HORAS O MENSUAL)
-    // -----------------------------
-    BigDecimal montoActividad = calcularMontoActividad(contrato, usuario, dto.getFecha());
-    pago.setMontoActividad(montoActividad);
+                // -----------------------------
+                // CALCULAR MONTO ACTIVIDAD (HORAS O MENSUAL)
+                // -----------------------------
+                BigDecimal montoActividad = calcularMontoActividad(contrato, usuario, dto.getFecha());
+                pago.setMontoActividad(montoActividad);
 
-    // -----------------------------
-    // ADELANTOS
-    // -----------------------------
-    if (dto.getAdelantos() != null) {
-        for (AdelantoRequestDTO a : dto.getAdelantos()) {
-            if (a.getMonto().compareTo(BigDecimal.ZERO) <= 0) continue;
+                // -----------------------------
+                // ADELANTOS
+                // -----------------------------
+                // 1. Buscamos los adelantos que están PENDIENTES en la BD para este usuario
+                List<Adelanto> adelantosPendientes = adelantoRepository
+                                .findByUsuarioIdAndEstado(usuario.getId(), EstadoAdelanto.PENDIENTE);
 
-            Adelanto adelanto = Adelanto.builder()
-                    .nombre(a.getNombre())
-                    .monto(a.getMonto())
-                    .pago(pago)
-                    .build();
-            listaAdelantos.add(adelanto);
-            totalAdelantos = totalAdelantos.add(a.getMonto());
+                // 2. Calculamos el monto total acumulado para el neto
+                totalAdelantos = adelantosPendientes.stream()
+                                .map(Adelanto::getMonto)
+                                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                // 3. Vinculamos cada adelanto al pago actual
+                for (Adelanto adelanto : adelantosPendientes) {
+                        adelanto.setPago(pago);
+                        adelanto.setEstado(EstadoAdelanto.APLICADO); // Marcamos que ya se cobrará
+                        listaAdelantos.add(adelanto);
+                }
+
+                // -----------------------------
+                // BONIFICACIONES
+                // -----------------------------
+                if (dto.getBonificaciones() != null) {
+                        for (BonificacionRequestDTO b : dto.getBonificaciones()) {
+                                if (b.getMonto().compareTo(BigDecimal.ZERO) <= 0)
+                                        continue;
+
+                                Bonificacion bonificacion = Bonificacion.builder()
+                                                .nombre(b.getNombre())
+                                                .monto(b.getMonto())
+                                                .pago(pago)
+                                                .build();
+                                listaBonificaciones.add(bonificacion);
+                                totalBonificaciones = totalBonificaciones.add(b.getMonto());
+                        }
+                }
+
+                // -----------------------------
+                // DEDUCCIONES AUTOMÁTICAS
+                // -----------------------------
+                BigDecimal descuentoAutomatica = BigDecimal.ZERO;
+
+                // Docente
+                Optional<Docente> docenteOpt = docenteRepository.findByUsuarioId(usuario.getId());
+                if (docenteOpt.isPresent()) {
+                        Docente docente = docenteOpt.get();
+
+                        LocalDate inicioMes = dto.getFecha().withDayOfMonth(1);
+                        LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
+
+                        PlanillaDocenteDTO planilla = planillaDocenteService.calcularPlanilla(
+                                        docente.getId(),
+                                        inicioMes,
+                                        finMes);
+
+                        descuentoAutomatica = planilla.getDescuentoFaltas()
+                                        .add(planilla.getDescuentoTardanza())
+                                        .add(planilla.getDescuentoCriterios());
+                }
+
+                // Administrativo
+                Optional<Administrativo> adminOpt = administrativoRepository.findByUsuarioId(usuario.getId());
+                if (adminOpt.isPresent()) {
+                        Administrativo admin = adminOpt.get();
+
+                        LocalDate inicioMes = dto.getFecha().withDayOfMonth(1);
+                        LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
+
+                        PlanillaAdministrativoDTO planilla = planillaAdministrativoService.calcularPlanilla(
+                                        admin.getId(),
+                                        inicioMes,
+                                        finMes);
+
+                        descuentoAutomatica = descuentoAutomatica.add(
+                                        planilla.getDescuentoFaltas().add(planilla.getDescuentoTardanza()));
+                }
+
+                // Crear deducción automática si aplica
+                if (descuentoAutomatica.compareTo(BigDecimal.ZERO) > 0) {
+                        TipoDeduccion tipoAutomatica = tipoDeduccionRepository
+                                        .findByNombre("Automática")
+                                        .orElseThrow(() -> new RuntimeException(
+                                                        "Debe existir tipo deducción 'Automática'"));
+
+                        Deduccion deduccion = Deduccion.builder()
+                                        .tipoDeduccion(tipoAutomatica)
+                                        .observaciones("Descuento automático (faltas, tardanzas y criterios)")
+                                        .monto(descuentoAutomatica)
+                                        .pago(pago)
+                                        .build();
+
+                        listaDeducciones.add(deduccion);
+                        totalDeducciones = totalDeducciones.add(descuentoAutomatica);
+                }
+
+                // -----------------------------
+                // DEDUCCIONES MANUALES
+                // -----------------------------
+                if (dto.getDeducciones() != null) {
+                        for (DescuentoRequestDTO d : dto.getDeducciones()) {
+                                if (d.getTipoDeduccionId() == null || d.getMonto().compareTo(BigDecimal.ZERO) <= 0)
+                                        continue;
+
+                                TipoDeduccion tipo = tipoDeduccionRepository.findById(d.getTipoDeduccionId())
+                                                .orElseThrow(() -> new RuntimeException(
+                                                                "Tipo deducción no encontrado"));
+
+                                Deduccion deduccion = Deduccion.builder()
+                                                .tipoDeduccion(tipo)
+                                                .observaciones(d.getObservaciones())
+                                                .monto(d.getMonto())
+                                                .pago(pago)
+                                                .build();
+
+                                listaDeducciones.add(deduccion);
+                                totalDeducciones = totalDeducciones.add(d.getMonto());
+                        }
+                }
+
+                // -----------------------------
+                // ASOCIAR LISTAS
+                // -----------------------------
+                pago.setAdelantos(listaAdelantos);
+                pago.setBonificaciones(listaBonificaciones);
+                pago.setDeducciones(listaDeducciones);
+
+                // -----------------------------
+                // CALCULAR NETO
+                // -----------------------------
+                recalcularNeto(pago, totalBonificaciones, totalDeducciones, totalAdelantos);
+
+                // -----------------------------
+                // GUARDAR PAGO
+                // -----------------------------
+                pagoRepository.save(pago);
+
+                return mapToResponse(pago);
         }
-    }
-
-    // -----------------------------
-    // BONIFICACIONES
-    // -----------------------------
-    if (dto.getBonificaciones() != null) {
-        for (BonificacionRequestDTO b : dto.getBonificaciones()) {
-            if (b.getMonto().compareTo(BigDecimal.ZERO) <= 0) continue;
-
-            Bonificacion bonificacion = Bonificacion.builder()
-                    .nombre(b.getNombre())
-                    .monto(b.getMonto())
-                    .pago(pago)
-                    .build();
-            listaBonificaciones.add(bonificacion);
-            totalBonificaciones = totalBonificaciones.add(b.getMonto());
-        }
-    }
-
-    // -----------------------------
-    // DEDUCCIONES AUTOMÁTICAS
-    // -----------------------------
-    BigDecimal descuentoAutomatica = BigDecimal.ZERO;
-
-    // Docente
-    Optional<Docente> docenteOpt = docenteRepository.findByUsuarioId(usuario.getId());
-    if (docenteOpt.isPresent()) {
-        Docente docente = docenteOpt.get();
-
-        LocalDate inicioMes = dto.getFecha().withDayOfMonth(1);
-        LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
-
-        PlanillaDocenteDTO planilla = planillaDocenteService.calcularPlanilla(
-                docente.getId(),
-                inicioMes,
-                finMes
-        );
-
-        descuentoAutomatica = planilla.getDescuentoFaltas()
-                .add(planilla.getDescuentoTardanza())
-                .add(planilla.getDescuentoCriterios());
-    }
-
-    // Administrativo
-    Optional<Administrativo> adminOpt = administrativoRepository.findByUsuarioId(usuario.getId());
-    if (adminOpt.isPresent()) {
-        Administrativo admin = adminOpt.get();
-
-        LocalDate inicioMes = dto.getFecha().withDayOfMonth(1);
-        LocalDate finMes = inicioMes.withDayOfMonth(inicioMes.lengthOfMonth());
-
-        PlanillaAdministrativoDTO planilla = planillaAdministrativoService.calcularPlanilla(
-                admin.getId(),
-                inicioMes,
-                finMes
-        );
-
-        descuentoAutomatica = descuentoAutomatica.add(
-                planilla.getDescuentoFaltas().add(planilla.getDescuentoTardanza())
-        );
-    }
-
-    // Crear deducción automática si aplica
-    if (descuentoAutomatica.compareTo(BigDecimal.ZERO) > 0) {
-        TipoDeduccion tipoAutomatica = tipoDeduccionRepository
-                .findByNombre("Automática")
-                .orElseThrow(() -> new RuntimeException(
-                        "Debe existir tipo deducción 'Automática'"));
-
-        Deduccion deduccion = Deduccion.builder()
-                .tipoDeduccion(tipoAutomatica)
-                .observaciones("Descuento automático (faltas, tardanzas y criterios)")
-                .monto(descuentoAutomatica)
-                .pago(pago)
-                .build();
-
-        listaDeducciones.add(deduccion);
-        totalDeducciones = totalDeducciones.add(descuentoAutomatica);
-    }
-
-    // -----------------------------
-    // DEDUCCIONES MANUALES
-    // -----------------------------
-    if (dto.getDeducciones() != null) {
-        for (DescuentoRequestDTO d : dto.getDeducciones()) {
-            if (d.getTipoDeduccionId() == null || d.getMonto().compareTo(BigDecimal.ZERO) <= 0) continue;
-
-            TipoDeduccion tipo = tipoDeduccionRepository.findById(d.getTipoDeduccionId())
-                    .orElseThrow(() -> new RuntimeException("Tipo deducción no encontrado"));
-
-            Deduccion deduccion = Deduccion.builder()
-                    .tipoDeduccion(tipo)
-                    .observaciones(d.getObservaciones())
-                    .monto(d.getMonto())
-                    .pago(pago)
-                    .build();
-
-            listaDeducciones.add(deduccion);
-            totalDeducciones = totalDeducciones.add(d.getMonto());
-        }
-    }
-
-    // -----------------------------
-    // ASOCIAR LISTAS
-    // -----------------------------
-    pago.setAdelantos(listaAdelantos);
-    pago.setBonificaciones(listaBonificaciones);
-    pago.setDeducciones(listaDeducciones);
-
-    // -----------------------------
-    // CALCULAR NETO
-    // -----------------------------
-    recalcularNeto(pago, totalBonificaciones, totalDeducciones, totalAdelantos);
-
-    // -----------------------------
-    // GUARDAR PAGO
-    // -----------------------------
-    pagoRepository.save(pago);
-
-    return mapToResponse(pago);
-}
 
         // =====================================================
         // ACTUALIZAR PAGO
@@ -368,7 +380,6 @@ public PagoResponseDTO crear(PagoRequestDTO dto) {
                 return contrato.getMontoBase().multiply(horasTrabajadas);
         }
 
-        
         private void recalcularNeto(Pago pago, BigDecimal bonificaciones, BigDecimal deducciones,
                         BigDecimal adelantos) {
                 BigDecimal neto = pago.getMontoActividad()
@@ -407,10 +418,10 @@ public PagoResponseDTO crear(PagoRequestDTO dto) {
                                 .divide(BigDecimal.valueOf(60), 2, RoundingMode.HALF_UP);
         }
 
- private PagoResponseDTO mapToResponse(Pago pago) {
-
+        private PagoResponseDTO mapToResponse(Pago pago) {
     PagoResponseDTO dto = new PagoResponseDTO();
 
+    // 1. Datos básicos del Pago
     dto.setPagoId(pago.getId());
     dto.setFecha(pago.getFecha());
 
@@ -423,55 +434,62 @@ public PagoResponseDTO crear(PagoRequestDTO dto) {
     dto.setMontoActividad(pago.getMontoActividad());
     dto.setNetoPagar(pago.getNetoPagar());
 
-    // ================= BONIFICACIONES =================
-    List<BonificacionResponseDTO> bonificaciones = pago.getBonificaciones() == null
-            ? List.of()
-            : pago.getBonificaciones().stream().map(b -> {
+    // 2. MAPEAR TOTALES (Esto es lo que salía null en tu JSON)
+    BigDecimal totalBono = pago.getBonificaciones() != null ? 
+        pago.getBonificaciones().stream().map(Bonificacion::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
+    
+    BigDecimal totalDeduc = pago.getDeducciones() != null ? 
+        pago.getDeducciones().stream().map(Deduccion::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
+        
+    BigDecimal totalAdel = pago.getAdelantos() != null ? 
+        pago.getAdelantos().stream().map(Adelanto::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-                BonificacionResponseDTO dtoB = new BonificacionResponseDTO();
-                dtoB.setNombre(b.getNombre());
-                dtoB.setMonto(b.getMonto());
+    dto.setTotalBonificaciones(totalBono);
+    dto.setTotalDeducciones(totalDeduc);
+    dto.setTotalAdelantos(totalAdel);
 
-                return dtoB;
-            }).toList();
+    // 3. MAPEAR LISTA DE ADELANTOS (Con todos sus campos)
+    dto.setAdelantos(pago.getAdelantos() == null ? List.of() : 
+        pago.getAdelantos().stream().map(a -> {
+            AdelantoResponseDTO dtoA = new AdelantoResponseDTO();
+            dtoA.setId(a.getId());
+            dtoA.setNombre(a.getNombre());
+            dtoA.setMonto(a.getMonto());
+            dtoA.setEstado(a.getEstado() != null ? a.getEstado() : null);
+            dtoA.setUsuarioId(a.getUsuario() != null ? a.getUsuario().getId() : null);
+            dtoA.setPagoId(pago.getId());
+            
+            if (a.getUsuario() != null && a.getUsuario().getPersona() != null) {
+                Persona p = a.getUsuario().getPersona();
+                dtoA.setNombreCompletoPersonal(p.getNombres() + " " + p.getApellidos());
+                dtoA.setDniPersonal(p.getDni());
+            }
+            return dtoA;
+        }).toList());
 
-    dto.setBonificaciones(bonificaciones);
+    // 4. MAPEAR LISTA DE BONIFICACIONES
+    dto.setBonificaciones(pago.getBonificaciones() == null ? List.of() : 
+        pago.getBonificaciones().stream().map(b -> {
+            BonificacionResponseDTO dtoB = new BonificacionResponseDTO();
+            dtoB.setNombre(b.getNombre());
+            dtoB.setMonto(b.getMonto());
+            return dtoB;
+        }).toList());
 
-    // ================= DEDUCCIONES =================
-    List<DescuentoResponseDTO> deducciones = pago.getDeducciones() == null
-            ? List.of()
-            : pago.getDeducciones().stream().map(d -> {
-
-                DescuentoResponseDTO dtoD = new DescuentoResponseDTO();
-                dtoD.setMonto(d.getMonto());
-                dtoD.setObservaciones(d.getObservaciones());
-
-                if (d.getTipoDeduccion() != null) {
-                    dtoD.setTipoDeduccionId(d.getTipoDeduccion().getId());
-                }
-
-                return dtoD;
-            }).toList();
-
-    dto.setDeducciones(deducciones);
-
-    // ================= ADELANTOS =================
-    List<AdelantoResponseDTO> adelantos = pago.getAdelantos() == null
-            ? List.of()
-            : pago.getAdelantos().stream().map(a -> {
-
-                AdelantoResponseDTO dtoA = new AdelantoResponseDTO();
-                dtoA.setNombre(a.getNombre());
-                dtoA.setMonto(a.getMonto());
-
-                return dtoA;
-            }).toList();
-
-    dto.setAdelantos(adelantos);
+    // 5. MAPEAR LISTA DE DEDUCCIONES
+    dto.setDeducciones(pago.getDeducciones() == null ? List.of() : 
+        pago.getDeducciones().stream().map(d -> {
+            DescuentoResponseDTO dtoD = new DescuentoResponseDTO();
+            dtoD.setMonto(d.getMonto());
+            dtoD.setObservaciones(d.getObservaciones());
+            if (d.getTipoDeduccion() != null) {
+                dtoD.setTipoDeduccionId(d.getTipoDeduccion().getId());
+            }
+            return dtoD;
+        }).toList());
 
     return dto;
 }
-
         // =====================================================
         // OBTENER CARGO DEL USUARIO (ADMINISTRATIVO O DOCENTE)
         // =====================================================
@@ -483,28 +501,32 @@ public PagoResponseDTO crear(PagoRequestDTO dto) {
                                                 .orElse("SIN ASIGNACIÓN"));
         }
 
-   /*      private int calcularDiasProgramados(
-                        Long administrativoId,
-                        LocalDate inicio,
-                        LocalDate fin) {
-
-                List<CronogramaAdministrativo> cronogramas = cronogramaAdministrativoRepository
-                                .findByAdministrativoId(administrativoId);
-
-                int dias = 0;
-
-                for (LocalDate fecha = inicio; !fecha.isAfter(fin); fecha = fecha.plusDays(1)) {
-
-                        String dia = fecha.getDayOfWeek().name();
-
-                        for (CronogramaAdministrativo c : cronogramas) {
-                                if (c.getDiaSemana().name().equals(dia)) {
-                                        dias++;
-                                        break;
-                                }
-                        }
-                }
-
-                return dias;
-        } */
+        /*
+         * private int calcularDiasProgramados(
+         * Long administrativoId,
+         * LocalDate inicio,
+         * LocalDate fin) {
+         * 
+         * List<CronogramaAdministrativo> cronogramas =
+         * cronogramaAdministrativoRepository
+         * .findByAdministrativoId(administrativoId);
+         * 
+         * int dias = 0;
+         * 
+         * for (LocalDate fecha = inicio; !fecha.isAfter(fin); fecha =
+         * fecha.plusDays(1)) {
+         * 
+         * String dia = fecha.getDayOfWeek().name();
+         * 
+         * for (CronogramaAdministrativo c : cronogramas) {
+         * if (c.getDiaSemana().name().equals(dia)) {
+         * dias++;
+         * break;
+         * }
+         * }
+         * }
+         * 
+         * return dias;
+         * }
+         */
 }

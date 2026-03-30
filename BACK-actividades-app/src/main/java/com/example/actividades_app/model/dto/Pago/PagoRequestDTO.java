@@ -19,7 +19,7 @@ public class PagoRequestDTO {
     @NotNull
     private Long contratoId;
 
-    private List<AdelantoRequestDTO> adelantos;
+    private List<Long> adelantoIds;
     private List<BonificacionRequestDTO> bonificaciones;
     private List<DescuentoRequestDTO> deducciones;
 }

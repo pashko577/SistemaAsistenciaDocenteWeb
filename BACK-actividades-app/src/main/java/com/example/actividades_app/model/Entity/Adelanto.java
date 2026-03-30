@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
 
+import com.example.actividades_app.enums.EstadoAdelanto;
 @Entity
 @Table(name = "adelanto")
 @Data
@@ -18,14 +19,23 @@ public class Adelanto {
     private Long id;
 
     @Column(name = "nombre", nullable = false, length = 150)
-    private String nombre;
+    private String nombre; // Ej: "Adelanto Quincena Marzo"
 
     @Column(name = "monto", nullable = false, precision = 10, scale = 2)
     private BigDecimal monto;
 
-    // FK -> Pago
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "pagoID", nullable = false)
-    private Pago pago;
+    @Enumerated(EnumType.STRING) // Importante para guardar el texto (PENDIENTE/APLICADO)
+    @Column(name = "estado", nullable = false)
+    private EstadoAdelanto estado;
 
+    // RELACIÓN CON USUARIO (La que unificamos)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuarioID", nullable = false)
+    private Usuario usuario;
+
+    // RELACIÓN CON PAGO (Ahora es opcional: nullable = true)
+    // Solo se llena cuando el estado pasa a APLICADO
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pagoID", nullable = true)
+    private Pago pago;
 }
