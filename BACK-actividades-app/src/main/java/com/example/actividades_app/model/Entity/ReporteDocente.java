@@ -19,8 +19,6 @@ public class ReporteDocente {
     @Column(name = "observaciones", length = 300)
     private String observaciones;
 
-    @Column(name = "tardanza")
-    private Integer tardanza;
 
     // FK -> CronogramaDiario
     @ManyToOne(fetch = FetchType.LAZY)

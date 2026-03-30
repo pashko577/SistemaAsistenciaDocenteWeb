@@ -24,10 +24,9 @@ public class AsistenciaDocenteServiceImpl implements AsistenciaDocenteService {
     private final CronogramaDiarioRepository cronogramaDiarioRepository;
 
    private static final int TOLERANCIA_MINUTOS = 5;
-
 @Override
 public AsistenciaDocenteResponseDTO registrar(AsistenciaDocenteRequestDTO dto) {
-
+    // 1. Validaciones previas
     if (asistenciaRepository.existsByCronogramaDiarioId(dto.getCronogramaDiarioId())) {
         throw new RuntimeException("La asistencia ya fue registrada");
     }
@@ -35,47 +34,38 @@ public AsistenciaDocenteResponseDTO registrar(AsistenciaDocenteRequestDTO dto) {
     CronogramaDiario cronograma = cronogramaDiarioRepository.findById(dto.getCronogramaDiarioId())
             .orElseThrow(() -> new RuntimeException("Cronograma diario no encontrado"));
 
-    LocalTime horaInicio = cronograma
-            .getCronogramaDocente()
-            .getHorarioBloque()
-            .getHoraInicio();
+    LocalTime horaInicio = cronograma.getCronogramaDocente().getHorarioBloque().getHoraInicio();
 
+    // 2. Cálculo de minutos de tardanza
     int minutosTardanza = 0;
-
     if (dto.getHoraEntradaDoc() != null) {
-
-        long minutos = java.time.Duration
-                .between(horaInicio, dto.getHoraEntradaDoc())
-                .toMinutes();
-
-        minutosTardanza = (int) Math.max(minutos - TOLERANCIA_MINUTOS, 0);
+        long diferencia = java.time.Duration.between(horaInicio, dto.getHoraEntradaDoc()).toMinutes();
+        // Aplicamos la constante de tolerancia que ya tenías definida
+        minutosTardanza = (int) Math.max(diferencia - TOLERANCIA_MINUTOS, 0);
     }
 
+    // 3. Determinación del Estado
     EstadoAsistenciaDocente estado;
-
     if (dto.getEstadoAsistencia() == EstadoAsistenciaDocente.PERMISO) {
-
         estado = EstadoAsistenciaDocente.PERMISO;
-
+        minutosTardanza = 0; // Si tiene permiso, no se le cuenta tardanza
     } else if (dto.getHoraEntradaDoc() == null) {
-
         estado = EstadoAsistenciaDocente.FALTA;
-
+        minutosTardanza = 0; // En falta no hay "minutos", hay inasistencia
     } else if (minutosTardanza > 0) {
-
         estado = EstadoAsistenciaDocente.TARDANZA;
-
     } else {
-
         estado = EstadoAsistenciaDocente.PUNTUAL;
     }
 
+    // 4. Construcción y Persistencia
     AsistenciaDocente asistencia = AsistenciaDocente.builder()
             .horaEntradaDoc(dto.getHoraEntradaDoc())
             .horaSalidaDoc(dto.getHoraSalidaDoc())
             .observacion(dto.getObservacion())
             .materialClase(dto.getMaterialClase())
             .usoTerno(dto.getUsoTerno())
+            .minutosTardanza(minutosTardanza) // <--- ASIGNAMOS EL VALOR CALCULADO
             .estadoAsistencia(estado)
             .cronogramaDiario(cronograma)
             .build();
@@ -94,18 +84,18 @@ public AsistenciaDocenteResponseDTO registrar(AsistenciaDocenteRequestDTO dto) {
                 .toList();
     }
 
-    private AsistenciaDocenteResponseDTO mapToResponse(AsistenciaDocente a) {
-
-        return AsistenciaDocenteResponseDTO.builder()
-                .id(a.getId())
-                .horaEntradaDoc(a.getHoraEntradaDoc())
-                .horaSalidaDoc(a.getHoraSalidaDoc())
-                .observacion(a.getObservacion())
-                .materialClase(a.getMaterialClase())
-                .usoTerno(a.getUsoTerno())
-                .estadoAsistencia(a.getEstadoAsistencia())
-                .cronogramaDiarioId(a.getCronogramaDiario().getId())
-                .build();
-    }
-
+// No olvides actualizar el mapeador
+private AsistenciaDocenteResponseDTO mapToResponse(AsistenciaDocente a) {
+    return AsistenciaDocenteResponseDTO.builder()
+            .id(a.getId())
+            .horaEntradaDoc(a.getHoraEntradaDoc())
+            .horaSalidaDoc(a.getHoraSalidaDoc())
+            .minutosTardanza(a.getMinutosTardanza()) // <--- LO ENVIAMOS AL DTO
+            .observacion(a.getObservacion())
+            .materialClase(a.getMaterialClase())
+            .usoTerno(a.getUsoTerno())
+            .estadoAsistencia(a.getEstadoAsistencia())
+            .cronogramaDiarioId(a.getCronogramaDiario().getId())
+            .build();
+}
 }

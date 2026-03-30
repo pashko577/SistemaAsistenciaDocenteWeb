@@ -25,6 +25,7 @@ public class AsistenciaDocenteResponseDTO {
 
     private EstadoAsistenciaDocente estadoAsistencia;
 
+    private Integer minutosTardanza;
     private Long cronogramaDiarioId;
 
 }

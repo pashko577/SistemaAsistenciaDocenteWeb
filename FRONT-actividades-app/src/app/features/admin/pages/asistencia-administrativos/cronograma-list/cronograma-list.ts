@@ -8,11 +8,12 @@ import { DiaSemana } from '../../../../../core/models/enums/dia-semana';
 import { CronogramaAdministrativoService } from '../../../../../core/services/cronograma-administrativo';
 import { AdministrativoResponse } from '../../../../../core/models/Administrativos/administrativo-response';
 import { AdministrativoService } from '../../../../../core/services/administrativo_services';
+import { MatIcon } from "@angular/material/icon";
 
 @Component({
   selector: 'app-cronograma-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MatIcon],
   templateUrl: './cronograma-list.html'
 })
 export class CronogramaList implements OnInit {

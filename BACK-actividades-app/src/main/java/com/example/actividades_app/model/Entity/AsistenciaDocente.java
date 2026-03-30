@@ -4,13 +4,11 @@ import com.example.actividades_app.enums.EstadoAsistenciaDocente;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalTime;
+
 @Entity
-@Table(
-    name = "asistencia_docente",
-    uniqueConstraints = {
+@Table(name = "asistencia_docente", uniqueConstraints = {
         @UniqueConstraint(columnNames = "cronogramaDiarioID")
-    }
-)
+})
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,6 +35,9 @@ public class AsistenciaDocente {
     @Column(name = "usoTerno")
     private Boolean usoTerno;
 
+    @Column(name = "minutosTardanza")
+    private Integer minutosTardanza;
+    
     @Enumerated(EnumType.STRING)
     @Column(name = "estadoAsistencia", nullable = false)
     private EstadoAsistenciaDocente estadoAsistencia;

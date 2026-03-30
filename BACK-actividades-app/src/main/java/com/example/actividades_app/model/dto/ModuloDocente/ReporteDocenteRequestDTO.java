@@ -8,12 +8,9 @@ import lombok.Data;
 @Data
 public class ReporteDocenteRequestDTO {
 
-    @NotNull(message = "La fecha es obligatoria")
-    private LocalDate fecha;
+
 
     private String observaciones;
-
-    private Integer tardanza;
 
     @NotNull(message = "El cronograma diario es obligatorio")
     private Long cronogramaDiarioId;

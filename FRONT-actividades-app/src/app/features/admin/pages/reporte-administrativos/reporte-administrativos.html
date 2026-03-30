@@ -1,13 +1,13 @@
 <div class="p-8 bg-slate-100 min-h-screen">
   
-  <mat-card class="mb-8 no-print !rounded-2xl !shadow-md !border-none">
-    <mat-card-content class="pt-6">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+  <mat-card class="mb-8 no-print !rounded-3xl !shadow-sm !border-none">
+    <mat-card-content class="pt-6 px-6">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
         
         <mat-form-field appearance="fill" class="md:col-span-4 w-full">
           <mat-label>Personal Administrativo</mat-label>
           <input type="text" matInput [matAutocomplete]="auto" [(ngModel)]="terminoBusqueda" (input)="filtrarPersonal()">
-          <mat-icon matSuffix class="text-slate-400">search</mat-icon>
+          <mat-icon matSuffix class="text-emerald-800">search</mat-icon>
           <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarAdministrativo($event.option.value)">
             <mat-option *ngFor="let admin of administrativosFiltrados" [value]="admin">
               <div class="flex flex-col py-1">
@@ -23,7 +23,7 @@
           <mat-select [(ngModel)]="mesSeleccionado" (selectionChange)="consultarReporte()">
             <mat-option *ngFor="let m of meses" [value]="m.id">{{ m.nombre }}</mat-option>
           </mat-select>
-          <mat-icon matSuffix class="text-slate-400">calendar_month</mat-icon>
+          <mat-icon matSuffix class="text-emerald-800">calendar_month</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="fill" class="md:col-span-2 w-full">
@@ -33,42 +33,45 @@
           </mat-select>
         </mat-form-field>
 
-       <div class="md:col-span-3 flex gap-2 h-[56px] items-center">
-  <button mat-flat-button color="primary" class="flex-1 !h-full !rounded-xl !font-bold"
-          [disabled]="!administrativoId" (click)="consultarReporte()">
-    GENERAR
-  </button>
+        <div class="md:col-span-3 flex gap-2 h-[56px] items-center">
+          <button mat-flat-button class="flex-1 !h-full !rounded-2xl !font-bold !bg-emerald-900 !text-white"
+                  [disabled]="!administrativoId" (click)="consultarReporte()">
+            GENERAR
+          </button>
 
-  <button mat-stroked-button class="!h-full !rounded-xl !border-slate-300" 
-          (click)="imprimir()" matTooltip="Imprimir PDF">
-    <mat-icon class="text-slate-600">print</mat-icon>
-  </button>
+          <button mat-stroked-button class="!h-full !rounded-2xl !border-slate-300" 
+                  (click)="imprimir()" matTooltip="Imprimir PDF">
+            <mat-icon class="text-slate-600">print</mat-icon>
+          </button>
 
-  <button mat-flat-button 
-          class="!h-full !rounded-xl !bg-emerald-600 !text-white hover:!bg-emerald-700 disabled:!bg-slate-200"
-          [disabled]="reporte.length === 0"
-          (click)="exportarExcel()" 
-          matTooltip="Descargar Excel">
-    <mat-icon>description</mat-icon>
-  </button>
-</div>
+          <button mat-flat-button 
+                  class="!h-full !rounded-2xl !bg-emerald-600 !text-white hover:!bg-emerald-700 disabled:!bg-slate-200"
+                  [disabled]="reporte.length === 0"
+                  (click)="exportarExcel()" 
+                  matTooltip="Descargar Excel">
+            <mat-icon>description</mat-icon>
+          </button>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
 
-  <div class="bg-white shadow-2xl rounded-sm max-w-5xl mx-auto overflow-hidden border-t-4 border-blue-600" id="printable-area">
+  <div class="bg-white shadow-2xl rounded-3xl max-w-5xl mx-auto overflow-hidden border-t-[6px] border-emerald-900" id="printable-area">
     
-    <div class="p-10 border-b border-slate-100 bg-slate-50/50">
+    <div class="p-10 border-b border-slate-100 bg-emerald-50/30">
       <div class="flex justify-between items-start">
         <div>
-          <h1 class="text-2xl font-black text-slate-800 uppercase">Reporte de Asistencia</h1>
-          <p class="text-blue-600 font-bold mt-2 text-lg">{{ nombreSeleccionado || '---' }}</p>
+          <h1 class="text-2xl font-black text-emerald-950 uppercase tracking-tight">Reporte de Asistencia</h1>
+          <p class="text-emerald-700 font-bold mt-1 text-xl">{{ nombreSeleccionado || '---' }}</p>
+          <p class="text-emerald-600/60 text-[10px] font-black uppercase tracking-widest">
+    {{ cargoAdministrativo }} | DNI: {{ dniAdministrativo }}
+  </p>
         </div>
         <div class="text-right">
-          <span class="px-4 py-2 bg-yellow-400 text-black font-black rounded-full text-xs">
+          <span class="px-5 py-2 bg-emerald-900 text-white font-black rounded-full text-xs shadow-lg shadow-emerald-200">
             {{ meses[mesSeleccionado-1].nombre }} {{ anioSeleccionado }}
           </span>
-          <p class="text-[10px] text-slate-400 mt-2 font-mono uppercase">COLEGIO JAMES BALDWIN</p>
+          <p class="text-[10px] text-emerald-800/50 mt-3 font-bold uppercase tracking-widest">COLEGIO JAMES BALDWIN</p>
         </div>
       </div>
     </div>
@@ -76,32 +79,34 @@
     <div class="p-10">
       <table class="w-full text-left">
         <thead>
-          <tr class="text-[11px] font-bold text-slate-400 uppercase tracking-wider border-b-2 border-slate-100">
-            <th class="pb-4">Día / Fecha</th>
-            <th class="pb-4 text-center">Ingreso</th>
-            <th class="pb-4 text-center">Almuerzo</th>
-            <th class="pb-4 text-center">Salida</th>
-            <th class="pb-4 text-center">Terno</th>
-            <th class="pb-4 pr-2 text-right">Tardanza</th>
+          <tr class="text-[11px] font-bold text-emerald-900/40 uppercase tracking-widest border-b-2 border-emerald-50">
+            <th class="pb-5 pl-2">Día / Fecha</th>
+            <th class="pb-5 text-center">Ingreso</th>
+            <th class="pb-5 text-center">Almuerzo</th>
+            <th class="pb-5 text-center">Salida</th>
+            <th class="pb-5 text-center">Terno</th>
+            <th class="pb-5 pr-2 text-right">Tardanza</th>
           </tr>
         </thead>
         <tbody class="text-slate-600">
-          <tr *ngFor="let item of reporte" class="border-b border-slate-50 hover:bg-blue-50/30">
-            <td class="py-4">
+          <tr *ngFor="let item of reporte" class="border-b border-slate-50 hover:bg-emerald-50/40 transition-colors">
+            <td class="py-4 pl-2">
               <div class="font-bold text-slate-800">{{ item.fecha | date:'EEEE':'':'es' | uppercase }}</div>
-              <div class="text-[11px] text-slate-400">{{ item.fecha | date:'dd/MM/yyyy' }}</div>
+              <div class="text-[11px] text-emerald-700/60 font-medium">{{ item.fecha | date:'dd/MM/yyyy' }}</div>
             </td>
-            <td class="py-4 text-center font-mono text-sm">{{ item.horaIngreso || '--:--' }}</td>
+            <td class="py-4 text-center font-mono text-sm font-semibold text-slate-700">{{ item.horaIngreso || '--:--' }}</td>
             <td class="py-4 text-center text-xs text-slate-400 font-mono">
-               {{ item.salidaAlmuerzo || '--' }} | {{ item.retornoAlmuerzo || '--' }}
+               {{ item.salidaAlmuerzo || '--' }} <span class="text-emerald-200 px-1">|</span> {{ item.retornoAlmuerzo || '--' }}
             </td>
-            <td class="py-4 text-center font-mono text-sm">{{ item.horaSalida || '--:--' }}</td>
+            <td class="py-4 text-center font-mono text-sm font-semibold text-slate-700">{{ item.horaSalida || '--:--' }}</td>
             <td class="py-4 text-center">
-              <span *ngIf="item.terno" class="text-blue-500 bg-blue-50 px-2 py-1 rounded text-[10px] font-bold">👔 SÍ</span>
+              <span *ngIf="item.terno" class="text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">
+                👔 SÍ
+              </span>
               <span *ngIf="!item.terno" class="text-slate-300">-</span>
             </td>
-            <td class="py-4 text-right">
-              <span *ngIf="item.tardanza > 0" class="text-red-600 font-black bg-red-50 px-2 py-1 rounded text-xs">
+            <td class="py-4 text-right pr-2">
+              <span *ngIf="item.tardanza > 0" class="text-red-700 font-black bg-red-50 px-2 py-1 rounded-lg text-xs border border-red-100">
                 +{{ item.tardanza }} min
               </span>
             </td>
@@ -109,29 +114,36 @@
         </tbody>
       </table>
 
-      <div *ngIf="reporte.length === 0" class="py-20 text-center text-slate-400 italic">
+      <div *ngIf="reporte.length === 0" class="py-20 text-center text-emerald-900/20 italic font-medium">
         No hay registros para este periodo.
       </div>
 
-      <div class="mt-12 flex justify-end">
-        <div class="w-80 space-y-3">
-          <div class="flex justify-between items-center px-4 py-2 border-l-4 border-red-500 bg-slate-50">
-            <span class="text-[11px] font-bold text-slate-500 uppercase">Tardanza Total</span>
-            <span class="text-red-600 font-black text-lg">{{ totalMinutosTardanza }} min</span>
+      <div class="mt-16 flex justify-end">
+        <div class="w-85 space-y-4">
+          <div class="flex justify-between items-center px-5 py-3 border-l-4 border-red-500 bg-slate-50 rounded-r-xl">
+            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tardanza Total</span>
+            <span class="text-red-700 font-black text-xl">{{ totalMinutosTardanza }} min</span>
           </div>
-          <div class="flex justify-between items-center px-4 py-4 bg-slate-900 rounded-xl shadow-lg">
-            <span class="text-xs font-bold text-slate-400 uppercase">Descuento</span>
-            <span class="text-white font-black text-2xl">S/ {{ montoDescuento | number:'1.2-2' }}</span>
+          
+          <div class="flex justify-between items-center px-6 py-5 bg-emerald-900 rounded-2xl shadow-xl shadow-emerald-200">
+            <span class="text-xs font-bold text-emerald-100 uppercase tracking-widest">Monto Descuento</span>
+            <span class="text-white font-black text-3xl tracking-tight">S/ {{ montoDescuento | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="p-10 bg-slate-50 border-t border-slate-100">
-       <div class="flex justify-around items-center pt-10">
-          <div class="w-48 border-t border-slate-300 text-[10px] text-slate-400 font-bold text-center uppercase">Firma del Empleado</div>
-          <div class="w-48 border-t border-slate-300 text-[10px] text-slate-400 font-bold text-center uppercase">Recursos Humanos</div>
-       </div>
+    <div class="p-10 bg-emerald-50/20 border-t border-slate-100">
+        <div class="flex justify-around items-center pt-10 pb-4">
+          <div class="flex flex-col items-center">
+            <div class="w-52 border-t-2 border-emerald-900/20 mb-3"></div>
+            <span class="text-[10px] text-emerald-900/40 font-black uppercase tracking-widest">Firma del Empleado</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <div class="w-52 border-t-2 border-emerald-900/20 mb-3"></div>
+            <span class="text-[10px] text-emerald-900/40 font-black uppercase tracking-widest">Recursos Humanos</span>
+          </div>
+        </div>
     </div>
   </div>
 </div>

@@ -1,104 +1,127 @@
-<div class="min-h-screen bg-gray-50 p-4 sm:p-8">
-  <div class="max-w-7xl mx-auto">
-    <div class="bg-white rounded-t-xl shadow-sm border-b border-gray-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold text-gray-800">Control de Asistencia</h1>
-        <p class="text-sm text-gray-500">Personal Administrativo - Transcripción diaria</p>
+<div class="min-h-screen bg-slate-50 p-4 sm:p-8">
+  <div class="max-w-7xl mx-auto space-y-4">
+    
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-4">
+        <div class="p-3 bg-emerald-500/10 rounded-xl">
+          <mat-icon class="text-emerald-600">history_edu</mat-icon>
+        </div>
+        <div>
+          <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Control de Asistencia</h1>
+          <p class="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">Transcripción Diaria Administrativa</p>
+        </div>
       </div>
-      <div class="flex items-center gap-3 bg-gray-100 p-2 rounded-lg border border-gray-200">
-        <label class="text-xs font-bold text-gray-500 px-2 uppercase tracking-tighter">Fecha de Proceso:</label>
+
+      <div class="flex items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200 shadow-sm">
+        <mat-icon class="text-slate-400 ml-2">calendar_today</mat-icon>
+        <label class="text-[10px] font-black text-slate-500 uppercase tracking-tighter">Fecha de Proceso:</label>
         <input type="date" [(ngModel)]="fechaSeleccionada" (ngModelChange)="cargarDatos()"
-          class="bg-white border border-gray-300 text-gray-900 text-sm rounded-md focus:ring-2 focus:ring-blue-500 outline-none p-2 shadow-sm">
+          class="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none p-2 shadow-inner font-bold">
       </div>
     </div>
 
-    <div class="bg-white shadow-xl rounded-b-xl overflow-hidden border border-gray-100">
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden border border-slate-100">
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
-          <thead class="text-[11px] text-gray-400 uppercase bg-gray-50/50 border-b font-black tracking-widest">
+          <thead class="text-[10px] text-slate-400 uppercase bg-slate-50/50 border-b border-slate-100 font-black tracking-widest">
             <tr>
-              <th class="px-6 py-4">Personal Administrativo</th>
-              <th class="px-2 py-4 text-center">Horario</th>
-              <th class="px-2 py-4">Ingreso</th>
-              <th class="px-2 py-4 text-center">Almuerzo (S/R)</th>
-              <th class="px-2 py-4 text-center">Salida</th>
-              <th class="px-2 py-4 text-center">Terno</th>
-              <th class="px-2 py-4 text-center">Estado</th>
-              <th class="px-6 py-4 text-right">Acciones</th>
+              <th class="px-6 py-5">Personal</th>
+              <th class="px-2 py-5 text-center">Programado</th>
+              <th class="px-2 py-5">Ingreso</th>
+              <th class="px-2 py-5 text-center">Almuerzo (S/R)</th>
+              <th class="px-2 py-5 text-center">Salida</th>
+              <th class="px-2 py-5 text-center">Terno</th>
+              <th class="px-2 py-5 text-center">Estado</th>
+              <th class="px-6 py-5 text-right">Acciones</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-slate-50">
             <tr *ngFor="let f of asistenciasView"
-                [ngClass]="{'bg-indigo-50/30': f.editado, 'bg-white': !f.editado}"
-                class="hover:bg-gray-50/80 transition-all duration-200">
+                [ngClass]="{'bg-emerald-50/20': f.editado, 'bg-white': !f.editado}"
+                class="hover:bg-slate-50/80 transition-all duration-200 group">
 
               <td class="px-6 py-4">
-                <div class="flex flex-col">
-                  <span class="font-extrabold text-gray-800 uppercase text-xs mb-1">{{ f.nombre }}</span>
-                  <span class="text-[10px] text-gray-400 font-mono tracking-tighter">CÓDIGO: {{ f.administrativoId }}</span>
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
+                    <mat-icon class="!w-5 !h-5 !text-[20px]">account_circle</mat-icon>
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="font-bold text-slate-700 uppercase text-xs tracking-tight">{{ f.nombre }}</span>
+                    <span class="text-[9px] text-slate-400 font-mono tracking-tighter">ID: {{ f.administrativoId }}</span>
+                  </div>
                 </div>
               </td>
 
               <td class="px-2 py-4 text-center">
-                <span class="px-2 py-1 bg-slate-100 text-slate-600 rounded-md text-[10px] font-bold border border-slate-200">
+                <div class="inline-flex items-center gap-1.5 px-2 py-1 bg-slate-100 text-slate-600 rounded-lg text-[10px] font-black border border-slate-200">
+                  <mat-icon class="!w-3 !h-3 !text-[14px]">schedule</mat-icon>
                   {{ f.horaEntradaProg }}
-                </span>
+                </div>
               </td>
 
               <td class="px-2 py-4">
-                <div class="relative">
+                <div class="relative max-w-[110px]">
                   <input type="time" [(ngModel)]="f.horaIngreso" (ngModelChange)="onIngresoChange(f)"
-                         class="w-full p-1.5 border rounded-lg text-xs font-medium focus:ring-2 outline-none transition-all shadow-sm"
+                         class="w-full p-2 border rounded-xl text-xs font-bold focus:ring-4 outline-none transition-all shadow-sm"
                          [ngClass]="{
-                           'border-red-300 bg-red-50 text-red-700 focus:ring-red-400': f.tardanza > 0,
-                           'border-emerald-200 bg-emerald-50 text-emerald-700 focus:ring-emerald-400': f.horaIngreso && f.tardanza === 0,
-                           'border-gray-200 focus:ring-blue-400': !f.horaIngreso
+                           'border-rose-200 bg-rose-50 text-rose-700 focus:ring-rose-200/50': f.tardanza > 0,
+                           'border-emerald-200 bg-emerald-50 text-emerald-700 focus:ring-emerald-200/50': f.horaIngreso && f.tardanza === 0,
+                           'border-slate-200 bg-white focus:ring-emerald-500/10': !f.horaIngreso
                          }">
                   <span *ngIf="f.tardanza > 0"
-                        class="absolute -top-2.5 -right-1 text-[9px] font-black text-white bg-red-500 px-1.5 rounded-full border-2 border-white shadow-sm">
+                        class="absolute -top-2.5 -right-2 text-[9px] font-black text-white bg-rose-500 px-2 py-0.5 rounded-full border-2 border-white shadow-md animate-bounce">
                     +{{ f.tardanza }}m
                   </span>
                 </div>
               </td>
 
               <td class="px-2 py-4">
-                <div class="flex gap-1">
+                <div class="flex items-center gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100 shadow-inner">
                   <input type="time" [(ngModel)]="f.salidaAlmuerzo" (ngModelChange)="marcarEditado(f)"
-                         class="w-1/2 p-1 border border-gray-200 rounded-md text-[10px] outline-none hover:border-gray-400 focus:ring-1 focus:ring-indigo-400">
+                         class="w-1/2 p-1 bg-transparent text-[10px] font-bold text-slate-500 outline-none">
+                  <div class="w-px h-3 bg-slate-200"></div>
                   <input type="time" [(ngModel)]="f.retornoAlmuerzo" (ngModelChange)="marcarEditado(f)"
-                         class="w-1/2 p-1 border border-gray-200 rounded-md text-[10px] outline-none hover:border-gray-400 focus:ring-1 focus:ring-indigo-400">
+                         class="w-1/2 p-1 bg-transparent text-[10px] font-bold text-slate-500 outline-none">
                 </div>
               </td>
 
-              <td class="px-2 py-4">
+              <td class="px-2 py-4 text-center">
                 <input type="time" [(ngModel)]="f.horaSalida" (ngModelChange)="marcarEditado(f)"
-                       class="w-full p-1.5 border border-gray-200 rounded-lg text-xs outline-none hover:border-gray-400 focus:ring-1 focus:ring-indigo-400">
+                       class="w-full max-w-[100px] p-2 border border-slate-200 rounded-xl text-xs font-bold outline-none focus:ring-4 focus:ring-emerald-500/10 transition-all">
               </td>
 
               <td class="px-2 py-4 text-center">
-                <input type="checkbox" [(ngModel)]="f.terno" (ngModelChange)="marcarEditado(f)"
-                       class="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer">
+                <div class="flex justify-center">
+                  <label class="relative flex items-center cursor-pointer">
+                    <input type="checkbox" [(ngModel)]="f.terno" (ngModelChange)="marcarEditado(f)" class="sr-only peer">
+                    <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                  </label>
+                </div>
               </td>
 
               <td class="px-2 py-4 text-center">
-                <select [(ngModel)]="f.tipoAsistencia" (ngModelChange)="marcarEditado(f)"
-                        [ngClass]="{
-                          'bg-emerald-100 text-emerald-700 border-emerald-200': f.tipoAsistencia === TipoAsistencia.ASISTIO,
-                          'bg-amber-100 text-amber-700 border-amber-200': f.tipoAsistencia === TipoAsistencia.TARDANZA,
-                          'bg-red-100 text-red-700 border-red-200': f.tipoAsistencia === TipoAsistencia.FALTA,
-                          'bg-blue-100 text-blue-700 border-blue-200': f.tipoAsistencia === TipoAsistencia.PERMISO
-                        }"
-                        class="text-[10px] font-black rounded-full px-2 py-1 border outline-none appearance-none cursor-pointer text-center w-24 shadow-sm hover:scale-105 transition-transform">
-                  <option *ngFor="let tipo of listaTipos" [value]="tipo">{{ tipo }}</option>
-                </select>
+                <div class="relative group inline-block">
+                  <select [(ngModel)]="f.tipoAsistencia" (ngModelChange)="marcarEditado(f)"
+                          [ngClass]="{
+                            'bg-emerald-50 text-emerald-700 border-emerald-200': f.tipoAsistencia === 'ASISTIO',
+                            'bg-amber-50 text-amber-700 border-amber-200': f.tipoAsistencia === 'TARDANZA',
+                            'bg-rose-50 text-rose-700 border-rose-200': f.tipoAsistencia === 'FALTA',
+                            'bg-sky-50 text-sky-700 border-sky-200': f.tipoAsistencia === 'PERMISO'
+                          }"
+                          class="text-[10px] font-black rounded-xl pl-3 pr-8 py-2 border outline-none appearance-none cursor-pointer transition-all w-28 shadow-sm">
+                    <option *ngFor="let tipo of listaTipos" [value]="tipo">{{ tipo }}</option>
+                  </select>
+                  <mat-icon class="absolute right-2 top-1.5 !w-4 !h-4 !text-[16px] pointer-events-none opacity-50">unfold_more</mat-icon>
+                </div>
               </td>
 
               <td class="px-6 py-4 text-right">
                 <button (click)="guardarFila(f)" [disabled]="!f.editado || f.guardando"
-                        class="inline-flex items-center justify-center px-4 py-2 rounded-lg text-[10px] font-black transition-all tracking-tighter shadow-md min-w-[100px]"
-                        [ngClass]="f.editado ? 'bg-indigo-600 text-white hover:bg-indigo-700 hover:shadow-indigo-200' : 'bg-gray-100 text-gray-300 cursor-not-allowed'">
-                  <span *ngIf="!f.guardando">{{ f.id ? 'ACTUALIZAR' : 'REGISTRAR' }}</span>
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black transition-all tracking-tighter shadow-lg disabled:shadow-none min-w-[110px] justify-center"
+                        [ngClass]="f.editado ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-slate-100 text-slate-300 cursor-not-allowed'">
+                  <mat-icon *ngIf="!f.guardando" class="!w-4 !h-4 !text-[16px]">{{ f.id ? 'sync' : 'save' }}</mat-icon>
+                  <span *ngIf="!f.guardando" class="uppercase">{{ f.id ? 'Actualizar' : 'Registrar' }}</span>
                   <div *ngIf="f.guardando" class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 </button>
               </td>
@@ -107,14 +130,12 @@
         </table>
       </div>
 
-      <div *ngIf="cargando" class="p-12 text-center bg-white/80 backdrop-blur-sm">
-        <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-indigo-500 border-t-transparent"></div>
-        <p class="mt-4 text-xs text-gray-400 font-bold uppercase tracking-widest">Sincronizando registros...</p>
-      </div>
-
-      <div *ngIf="!cargando && asistenciasView.length === 0" class="p-20 text-center bg-white">
-        <div class="text-gray-200 mb-4 text-5xl">📅</div>
-        <p class="text-gray-400 uppercase tracking-widest text-[10px] font-bold">No hay cronogramas asignados para este día.</p>
+      <div *ngIf="cargando" class="p-16 text-center bg-white/90 backdrop-blur-sm">
+        <div class="relative inline-block">
+            <div class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin"></div>
+            <mat-icon class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-emerald-600 !w-5 !h-5 !text-[20px]">sync</mat-icon>
+        </div>
+        <p class="mt-4 text-[10px] text-slate-400 font-black uppercase tracking-[0.3em]">Sincronizando Base de Datos...</p>
       </div>
     </div>
   </div>
