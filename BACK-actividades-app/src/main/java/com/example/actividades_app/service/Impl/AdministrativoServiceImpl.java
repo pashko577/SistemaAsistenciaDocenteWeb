@@ -3,6 +3,7 @@ package com.example.actividades_app.service.Impl;
 import com.example.actividades_app.enums.Estado;
 import com.example.actividades_app.model.Entity.Administrativo;
 import com.example.actividades_app.model.Entity.CargoAdministrativo;
+import com.example.actividades_app.model.Entity.Contrato;
 import com.example.actividades_app.model.Entity.Persona;
 import com.example.actividades_app.model.Entity.Rol;
 import com.example.actividades_app.model.Entity.Sede;
@@ -44,7 +45,7 @@ public class AdministrativoServiceImpl implements AdministrativoService {
         @Override
         @Transactional
         public AdministrativoResponseDTO registrarAdministrativo(AdministrativoRequestDTO request) {
-System.out.println("DATOS RECIBIDOS: " + request.toString());
+                System.out.println("DATOS RECIBIDOS: " + request.toString());
                 // 1. Validaciones
                 if (usuarioRepository.existsByPersonaDni(request.getDni())) {
                         throw new RuntimeException("Ya existe un usuario registrado con ese DNI");
@@ -165,31 +166,39 @@ System.out.println("DATOS RECIBIDOS: " + request.toString());
                 administrativoRepository.save(admin);
         }
 
-       @Override
-public List<AdministrativoResponseDTO> listarAdministrativos() {
-    // Cambia findByEstadoNot por findAll() para enviar toda la data
-    return administrativoRepository.findAll() 
-            .stream()
-            .map(this::mapToResponse)
-            .toList();
-}
+        @Override
+        public List<AdministrativoResponseDTO> listarAdministrativos() {
+                // Cambia findByEstadoNot por findAll() para enviar toda la data
+                return administrativoRepository.findAll()
+                                .stream()
+                                .map(this::mapToResponse)
+                                .toList();
+        }
 
-@Override
-public List<AdministrativoResponseDTO> listarSoloConContrato() {
-    return administrativoRepository.findByHasActiveContrato()
-            .stream()
-            .map(this::mapToResponse) // Usamos tu mapper ya existente
-            .toList();
-}
+        @Override
+        public List<AdministrativoResponseDTO> listarSoloConContrato() {
+                return administrativoRepository.findByHasActiveContrato()
+                                .stream()
+                                .map(this::mapToResponse) // Usamos tu mapper ya existente
+                                .toList();
+        }
 
         private AdministrativoResponseDTO mapToResponse(Administrativo admin) {
                 // Extraemos la persona para facilitar el acceso a los datos
+                Usuario usuario = admin.getUsuario();
                 Persona persona = admin.getUsuario().getPersona();
                 Sede sede = admin.getUsuario().getSede();
 
+                Long contratoIdActivo = (usuario.getContratos() != null) ? usuario.getContratos().stream()
+                                .filter(c -> c.getEstado() != null &&
+                                                "ACTIVO".equalsIgnoreCase(c.getEstado().toString().trim()))
+                                .map(Contrato::getId)
+                                .findFirst()
+                                .orElse(null) : null;
                 return AdministrativoResponseDTO.builder()
                                 .id(admin.getId())
                                 .usuarioId(admin.getUsuario().getId())
+                                .contratoId(contratoIdActivo)
 
                                 // Llenamos nombres y apellidos por separado
                                 .nombres(persona.getNombres())
