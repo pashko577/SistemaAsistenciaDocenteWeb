@@ -15,6 +15,7 @@ public class AdministrativoResponseDTO {
 
     private Long id;
     private Long usuarioId;
+    private Long contratoId;
 
     // Agregamos estos dos para que Angular pueda hacer: {{ admin.nombres }}
     private String nombres;

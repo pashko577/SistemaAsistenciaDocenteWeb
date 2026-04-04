@@ -1,13 +1,13 @@
 <div class="min-h-screen bg-gray-50 p-6">
   <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-    
+
     <div class="bg-[#004d40] p-8 text-white">
       <h2 class="text-2xl font-bold mb-6">Generación de Planilla Mensual</h2>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+
         <div>
           <label class="block text-sm font-medium opacity-80">Personal Administrativo</label>
-          <select [(ngModel)]="usuarioSeleccionadoId" (change)="cargarInformacionTodo()"
+          <select [(ngModel)]="usuarioSeleccionadoId" (ngModelChange)="cargarInformacionTodo()"
             class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
             <option *ngFor="let admin of listaAdministrativos" [value]="admin.id">
               {{ admin.nombres }} {{ admin.apellidos }}
@@ -17,7 +17,7 @@
 
         <div>
           <label class="block text-sm font-medium opacity-80">Mes de Pago</label>
-          <select [(ngModel)]="mesSeleccionado" (change)="cargarInformacionTodo()"
+          <select [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarInformacionTodo()"
             class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
             <option *ngFor="let mes of mesesDelAnio" [value]="mes.valor">
               {{ mes.nombre }}
@@ -56,8 +56,9 @@
 
         <div class="space-y-4">
           <h4 class="font-bold text-red-800 border-l-4 border-red-500 pl-2">DESCUENTOS</h4>
-          
-          <div *ngFor="let adelanto of adelantosPendientes" class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
+
+          <div *ngFor="let adelanto of adelantosPendientes"
+            class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
             <span>Adelanto: {{ adelanto.nombre }}</span>
             <span class="font-semibold">- S/ {{ adelanto.monto | number:'1.2-2' }}</span>
           </div>
@@ -90,8 +91,5 @@
   </div>
 </div>
 
-<app-pago-detalle-modal 
-  *ngIf="modalVisible" 
-  [pago]="pagoGenerado" 
-  (close)="modalVisible = false">
+<app-pago-detalle-modal *ngIf="modalVisible" [pago]="pagoGenerado" (close)="modalVisible = false">
 </app-pago-detalle-modal>

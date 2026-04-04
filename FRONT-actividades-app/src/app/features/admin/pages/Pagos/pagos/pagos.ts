@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdelantoResponse } from '../../../../../core/models/pagos/adelanto-response';
@@ -57,7 +57,8 @@ export class Pagos implements OnInit {
     private pagosService: PagosService,
     private adelantoService: AdelantoService,
     private administrativoService: AdministrativoService,
-    private planillaService: PlanillaAdministrativoService 
+    private planillaService: PlanillaAdministrativoService,
+    private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit(): void {
@@ -68,52 +69,56 @@ export class Pagos implements OnInit {
     this.administrativoService.listarConContrato().subscribe({
       next: (data) => {
         this.listaAdministrativos = data;
-        if (data.length > 0) {
-          // Sincronizamos con el ID que viene de la respuesta (AdministrativoResponse.id)
+        if (data.length > 0 && !this.usuarioSeleccionadoId) {
           this.usuarioSeleccionadoId = data[0].id;
-          this.cargarInformacionTodo();
         }
-      },
-      error: (err) => console.error('Error cargando personal:', err)
+        this.cargarInformacionTodo();
+      }
     });
   }
 
   cargarInformacionTodo(): void {
     if (!this.usuarioSeleccionadoId) return;
 
-    // 1. Cargamos adelantos primero
-    this.adelantoService.listarPendientesPorUsuario(this.usuarioSeleccionadoId)
-      .subscribe({
-        next: (data) => {
-          this.adelantosPendientes = data;
-          this.totalAdelantos = data.reduce((sum, item) => sum + item.monto, 0);
-          // 2. Cargamos los datos de planilla (esto actualizará el sueldoBase y el neto)
-          this.obtenerDatosPlanilla();
-        },
-        error: (err) => console.error('Error cargando adelantos:', err)
-      });
+    // 3. Limpiar datos viejos para evitar confusión visual
+    this.sueldoBase = 0;
+    this.netoProyectado = 0;
+    this.totalAdelantos = 0;
+    this.adelantosPendientes = [];
+
+    // 4. Encadenamos las llamadas para que se ejecuten en orden
+    this.adelantoService.listarPendientesPorUsuario(this.usuarioSeleccionadoId).subscribe({
+      next: (adelantos) => {
+        this.adelantosPendientes = adelantos;
+        this.totalAdelantos = adelantos.reduce((sum, item) => sum + item.monto, 0);
+        
+        // Llamamos al cálculo de planilla después de tener los adelantos
+        this.obtenerDatosPlanilla();
+      },
+      error: (err) => console.error(err)
+    });
   }
 
   obtenerDatosPlanilla(): void {
-    if (!this.usuarioSeleccionadoId) return;
-
     const mesNum = this.obtenerNumeroMes();
     const anio = this.anioSeleccionado;
-    
     const inicio = `${anio}-${mesNum}-01`;
     const ultimoDia = new Date(anio, parseInt(mesNum), 0).getDate();
     const fin = `${anio}-${mesNum}-${ultimoDia}`;
 
-    this.planillaService.calcularPlanilla(this.usuarioSeleccionadoId, inicio, fin).subscribe({
+    this.planillaService.calcularPlanilla(this.usuarioSeleccionadoId!, inicio, fin).subscribe({
       next: (data: PlanillaAdministrativoDTO) => {
         this.sueldoBase = data.sueldoBase;
         this.montoTardanzas = data.descuentoFaltas + data.descuentoTardanza;
-        
-        // CORRECCIÓN: El neto proyectado debe basarse en el sueldo neto del backend menos adelantos
-        // o recalcular usando el sueldoBase que llega (el 1800)
         this.netoProyectado = data.sueldoNeto - this.totalAdelantos;
+
+        // 5. ¡CLAVE!: Forzar a Angular a revisar los cambios inmediatamente
+        this.cdr.detectChanges(); 
       },
-      error: (err) => console.error('Error en cálculo de planilla:', err)
+      error: (err) => {
+        console.error('Error en cálculo:', err);
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -123,32 +128,41 @@ export class Pagos implements OnInit {
     this.netoProyectado = this.sueldoBase - this.totalAdelantos - this.montoTardanzas;
   }
 
-  onGenerarPago(): void {
-    if (!this.usuarioSeleccionadoId) return;
+onGenerarPago(): void {
+  if (!this.usuarioSeleccionadoId) return;
 
-    const mesNum = this.obtenerNumeroMes();
-    const ultimoDia = new Date(this.anioSeleccionado, parseInt(mesNum), 0).getDate();
+  // Convertimos ambos a Number para asegurar que el .find() funcione
+  const idABuscar = Number(this.usuarioSeleccionadoId);
+  const adminActual = this.listaAdministrativos.find(a => Number(a.id) === idABuscar);
 
-    // CORRECCIÓN: Buscamos por .id, que es lo que guardamos en usuarioSeleccionadoId
-    const adminActual = this.listaAdministrativos.find(a => a.id === this.usuarioSeleccionadoId);
 
-    const payload: PagoRequest = {
-      fecha: `${this.anioSeleccionado}-${mesNum}-${ultimoDia}`, 
-      contratoId: adminActual?.id || 0, 
-      adelantoIds: this.adelantosPendientes.map(a => a.id),
-      deducciones: [], 
-      bonificaciones: []
-    };
+  if (!adminActual) {
 
-    this.pagosService.crear(payload).subscribe({
-      next: (response: PagoResponse) => {
-        this.pagoGenerado = response; 
-        this.modalVisible = true;
-      },
-      error: (err) => console.error('Error al generar pago:', err)
-    });
+    return;
   }
 
+  if (!adminActual.contratoId) {
+    alert("Error: El administrativo seleccionado no tiene un contrato ACTIVO en el sistema.");
+    return;
+  }
+
+  const payload: PagoRequest = {
+    // Usamos el número de mes correctamente formateado
+    fecha: `${this.anioSeleccionado}-${this.obtenerNumeroMes()}-${new Date(this.anioSeleccionado, parseInt(this.obtenerNumeroMes()), 0).getDate()}`, 
+    contratoId: adminActual.contratoId,
+    adelantoIds: this.adelantosPendientes.map(a => a.id),
+    deducciones: [], 
+    bonificaciones: []
+  };
+
+  this.pagosService.crear(payload).subscribe({
+    next: (response) => {
+      this.pagoGenerado = response;
+      this.modalVisible = true;
+    },
+    error: (err) => console.error('Error al crear pago:', err)
+  });
+}
   private obtenerNumeroMes(): string {
     const mesEncontrado = this.mesesDelAnio.find(m => m.valor === this.mesSeleccionado);
     return mesEncontrado ? mesEncontrado.num : '01';

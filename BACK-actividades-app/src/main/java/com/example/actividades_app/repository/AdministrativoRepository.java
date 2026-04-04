@@ -14,8 +14,11 @@ import com.example.actividades_app.model.Entity.Administrativo;
 @Repository
 public interface AdministrativoRepository extends JpaRepository<Administrativo, Long> {
 
-    @Query("SELECT a FROM Administrativo a WHERE EXISTS " +
-            "(SELECT c FROM Contrato c WHERE c.usuario.id = a.usuario.id AND c.estado = 'ACTIVO')")
+   @Query("SELECT DISTINCT a FROM Administrativo a " +
+           "JOIN FETCH a.usuario u " +
+           "JOIN FETCH u.persona p " +
+           "JOIN FETCH u.contratos c " +
+           "WHERE c.estado = 'ACTIVO' AND a.estado = 'ACTIVO'")
     List<Administrativo> findByHasActiveContrato();
 
     @Query("SELECT a FROM Administrativo a WHERE a.usuario.id = :usuarioId")
