@@ -1,93 +1,175 @@
 <div class="min-h-screen bg-gray-50 p-6">
-  <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-
-    <div class="bg-[#004d40] p-8 text-white">
-      <h2 class="text-2xl font-bold mb-6">Generación de Planilla Mensual</h2>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-        <div>
-          <label class="block text-sm font-medium opacity-80">Personal Administrativo</label>
-          <select [(ngModel)]="usuarioSeleccionadoId" (ngModelChange)="cargarInformacionTodo()"
-            class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
-            <option *ngFor="let admin of listaAdministrativos" [value]="admin.id">
-              {{ admin.nombres }} {{ admin.apellidos }}
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium opacity-80">Mes de Pago</label>
-          <select [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarInformacionTodo()"
-            class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
-            <option *ngFor="let mes of mesesDelAnio" [value]="mes.valor">
-              {{ mes.nombre }}
-            </option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium opacity-80">Año</label>
-          <select [(ngModel)]="anioSeleccionado" (change)="cargarInformacionTodo()"
-            class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
-            <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
-          </select>
-        </div>
-      </div>
+  <div class="max-w-6xl mx-auto">
+    
+    <div class="flex space-x-1 bg-gray-200 p-1 rounded-xl mb-6 w-full md:w-80">
+      <button 
+        (click)="viewMode = 'generar'"
+        [class.bg-white]="viewMode === 'generar'"
+        [class.shadow-sm]="viewMode === 'generar'"
+        [class.text-emerald-800]="viewMode === 'generar'"
+        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600">
+        Generar Pago
+      </button>
+      <button 
+        (click)="viewMode = 'historial'; cargarHistorial()"
+        [class.bg-white]="viewMode === 'historial'"
+        [class.shadow-sm]="viewMode === 'historial'"
+        [class.text-emerald-800]="viewMode === 'historial'"
+        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600">
+        Historial
+      </button>
     </div>
 
-    <div class="p-8">
-      <div class="flex justify-between items-center border-b pb-4 mb-6">
-        <div>
-          <h3 class="text-xl font-bold text-gray-800">Detalle de Conceptos</h3>
-          <p class="text-gray-500 text-sm">
-            Cierre estimado al cierre de {{ mesSeleccionado | titlecase }} {{ anioSeleccionado }}
-          </p>
+    <div *ngIf="viewMode === 'generar'" class="bg-white rounded-3xl shadow-xl overflow-hidden animate-fadeIn">
+      <div class="bg-[#004d40] p-8 text-white">
+        <h2 class="text-2xl font-bold mb-6">Generación de Planilla Mensual</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm font-medium opacity-80">Personal Administrativo</label>
+            <select [(ngModel)]="usuarioSeleccionadoId" (ngModelChange)="cargarInformacionTodo()"
+              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2 outline-none">
+              <option *ngFor="let admin of listaAdministrativos" [value]="admin.id">
+                {{ admin.nombres }} {{ admin.apellidos }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium opacity-80">Mes de Pago</label>
+            <select [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarInformacionTodo()"
+              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2 outline-none">
+              <option *ngFor="let mes of mesesDelAnio" [value]="mes.valor">
+                {{ mes.nombre }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium opacity-80">Año</label>
+            <select [(ngModel)]="anioSeleccionado" (change)="cargarInformacionTodo()"
+              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2 outline-none">
+              <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="space-y-4">
-          <h4 class="font-bold text-emerald-800 border-l-4 border-emerald-500 pl-2">INGRESOS</h4>
-          <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
-            <span>Sueldo Base Mensual</span>
-            <span class="font-semibold text-emerald-700">S/ {{ sueldoBase | number:'1.2-2' }}</span>
+      <div class="p-8">
+        <div class="flex justify-between items-center border-b pb-4 mb-6">
+          <div>
+            <h3 class="text-xl font-bold text-gray-800">Detalle de Conceptos</h3>
+            <p class="text-gray-500 text-sm">
+              Cierre estimado al cierre de {{ mesSeleccionado | titlecase }} {{ anioSeleccionado }}
+            </p>
           </div>
         </div>
 
-        <div class="space-y-4">
-          <h4 class="font-bold text-red-800 border-l-4 border-red-500 pl-2">DESCUENTOS</h4>
-
-          <div *ngFor="let adelanto of adelantosPendientes"
-            class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
-            <span>Adelanto: {{ adelanto.nombre }}</span>
-            <span class="font-semibold">- S/ {{ adelanto.monto | number:'1.2-2' }}</span>
-          </div>
-
-          <div class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
-            <div class="flex flex-col">
-              <span>Tardanzas y Faltas</span>
-              <small class="text-xs opacity-70">Sincronizado con asistencia</small>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="space-y-4">
+            <h4 class="font-bold text-emerald-800 border-l-4 border-emerald-500 pl-2">INGRESOS</h4>
+            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+              <span>Sueldo Base Mensual</span>
+              <span class="font-semibold text-emerald-700">S/ {{ sueldoBase | number:'1.2-2' }}</span>
             </div>
-            <span class="font-semibold">- S/ {{ montoTardanzas | number:'1.2-2' }}</span>
+          </div>
+          <div class="space-y-4">
+            <h4 class="font-bold text-red-800 border-l-4 border-red-500 pl-2">DESCUENTOS</h4>
+            <div *ngFor="let adelanto of adelantosPendientes"
+              class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
+              <span>Adelanto: {{ adelanto.nombre }}</span>
+              <span class="font-semibold">- S/ {{ adelanto.monto | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
+              <div class="flex flex-col">
+                <span>Tardanzas y Faltas</span>
+                <small class="text-xs opacity-70">Sincronizado con asistencia</small>
+              </div>
+              <span class="font-semibold">- S/ {{ montoTardanzas | number:'1.2-2' }}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="mt-10 bg-[#f8fafc] border-2 border-dashed border-gray-200 rounded-2xl p-6">
-        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div class="text-center md:text-left">
-            <p class="text-gray-500 text-sm uppercase tracking-widest">Neto a Percibir</p>
-            <h2 class="text-4xl font-black text-[#004d40]">
-              S/ {{ netoProyectado | number:'1.2-2' }}
-            </h2>
+        <div class="mt-10 bg-[#f8fafc] border-2 border-dashed border-gray-200 rounded-2xl p-6">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+              <p class="text-gray-500 text-sm uppercase tracking-widest">Neto a Percibir</p>
+              <h2 class="text-4xl font-black text-[#004d40]">
+                S/ {{ netoProyectado | number:'1.2-2' }}
+              </h2>
+            </div>
+            <button (click)="onGenerarPago()"
+              class="bg-[#004d40] hover:bg-[#00332a] text-white px-10 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105">
+              GENERAR PAGO FINAL
+            </button>
           </div>
-          <button (click)="onGenerarPago()"
-            class="bg-[#004d40] hover:bg-[#00332a] text-white px-10 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105">
-            GENERAR PAGO FINAL
-          </button>
         </div>
       </div>
     </div>
+
+    <div *ngIf="viewMode === 'historial'" class="animate-fadeIn">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-800">Historial de Pagos</h1>
+          <p class="text-slate-500 text-sm">Gestión de planillas del año {{ anioSeleccionado }}</p>
+        </div>
+        <div class="relative max-w-md w-full">
+          <input 
+            type="text" 
+            [(ngModel)]="busqueda"
+            placeholder="Buscar por nombre o DNI..." 
+            class="w-full pl-4 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all shadow-sm"
+          />
+        </div>
+      </div>
+
+      <div *ngIf="cargandoHistorial" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
+        <p class="mt-4 text-slate-600 font-medium">Cargando registros...</p>
+      </div>
+
+      <div *ngIf="!cargandoHistorial" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200">
+                <th class="px-6 py-4 text-sm font-semibold text-slate-600">Personal</th>
+                <th class="px-6 py-4 text-sm font-semibold text-slate-600">Fecha</th>
+                <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-right">Monto Neto</th>
+                <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr *ngFor="let pago of pagosFiltrados" class="hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-4">
+                  <div class="flex flex-col">
+                    <span class="font-bold text-slate-700">{{ pago.nombreCompleto }}</span>
+                    <span class="text-xs text-slate-500">DNI: {{ pago.dni }}</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600">
+                  {{ pago.fecha | date:'dd/MM/yyyy' }}
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <span class="text-emerald-600 font-bold">
+                    S/ {{ pago.netoPagar | number:'1.2-2' }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <button (click)="verDetalleHistorial(pago)"
+                    class="text-emerald-600 hover:text-emerald-800 p-2 hover:bg-emerald-50 rounded-full transition-all">
+                    <i class="fas fa-file-invoice-dollar"></i> Ver Boleta
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="pagosFiltrados.length === 0">
+                <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                  No se encontraron registros.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
