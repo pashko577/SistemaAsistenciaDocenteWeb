@@ -16,6 +16,8 @@ public class PlanillaAdministrativoDTO {
 
     private Integer faltas;
 
+    private Integer permisos; 
+
     private Integer minutosTardanza;
 
     private BigDecimal descuentoFaltas;

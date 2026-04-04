@@ -19,6 +19,9 @@ export class AdministrativoService {
     return this.http.get<AdministrativoResponse[]>(`${this.API_URL}/administrativos`);
   }
 
+  listarConContrato(): Observable<AdministrativoResponse[]> {
+    return this.http.get<AdministrativoResponse[]>(`${this.API_URL}/administrativos/con-contrato`);
+  }
   // Registrar nuevo
   registrar(admin: AdministrativoRequest): Observable<any> {
     return this.http.post(`${this.API_URL}/administrativos`, admin);

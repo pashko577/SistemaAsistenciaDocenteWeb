@@ -1,0 +1,97 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
+    
+    <div class="bg-[#004d40] p-8 text-white">
+      <h2 class="text-2xl font-bold mb-6">Generación de Planilla Mensual</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div>
+          <label class="block text-sm font-medium opacity-80">Personal Administrativo</label>
+          <select [(ngModel)]="usuarioSeleccionadoId" (change)="cargarInformacionTodo()"
+            class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
+            <option *ngFor="let admin of listaAdministrativos" [value]="admin.id">
+              {{ admin.nombres }} {{ admin.apellidos }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium opacity-80">Mes de Pago</label>
+          <select [(ngModel)]="mesSeleccionado" (change)="cargarInformacionTodo()"
+            class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
+            <option *ngFor="let mes of mesesDelAnio" [value]="mes.valor">
+              {{ mes.nombre }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium opacity-80">Año</label>
+          <select [(ngModel)]="anioSeleccionado" (change)="cargarInformacionTodo()"
+            class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2">
+            <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-8">
+      <div class="flex justify-between items-center border-b pb-4 mb-6">
+        <div>
+          <h3 class="text-xl font-bold text-gray-800">Detalle de Conceptos</h3>
+          <p class="text-gray-500 text-sm">
+            Cierre estimado al cierre de {{ mesSeleccionado | titlecase }} {{ anioSeleccionado }}
+          </p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+          <h4 class="font-bold text-emerald-800 border-l-4 border-emerald-500 pl-2">INGRESOS</h4>
+          <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
+            <span>Sueldo Base Mensual</span>
+            <span class="font-semibold text-emerald-700">S/ {{ sueldoBase | number:'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <h4 class="font-bold text-red-800 border-l-4 border-red-500 pl-2">DESCUENTOS</h4>
+          
+          <div *ngFor="let adelanto of adelantosPendientes" class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
+            <span>Adelanto: {{ adelanto.nombre }}</span>
+            <span class="font-semibold">- S/ {{ adelanto.monto | number:'1.2-2' }}</span>
+          </div>
+
+          <div class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
+            <div class="flex flex-col">
+              <span>Tardanzas y Faltas</span>
+              <small class="text-xs opacity-70">Sincronizado con asistencia</small>
+            </div>
+            <span class="font-semibold">- S/ {{ montoTardanzas | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-10 bg-[#f8fafc] border-2 border-dashed border-gray-200 rounded-2xl p-6">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+          <div class="text-center md:text-left">
+            <p class="text-gray-500 text-sm uppercase tracking-widest">Neto a Percibir</p>
+            <h2 class="text-4xl font-black text-[#004d40]">
+              S/ {{ netoProyectado | number:'1.2-2' }}
+            </h2>
+          </div>
+          <button (click)="onGenerarPago()"
+            class="bg-[#004d40] hover:bg-[#00332a] text-white px-10 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105">
+            GENERAR PAGO FINAL
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-pago-detalle-modal 
+  *ngIf="modalVisible" 
+  [pago]="pagoGenerado" 
+  (close)="modalVisible = false">
+</app-pago-detalle-modal>
