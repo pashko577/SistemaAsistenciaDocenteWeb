@@ -13,4 +13,6 @@ public interface AdministrativoService {
     void eliminarAdministrativo(Long id);
 
     List<AdministrativoResponseDTO> listarAdministrativos();
+
+    List<AdministrativoResponseDTO> listarSoloConContrato();
 }

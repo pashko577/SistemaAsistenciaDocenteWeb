@@ -174,6 +174,14 @@ public List<AdministrativoResponseDTO> listarAdministrativos() {
             .toList();
 }
 
+@Override
+public List<AdministrativoResponseDTO> listarSoloConContrato() {
+    return administrativoRepository.findByHasActiveContrato()
+            .stream()
+            .map(this::mapToResponse) // Usamos tu mapper ya existente
+            .toList();
+}
+
         private AdministrativoResponseDTO mapToResponse(Administrativo admin) {
                 // Extraemos la persona para facilitar el acceso a los datos
                 Persona persona = admin.getUsuario().getPersona();

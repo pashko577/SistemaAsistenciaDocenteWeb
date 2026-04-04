@@ -46,6 +46,12 @@ public class AdministrativoController {
         return ResponseEntity.ok(administrativoService.listarAdministrativos());
     }
 
+    @GetMapping("/con-contrato")
+@PreAuthorize("hasRole('ADMIN')")
+public ResponseEntity<List<AdministrativoResponseDTO>> listarConContrato() {
+    return ResponseEntity.ok(administrativoService.listarSoloConContrato());
+}
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<AdministrativoResponseDTO> actualizar(

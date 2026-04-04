@@ -38,6 +38,12 @@ export const routes: Routes = [
           .then(m => m.ReporteAdministrativos)
       },
       {
+        path: 'pagos',
+        loadComponent: () => import('./features/admin/pages/Pagos/pagos/pagos') // Ajusta si la carpeta se llama distinto
+          .then(m => m.Pagos)
+      },
+    
+      {
         path: 'gestionDocente',
         loadComponent: () => import('./features/admin/pages/gestion-docente/gestion-docente')
           .then(m => m.GestionDocente)
@@ -51,7 +57,7 @@ export const routes: Routes = [
         path: 'gestionContrato',
         loadComponent: () => import('./features/admin/pages/gestion-contrato/gestion-contrato')
           .then(m => m.GestionContrato)
-      }
+      },
     ]
   },
 
