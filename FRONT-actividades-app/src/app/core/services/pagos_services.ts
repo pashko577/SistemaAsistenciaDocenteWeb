@@ -41,6 +41,7 @@ export class PagosService {
     return this.http.get<PagoResponse[]>(`${this.URL}/usuario/${usuarioId}`);
   }
 
+
   listarPorFecha(fecha: string): Observable<PagoResponse[]> {
     const params = new HttpParams().set('fecha', fecha);
     return this.http.get<PagoResponse[]>(`${this.URL}/fecha`, { params });

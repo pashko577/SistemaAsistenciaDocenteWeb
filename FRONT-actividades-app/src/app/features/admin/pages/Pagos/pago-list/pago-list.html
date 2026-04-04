@@ -1,1 +1,88 @@
-<p>pago-list works!</p>
+<div class="p-6 bg-slate-50 min-h-screen">
+  <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-800">Historial de Pagos</h1>
+      <p class="text-slate-500 text-sm">Gestión y consulta de planillas generadas - {{ mesActual }} {{ anioActual }}</p>
+    </div>
+
+    <div class="relative max-w-md w-full">
+      <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+        <i class="fas fa-search"></i>
+      </span>
+      <input 
+        type="text" 
+        [(ngModel)]="busqueda"
+        placeholder="Buscar por nombre, DNI o cargo..." 
+        class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all shadow-sm"
+      />
+    </div>
+  </div>
+
+  <div *ngIf="cargando" class="flex flex-col items-center justify-center py-20">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+    <p class="mt-4 text-slate-600 font-medium">Cargando historial...</p>
+  </div>
+
+  <div *ngIf="!cargando" class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200">
+            <th class="px-6 py-4 text-sm font-semibold text-slate-600">Personal</th>
+            <th class="px-6 py-4 text-sm font-semibold text-slate-600">Fecha de Pago</th>
+            <th class="px-6 py-4 text-sm font-semibold text-slate-600">Sede</th>
+            <th class="px-6 py-4 text-sm font-semibold text-slate-600">Tipo</th>
+            <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-right">Neto a Pagar</th>
+            <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let pago of pagosFiltrados" class="hover:bg-slate-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="flex flex-col">
+                <span class="font-bold text-slate-700">{{ pago.nombreCompleto }}</span>
+                <span class="text-xs text-slate-500">DNI: {{ pago.dni }} • {{ pago.cargo }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-sm text-slate-600">
+              {{ pago.fecha | date:'dd/MM/yyyy' }}
+            </td>
+            <td class="px-6 py-4 text-sm text-slate-600">
+              <span class="px-2 py-1 bg-slate-100 rounded text-xs font-medium uppercase">
+                {{ pago.sede }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-sm">
+              <span [ngClass]="{
+                'text-blue-600 bg-blue-50': pago.tipoPago === 'PAGO_MENSUAL',
+                'text-purple-600 bg-purple-50': pago.tipoPago === 'PAGO_HORA'
+              }" class="px-2 py-1 rounded text-xs font-bold">
+                {{ pago.tipoPago }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <span class="text-emerald-600 font-bold">
+                S/ {{ pago.netoPagar | number:'1.2-2' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-center">
+              <button 
+                (click)="verDetalle(pago)"
+                class="text-blue-600 hover:text-blue-800 p-2 hover:bg-blue-50 rounded-full transition-all"
+                title="Ver Boleta Detallada">
+                <i class="fas fa-file-invoice-dollar"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="pagosFiltrados.length === 0">
+            <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+              <i class="fas fa-folder-open text-4xl mb-3 block"></i>
+              No se encontraron pagos registrados con ese criterio.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

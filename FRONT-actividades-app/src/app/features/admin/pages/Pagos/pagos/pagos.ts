@@ -1,4 +1,4 @@
-import { Component, OnInit,ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdelantoResponse } from '../../../../../core/models/pagos/adelanto-response';
@@ -20,8 +20,15 @@ import { AdministrativoResponse } from '../../../../../core/models/Administrativ
   styleUrl: './pagos.css',
 })
 export class Pagos implements OnInit {
+  // --- Control de Vista ---
+  viewMode: 'generar' | 'historial' = 'generar';
+
   // --- Listas Dinámicas ---
   listaAdministrativos: AdministrativoResponse[] = [];
+  listaPagos: PagoResponse[] = [];
+  busqueda: string = '';
+  cargandoHistorial: boolean = false;
+
   aniosDisponibles: number[] = [2025, 2026, 2027];
   mesesDelAnio = [
     { nombre: 'Enero', valor: 'ENERO', num: '01' },
@@ -63,8 +70,10 @@ export class Pagos implements OnInit {
 
   ngOnInit(): void {
     this.cargarListaPersonal();
+    this.cargarHistorial();
   }
 
+  // --- LÓGICA DE GENERACIÓN ---
   cargarListaPersonal(): void {
     this.administrativoService.listarConContrato().subscribe({
       next: (data) => {
@@ -80,19 +89,15 @@ export class Pagos implements OnInit {
   cargarInformacionTodo(): void {
     if (!this.usuarioSeleccionadoId) return;
 
-    // 3. Limpiar datos viejos para evitar confusión visual
     this.sueldoBase = 0;
     this.netoProyectado = 0;
     this.totalAdelantos = 0;
     this.adelantosPendientes = [];
 
-    // 4. Encadenamos las llamadas para que se ejecuten en orden
     this.adelantoService.listarPendientesPorUsuario(this.usuarioSeleccionadoId).subscribe({
       next: (adelantos) => {
         this.adelantosPendientes = adelantos;
         this.totalAdelantos = adelantos.reduce((sum, item) => sum + item.monto, 0);
-        
-        // Llamamos al cálculo de planilla después de tener los adelantos
         this.obtenerDatosPlanilla();
       },
       error: (err) => console.error(err)
@@ -111,58 +116,71 @@ export class Pagos implements OnInit {
         this.sueldoBase = data.sueldoBase;
         this.montoTardanzas = data.descuentoFaltas + data.descuentoTardanza;
         this.netoProyectado = data.sueldoNeto - this.totalAdelantos;
-
-        // 5. ¡CLAVE!: Forzar a Angular a revisar los cambios inmediatamente
         this.cdr.detectChanges(); 
+      }
+    });
+  }
+
+  onGenerarPago(): void {
+    if (!this.usuarioSeleccionadoId) return;
+    const adminActual = this.listaAdministrativos.find(a => Number(a.id) === Number(this.usuarioSeleccionadoId));
+
+    if (!adminActual || !adminActual.contratoId) {
+      alert("Error: El usuario no tiene un contrato activo.");
+      return;
+    }
+
+    const payload: PagoRequest = {
+      fecha: `${this.anioSeleccionado}-${this.obtenerNumeroMes()}-${new Date(this.anioSeleccionado, parseInt(this.obtenerNumeroMes()), 0).getDate()}`, 
+      contratoId: adminActual.contratoId,
+      adelantoIds: this.adelantosPendientes.map(a => a.id),
+      deducciones: [], 
+      bonificaciones: []
+    };
+
+    this.pagosService.crear(payload).subscribe({
+      next: (response) => {
+        this.pagoGenerado = response;
+        this.modalVisible = true;
+        this.cargarHistorial(); // Refrescar historial tras pagar
+      }
+    });
+  }
+
+ // --- LÓGICA DE HISTORIAL (CORREGIDA PARA EVITAR 403) ---
+  cargarHistorial(): void {
+    this.cargandoHistorial = true;
+    
+    // Usamos el rango del año seleccionado para consultar al endpoint /api/pagos/rango
+    const inicio = `${this.anioSeleccionado}-01-01`;
+    const fin = `${this.anioSeleccionado}-12-31`;
+
+    this.pagosService.listarPorRango(inicio, fin).subscribe({
+      next: (data) => {
+        this.listaPagos = data.sort((a, b) => b.pagoId - a.pagoId);
+        this.cargandoHistorial = false;
+        this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Error en cálculo:', err);
+      error: () => {
+        this.cargandoHistorial = false;
         this.cdr.detectChanges();
       }
     });
   }
 
-  recalcularTotales(): void {
-    // Este método queda como apoyo, pero la lógica fuerte ahora está en obtenerDatosPlanilla
-    this.totalAdelantos = this.adelantosPendientes.reduce((sum, item) => sum + item.monto, 0);
-    this.netoProyectado = this.sueldoBase - this.totalAdelantos - this.montoTardanzas;
+  get pagosFiltrados() {
+    if (!this.busqueda.trim()) return this.listaPagos;
+    const term = this.busqueda.toLowerCase();
+    return this.listaPagos.filter(p => 
+      p.nombreCompleto.toLowerCase().includes(term) || p.dni.includes(term)
+    );
   }
 
-onGenerarPago(): void {
-  if (!this.usuarioSeleccionadoId) return;
-
-  // Convertimos ambos a Number para asegurar que el .find() funcione
-  const idABuscar = Number(this.usuarioSeleccionadoId);
-  const adminActual = this.listaAdministrativos.find(a => Number(a.id) === idABuscar);
-
-
-  if (!adminActual) {
-
-    return;
+  verDetalleHistorial(pago: PagoResponse) {
+    this.pagoGenerado = pago;
+    this.modalVisible = true;
   }
 
-  if (!adminActual.contratoId) {
-    alert("Error: El administrativo seleccionado no tiene un contrato ACTIVO en el sistema.");
-    return;
-  }
-
-  const payload: PagoRequest = {
-    // Usamos el número de mes correctamente formateado
-    fecha: `${this.anioSeleccionado}-${this.obtenerNumeroMes()}-${new Date(this.anioSeleccionado, parseInt(this.obtenerNumeroMes()), 0).getDate()}`, 
-    contratoId: adminActual.contratoId,
-    adelantoIds: this.adelantosPendientes.map(a => a.id),
-    deducciones: [], 
-    bonificaciones: []
-  };
-
-  this.pagosService.crear(payload).subscribe({
-    next: (response) => {
-      this.pagoGenerado = response;
-      this.modalVisible = true;
-    },
-    error: (err) => console.error('Error al crear pago:', err)
-  });
-}
   private obtenerNumeroMes(): string {
     const mesEncontrado = this.mesesDelAnio.find(m => m.valor === this.mesSeleccionado);
     return mesEncontrado ? mesEncontrado.num : '01';

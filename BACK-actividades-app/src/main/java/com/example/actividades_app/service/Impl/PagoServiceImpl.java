@@ -419,77 +419,84 @@ public class PagoServiceImpl implements PagoService {
         }
 
         private PagoResponseDTO mapToResponse(Pago pago) {
-    PagoResponseDTO dto = new PagoResponseDTO();
+                PagoResponseDTO dto = new PagoResponseDTO();
+                Contrato contrato = pago.getContrato();
+                Usuario usuario = contrato.getUsuario();
+                Persona persona = usuario.getPersona();
 
-    // 1. Datos básicos del Pago
-    dto.setPagoId(pago.getId());
-    dto.setFecha(pago.getFecha());
+                // 1. Datos básicos del Pago
+                dto.setPagoId(pago.getId());
+                dto.setFecha(pago.getFecha());
 
-    if (pago.getContrato() != null) {
-        dto.setContratoId(pago.getContrato().getId());
-        dto.setTipoPago(pago.getContrato().getTipoPago().name());
-        dto.setMontoBase(pago.getContrato().getMontoBase());
-    }
+                if (pago.getContrato() != null) {
+                        dto.setContratoId(pago.getContrato().getId());
+                        dto.setTipoPago(pago.getContrato().getTipoPago().name());
+                        dto.setMontoBase(pago.getContrato().getMontoBase());
 
-    dto.setMontoActividad(pago.getMontoActividad());
-    dto.setNetoPagar(pago.getNetoPagar());
+                        dto.setNombreCompleto(persona.getNombres() + " " + persona.getApellidos());
+                        dto.setDni(persona.getDni());
+                        dto.setSede(usuario.getSede() != null ? usuario.getSede().getNombreSede() : "N/A");
+                        dto.setCargo(obtenerCargo(usuario)); // Reutilizamos tu método existente
+                }
 
-    // 2. MAPEAR TOTALES (Esto es lo que salía null en tu JSON)
-    BigDecimal totalBono = pago.getBonificaciones() != null ? 
-        pago.getBonificaciones().stream().map(Bonificacion::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-    
-    BigDecimal totalDeduc = pago.getDeducciones() != null ? 
-        pago.getDeducciones().stream().map(Deduccion::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
-        
-    BigDecimal totalAdel = pago.getAdelantos() != null ? 
-        pago.getAdelantos().stream().map(Adelanto::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
+                dto.setMontoActividad(pago.getMontoActividad());
+                dto.setNetoPagar(pago.getNetoPagar());
 
-    dto.setTotalBonificaciones(totalBono);
-    dto.setTotalDeducciones(totalDeduc);
-    dto.setTotalAdelantos(totalAdel);
+                // 2. MAPEAR TOTALES (Esto es lo que salía null en tu JSON)
+                BigDecimal totalBono = pago.getBonificaciones() != null ? pago.getBonificaciones().stream()
+                                .map(Bonificacion::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-    // 3. MAPEAR LISTA DE ADELANTOS (Con todos sus campos)
-    dto.setAdelantos(pago.getAdelantos() == null ? List.of() : 
-        pago.getAdelantos().stream().map(a -> {
-            AdelantoResponseDTO dtoA = new AdelantoResponseDTO();
-            dtoA.setId(a.getId());
-            dtoA.setNombre(a.getNombre());
-            dtoA.setMonto(a.getMonto());
-            dtoA.setEstado(a.getEstado() != null ? a.getEstado() : null);
-            dtoA.setUsuarioId(a.getUsuario() != null ? a.getUsuario().getId() : null);
-            dtoA.setPagoId(pago.getId());
-            
-            if (a.getUsuario() != null && a.getUsuario().getPersona() != null) {
-                Persona p = a.getUsuario().getPersona();
-                dtoA.setNombreCompletoPersonal(p.getNombres() + " " + p.getApellidos());
-                dtoA.setDniPersonal(p.getDni());
-            }
-            return dtoA;
-        }).toList());
+                BigDecimal totalDeduc = pago.getDeducciones() != null ? pago.getDeducciones().stream()
+                                .map(Deduccion::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-    // 4. MAPEAR LISTA DE BONIFICACIONES
-    dto.setBonificaciones(pago.getBonificaciones() == null ? List.of() : 
-        pago.getBonificaciones().stream().map(b -> {
-            BonificacionResponseDTO dtoB = new BonificacionResponseDTO();
-            dtoB.setNombre(b.getNombre());
-            dtoB.setMonto(b.getMonto());
-            return dtoB;
-        }).toList());
+                BigDecimal totalAdel = pago.getAdelantos() != null ? pago.getAdelantos().stream()
+                                .map(Adelanto::getMonto).reduce(BigDecimal.ZERO, BigDecimal::add) : BigDecimal.ZERO;
 
-    // 5. MAPEAR LISTA DE DEDUCCIONES
-    dto.setDeducciones(pago.getDeducciones() == null ? List.of() : 
-        pago.getDeducciones().stream().map(d -> {
-            DescuentoResponseDTO dtoD = new DescuentoResponseDTO();
-            dtoD.setMonto(d.getMonto());
-            dtoD.setObservaciones(d.getObservaciones());
-            if (d.getTipoDeduccion() != null) {
-                dtoD.setTipoDeduccionId(d.getTipoDeduccion().getId());
-            }
-            return dtoD;
-        }).toList());
+                dto.setTotalBonificaciones(totalBono);
+                dto.setTotalDeducciones(totalDeduc);
+                dto.setTotalAdelantos(totalAdel);
 
-    return dto;
-}
+                // 3. MAPEAR LISTA DE ADELANTOS (Con todos sus campos)
+                dto.setAdelantos(pago.getAdelantos() == null ? List.of() : pago.getAdelantos().stream().map(a -> {
+                        AdelantoResponseDTO dtoA = new AdelantoResponseDTO();
+                        dtoA.setId(a.getId());
+                        dtoA.setNombre(a.getNombre());
+                        dtoA.setMonto(a.getMonto());
+                        dtoA.setEstado(a.getEstado() != null ? a.getEstado() : null);
+                        dtoA.setUsuarioId(a.getUsuario() != null ? a.getUsuario().getId() : null);
+                        dtoA.setPagoId(pago.getId());
+
+                        if (a.getUsuario() != null && a.getUsuario().getPersona() != null) {
+                                Persona p = a.getUsuario().getPersona();
+                                dtoA.setNombreCompletoPersonal(p.getNombres() + " " + p.getApellidos());
+                                dtoA.setDniPersonal(p.getDni());
+                        }
+                        return dtoA;
+                }).toList());
+
+                // 4. MAPEAR LISTA DE BONIFICACIONES
+                dto.setBonificaciones(pago.getBonificaciones() == null ? List.of()
+                                : pago.getBonificaciones().stream().map(b -> {
+                                        BonificacionResponseDTO dtoB = new BonificacionResponseDTO();
+                                        dtoB.setNombre(b.getNombre());
+                                        dtoB.setMonto(b.getMonto());
+                                        return dtoB;
+                                }).toList());
+
+                // 5. MAPEAR LISTA DE DEDUCCIONES
+                dto.setDeducciones(pago.getDeducciones() == null ? List.of() : pago.getDeducciones().stream().map(d -> {
+                        DescuentoResponseDTO dtoD = new DescuentoResponseDTO();
+                        dtoD.setMonto(d.getMonto());
+                        dtoD.setObservaciones(d.getObservaciones());
+                        if (d.getTipoDeduccion() != null) {
+                                dtoD.setTipoDeduccionId(d.getTipoDeduccion().getId());
+                        }
+                        return dtoD;
+                }).toList());
+
+                return dto;
+        }
+
         // =====================================================
         // OBTENER CARGO DEL USUARIO (ADMINISTRATIVO O DOCENTE)
         // =====================================================

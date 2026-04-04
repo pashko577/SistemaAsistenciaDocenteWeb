@@ -6,6 +6,10 @@ export interface PagoResponse {
   pagoId: number;
   fecha: string;
   contratoId: number;
+  nombreCompleto: string;
+  dni: string;
+  cargo: string;
+  sede: string;
   tipoPago: string;
   montoBase: number;
   montoActividad: number;

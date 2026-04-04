@@ -26,6 +26,11 @@ public class PagoResponseDTO {
 
     private Long contratoId;
 
+    private String nombreCompleto; 
+    private String dni;
+    private String cargo;
+    private String sede;
+
     private String tipoPago; // PAGO_HORA | PAGO_MENSUAL
 
     private BigDecimal montoBase;       // del contrato
