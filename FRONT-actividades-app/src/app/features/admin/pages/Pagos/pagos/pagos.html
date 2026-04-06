@@ -1,51 +1,65 @@
 <div class="min-h-screen bg-gray-50 p-6">
   <div class="max-w-6xl mx-auto">
     
-    <div class="flex space-x-1 bg-gray-200 p-1 rounded-xl mb-6 w-full md:w-80">
-      <button 
-        (click)="viewMode = 'generar'"
+    <div class="flex space-x-1 bg-gray-200 p-1 rounded-xl mb-6 w-full max-w-md shadow-inner">
+      <button (click)="cambiarTab('generar')" 
         [class.bg-white]="viewMode === 'generar'"
         [class.shadow-sm]="viewMode === 'generar'"
-        [class.text-emerald-800]="viewMode === 'generar'"
-        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600">
+        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600 hover:text-emerald-700">
         Generar Pago
       </button>
-      <button 
-        (click)="viewMode = 'historial'; cargarHistorial()"
+      <button (click)="cambiarTab('adelantos')" 
+        [class.bg-white]="viewMode === 'adelantos'"
+        [class.shadow-sm]="viewMode === 'adelantos'"
+        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600 hover:text-emerald-700">
+        Adelantos
+      </button>
+      <button (click)="cambiarTab('historial')" 
         [class.bg-white]="viewMode === 'historial'"
         [class.shadow-sm]="viewMode === 'historial'"
-        [class.text-emerald-800]="viewMode === 'historial'"
-        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600">
+        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600 hover:text-emerald-700">
         Historial
       </button>
     </div>
 
+    <div *ngIf="viewMode === 'adelantos'" class="animate-fadeIn">
+  <app-adelanto 
+  [usuarioId]="usuarioSeleccionadoId" 
+  [mes]="mesSeleccionado" 
+  [anio]="anioSeleccionado"
+  [listaAdministrativos]="listaAdministrativos"
+  (usuarioCambiado)="usuarioSeleccionadoId = $event" 
+  (cambioAdelantos)="onCambioAdelantos($event)">
+</app-adelanto>
+</div>
+
     <div *ngIf="viewMode === 'generar'" class="bg-white rounded-3xl shadow-xl overflow-hidden animate-fadeIn">
       <div class="bg-[#004d40] p-8 text-white">
-        <h2 class="text-2xl font-bold mb-6">Generación de Planilla Mensual</h2>
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <i class="fas fa-file-invoice-dollar opacity-50"></i>
+          Generación de Planilla Mensual
+        </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div>
-            <label class="block text-sm font-medium opacity-80">Personal Administrativo</label>
-            <select [(ngModel)]="usuarioSeleccionadoId" (ngModelChange)="cargarInformacionTodo()"
-              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2 outline-none">
+            <label class="block text-sm font-medium opacity-80 mb-1">Personal Administrativo</label>
+            <select [(ngModel)]="usuarioSeleccionadoId" (ngModelChange)="obtenerDatosPlanilla()"
+              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-3 outline-none focus:ring-2 focus:ring-emerald-400">
               <option *ngFor="let admin of listaAdministrativos" [value]="admin.id">
                 {{ admin.nombres }} {{ admin.apellidos }}
               </option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium opacity-80">Mes de Pago</label>
-            <select [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarInformacionTodo()"
-              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2 outline-none">
-              <option *ngFor="let mes of mesesDelAnio" [value]="mes.valor">
-                {{ mes.nombre }}
-              </option>
+            <label class="block text-sm font-medium opacity-80 mb-1">Mes de Pago</label>
+            <select [(ngModel)]="mesSeleccionado" (ngModelChange)="alCambiarFiltro()"
+              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-3 outline-none focus:ring-2 focus:ring-emerald-400">
+              <option *ngFor="let mes of mesesDelAnio" [value]="mes.valor">{{ mes.nombre }}</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium opacity-80">Año</label>
-            <select [(ngModel)]="anioSeleccionado" (change)="cargarInformacionTodo()"
-              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-2 outline-none">
+            <label class="block text-sm font-medium opacity-80 mb-1">Año</label>
+            <select [(ngModel)]="anioSeleccionado" (change)="alCambiarFiltro()"
+              class="mt-1 block w-full bg-[#00332a] border-none rounded-lg text-white p-3 outline-none focus:ring-2 focus:ring-emerald-400">
               <option *ngFor="let anio of aniosDisponibles" [value]="anio">{{ anio }}</option>
             </select>
           </div>
@@ -53,115 +67,115 @@
       </div>
 
       <div class="p-8">
-        <div class="flex justify-between items-center border-b pb-4 mb-6">
-          <div>
-            <h3 class="text-xl font-bold text-gray-800">Detalle de Conceptos</h3>
-            <p class="text-gray-500 text-sm">
-              Cierre estimado al cierre de {{ mesSeleccionado | titlecase }} {{ anioSeleccionado }}
-            </p>
-          </div>
+        <div class="border-b pb-4 mb-6">
+          <h3 class="text-xl font-bold text-gray-800">Detalle de Conceptos</h3>
+          <p class="text-gray-500 text-sm italic">
+            Cierre estimado al {{ mesSeleccionado | titlecase }} {{ anioSeleccionado }}
+          </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
           <div class="space-y-4">
-            <h4 class="font-bold text-emerald-800 border-l-4 border-emerald-500 pl-2">INGRESOS</h4>
-            <div class="flex justify-between p-3 bg-gray-50 rounded-lg">
-              <span>Sueldo Base Mensual</span>
-              <span class="font-semibold text-emerald-700">S/ {{ sueldoBase | number:'1.2-2' }}</span>
+            <h4 class="text-xs font-black text-emerald-700 uppercase tracking-widest border-l-4 border-emerald-500 pl-3">Ingresos</h4>
+            <div class="flex justify-between p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100">
+              <span class="text-slate-600 font-medium">Sueldo Base Mensual</span>
+              <span class="font-bold text-emerald-700">S/ {{ sueldoBase | number:'1.2-2' }}</span>
             </div>
           </div>
+
           <div class="space-y-4">
-            <h4 class="font-bold text-red-800 border-l-4 border-red-500 pl-2">DESCUENTOS</h4>
+            <h4 class="text-xs font-black text-red-700 uppercase tracking-widest border-l-4 border-red-500 pl-3">Descuentos</h4>
+            
             <div *ngFor="let adelanto of adelantosPendientes"
-              class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
-              <span>Adelanto: {{ adelanto.nombre }}</span>
-              <span class="font-semibold">- S/ {{ adelanto.monto | number:'1.2-2' }}</span>
+              class="flex justify-between p-3 bg-red-50/50 rounded-xl text-red-700 border border-red-100">
+              <span class="text-sm">Adelanto: {{ adelanto.nombre }}</span>
+              <span class="font-bold">- S/ {{ adelanto.monto | number:'1.2-2' }}</span>
             </div>
-            <div class="flex justify-between p-3 bg-red-50 rounded-lg text-red-700">
+
+            <div class="flex justify-between p-4 bg-red-50/50 rounded-xl text-red-700 border border-red-100">
               <div class="flex flex-col">
-                <span>Tardanzas y Faltas</span>
-                <small class="text-xs opacity-70">Sincronizado con asistencia</small>
+                <span class="text-sm font-semibold">Tardanzas y Faltas</span>
+                <small class="text-[10px] opacity-70 uppercase font-bold">Sincronizado con Asistencia</small>
               </div>
-              <span class="font-semibold">- S/ {{ montoTardanzas | number:'1.2-2' }}</span>
+              <span class="font-bold">- S/ {{ montoTardanzas | number:'1.2-2' }}</span>
             </div>
           </div>
         </div>
 
-        <div class="mt-10 bg-[#f8fafc] border-2 border-dashed border-gray-200 rounded-2xl p-6">
-          <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="mt-12 bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-2xl relative overflow-hidden">
+          <div class="flex flex-col md:flex-row justify-between items-center gap-8 relative z-10">
             <div class="text-center md:text-left">
-              <p class="text-gray-500 text-sm uppercase tracking-widest">Neto a Percibir</p>
-              <h2 class="text-4xl font-black text-[#004d40]">
+              <p class="text-emerald-400 text-xs font-bold uppercase tracking-[0.2em] mb-2">Monto Neto a Percibir</p>
+              <h2 class="text-5xl font-black tracking-tighter">
                 S/ {{ netoProyectado | number:'1.2-2' }}
               </h2>
             </div>
             <button (click)="onGenerarPago()"
-              class="bg-[#004d40] hover:bg-[#00332a] text-white px-10 py-4 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105">
+              class="w-full md:w-auto bg-emerald-500 hover:bg-emerald-400 text-white px-12 py-5 rounded-2xl font-black text-lg transition-all transform hover:scale-105 shadow-xl shadow-emerald-500/20">
               GENERAR PAGO FINAL
             </button>
+          </div>
+          <div class="absolute -right-10 -bottom-10 opacity-10">
+            <i class="fas fa-coins text-9xl"></i>
           </div>
         </div>
       </div>
     </div>
 
     <div *ngIf="viewMode === 'historial'" class="animate-fadeIn">
-      <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div>
-          <h1 class="text-2xl font-bold text-slate-800">Historial de Pagos</h1>
-          <p class="text-slate-500 text-sm">Gestión de planillas del año {{ anioSeleccionado }}</p>
+          <h1 class="text-3xl font-black text-slate-800 tracking-tight">Historial de Pagos</h1>
+          <p class="text-slate-500 font-medium">Gestión de planillas del periodo {{ anioSeleccionado }}</p>
         </div>
-        <div class="relative max-w-md w-full">
-          <input 
-            type="text" 
-            [(ngModel)]="busqueda"
-            placeholder="Buscar por nombre o DNI..." 
-            class="w-full pl-4 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition-all shadow-sm"
-          />
+        <div class="relative w-full max-w-md">
+          <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+          <input type="text" [(ngModel)]="busqueda" placeholder="Buscar por nombre o DNI..." 
+            class="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 outline-none transition-all shadow-sm">
         </div>
       </div>
 
-      <div *ngIf="cargandoHistorial" class="flex flex-col items-center justify-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
-        <p class="mt-4 text-slate-600 font-medium">Cargando registros...</p>
+      <div *ngIf="cargandoHistorial" class="py-20 text-center bg-white rounded-3xl border border-slate-100">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600 mx-auto"></div>
+        <p class="mt-4 text-slate-500 font-bold">Consultando registros...</p>
       </div>
 
-      <div *ngIf="!cargandoHistorial" class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+      <div *ngIf="!cargandoHistorial" class="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="px-6 py-4 text-sm font-semibold text-slate-600">Personal</th>
-                <th class="px-6 py-4 text-sm font-semibold text-slate-600">Fecha</th>
-                <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-right">Monto Neto</th>
-                <th class="px-6 py-4 text-sm font-semibold text-slate-600 text-center">Acciones</th>
+              <tr class="bg-slate-50/50 border-b border-slate-100">
+                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Personal Administrativo</th>
+                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest">Fecha de Pago</th>
+                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-right">Monto Neto</th>
+                <th class="px-8 py-5 text-xs font-black text-slate-400 uppercase tracking-widest text-center">Acciones</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-100">
-              <tr *ngFor="let pago of pagosFiltrados" class="hover:bg-slate-50 transition-colors">
-                <td class="px-6 py-4">
+            <tbody class="divide-y divide-slate-50">
+              <tr *ngFor="let pago of pagosFiltrados" class="hover:bg-slate-50/80 transition-colors group">
+                <td class="px-8 py-5">
                   <div class="flex flex-col">
-                    <span class="font-bold text-slate-700">{{ pago.nombreCompleto }}</span>
-                    <span class="text-xs text-slate-500">DNI: {{ pago.dni }}</span>
+                    <span class="font-bold text-slate-700 group-hover:text-emerald-700 transition-colors">{{ pago.nombreCompleto }}</span>
+                    <span class="text-xs text-slate-400">DNI: {{ pago.dni }}</span>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-sm text-slate-600">
+                <td class="px-8 py-5 text-sm font-medium text-slate-600">
                   {{ pago.fecha | date:'dd/MM/yyyy' }}
                 </td>
-                <td class="px-6 py-4 text-right">
-                  <span class="text-emerald-600 font-bold">
-                    S/ {{ pago.netoPagar | number:'1.2-2' }}
-                  </span>
+                <td class="px-8 py-5 text-right font-black text-emerald-600">
+                  S/ {{ pago.netoPagar | number:'1.2-2' }}
                 </td>
-                <td class="px-6 py-4 text-center">
+                <td class="px-8 py-5 text-center">
                   <button (click)="verDetalleHistorial(pago)"
-                    class="text-emerald-600 hover:text-emerald-800 p-2 hover:bg-emerald-50 rounded-full transition-all">
-                    <i class="fas fa-file-invoice-dollar"></i> Ver Boleta
+                    class="bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-600 px-5 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-2 mx-auto shadow-sm">
+                    <i class="fas fa-file-invoice-dollar text-emerald-500"></i> VER BOLETA
                   </button>
                 </td>
               </tr>
               <tr *ngIf="pagosFiltrados.length === 0">
-                <td colspan="4" class="px-6 py-12 text-center text-slate-400">
-                  No se encontraron registros.
+                <td colspan="4" class="px-8 py-20 text-center">
+                  <i class="fas fa-folder-open text-slate-200 text-5xl mb-4 block"></i>
+                  <p class="text-slate-400 font-medium">No se encontraron registros en este periodo.</p>
                 </td>
               </tr>
             </tbody>
@@ -173,5 +187,9 @@
   </div>
 </div>
 
-<app-pago-detalle-modal *ngIf="modalVisible" [pago]="pagoGenerado" (close)="modalVisible = false">
+<app-pago-detalle-modal 
+  *ngIf="modalVisible" 
+  [pago]="pagoGenerado" 
+  [visible]="modalVisible"
+  (close)="modalVisible = false">
 </app-pago-detalle-modal>

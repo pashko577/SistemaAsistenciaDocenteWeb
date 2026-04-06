@@ -1,70 +1,69 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AdelantoResponse } from '../../../../../core/models/pagos/adelanto-response';
+
+// Services
 import { PagosService } from '../../../../../core/services/pagos_services';
-import { AdelantoService } from '../../../../../core/services/adelanto_services';
-import { PagoRequest } from '../../../../../core/models/pagos/pago-request';
-import { PagoResponse } from '../../../../../core/models/pagos/pago-response';
-import { PagoDetalleModal } from "../modal/pago-detalle-modal/pago-detalle-modal";
-import { PlanillaAdministrativoService } from '../../../../../core/services/planilla-administrativos.services';
-import { PlanillaAdministrativoDTO } from '../../../../../core/models/Administrativos/planillaAdministrativoDTO';
 import { AdministrativoService } from '../../../../../core/services/administrativo_services';
+import { PlanillaAdministrativoService } from '../../../../../core/services/planilla-administrativos.services';
+
+// Models
+import { PagoResponse } from '../../../../../core/models/pagos/pago-response';
+import { AdelantoResponse } from '../../../../../core/models/pagos/adelanto-response';
 import { AdministrativoResponse } from '../../../../../core/models/Administrativos/administrativo-response';
+
+// Components
+import { PagoDetalleModal } from "../modal/pago-detalle-modal/pago-detalle-modal";
+import { Adelanto } from '../modal/adelanto/adelanto';
+
+import { AdelantoService } from '../../../../../core/services/adelanto_services';
+
 
 @Component({
   selector: 'app-pagos',
   standalone: true,
-  imports: [CommonModule, FormsModule, PagoDetalleModal],
+  imports: [CommonModule, FormsModule, PagoDetalleModal, Adelanto],
   templateUrl: './pagos.html',
   styleUrl: './pagos.css',
 })
 export class Pagos implements OnInit {
-  // --- Control de Vista ---
-  viewMode: 'generar' | 'historial' = 'generar';
-
-  // --- Listas Dinámicas ---
-  listaAdministrativos: AdministrativoResponse[] = [];
-  listaPagos: PagoResponse[] = [];
-  busqueda: string = '';
-  cargandoHistorial: boolean = false;
-
-  aniosDisponibles: number[] = [2025, 2026, 2027];
-  mesesDelAnio = [
-    { nombre: 'Enero', valor: 'ENERO', num: '01' },
-    { nombre: 'Febrero', valor: 'FEBRERO', num: '02' },
-    { nombre: 'Marzo', valor: 'MARZO', num: '03' },
-    { nombre: 'Abril', valor: 'ABRIL', num: '04' },
-    { nombre: 'Mayo', valor: 'MAYO', num: '05' },
-    { nombre: 'Junio', valor: 'JUNIO', num: '06' },
-    { nombre: 'Julio', valor: 'JULIO', num: '07' },
-    { nombre: 'Agosto', valor: 'AGOSTO', num: '08' },
-    { nombre: 'Septiembre', valor: 'SEPTIEMBRE', num: '09' },
-    { nombre: 'Octubre', valor: 'OCTUBRE', num: '10' },
-    { nombre: 'Noviembre', valor: 'NOVIEMBRE', num: '11' },
-    { nombre: 'Diciembre', valor: 'DICIEMBRE', num: '12' }
-  ];
-
   // --- Estado de la Vista ---
+  viewMode: 'generar' | 'historial' | 'adelantos' = 'generar';
   usuarioSeleccionadoId: number | null = null;
   mesSeleccionado: string = 'ABRIL';
   anioSeleccionado: number = 2026;
+  busqueda: string = '';
+  cargandoHistorial = false;
+  modalVisible = false;
 
-  // --- Datos Económicos ---
-  sueldoBase: number = 0;
-  montoTardanzas: number = 0; 
+  // --- Listas de Datos ---
+  listaAdministrativos: AdministrativoResponse[] = [];
+  listaPagos: PagoResponse[] = [];
+  pagoGenerado: PagoResponse | null = null;
+
+  // --- Datos de Planilla (Sincronizados) ---
   adelantosPendientes: AdelantoResponse[] = [];
   totalAdelantos: number = 0;
+  sueldoBase: number = 0;
+  montoTardanzas: number = 0;
   netoProyectado: number = 0;
 
-  modalVisible = false;
-  pagoGenerado: PagoResponse | null = null;
+  // --- Configuración ---
+  aniosDisponibles = [2025, 2026, 2027];
+  mesesDelAnio = [
+    { nombre: 'Enero', valor: 'ENERO', num: '01' }, { nombre: 'Febrero', valor: 'FEBRERO', num: '02' },
+    { nombre: 'Marzo', valor: 'MARZO', num: '03' }, { nombre: 'Abril', valor: 'ABRIL', num: '04' },
+    { nombre: 'Mayo', valor: 'MAYO', num: '05' }, { nombre: 'Junio', valor: 'JUNIO', num: '06' },
+    { nombre: 'Julio', valor: 'JULIO', num: '07' }, { nombre: 'Agosto', valor: 'AGOSTO', num: '08' },
+    { nombre: 'Septiembre', valor: 'SEPTIEMBRE', num: '09' }, { nombre: 'Octubre', valor: 'OCTUBRE', num: '10' },
+    { nombre: 'Noviembre', valor: 'NOVIEMBRE', num: '11' }, { nombre: 'Diciembre', valor: 'DICIEMBRE', num: '12' }
+  ];
 
   constructor(
     private pagosService: PagosService,
-    private adelantoService: AdelantoService,
     private administrativoService: AdministrativoService,
     private planillaService: PlanillaAdministrativoService,
+    private adelantoService: AdelantoService, // <--- Inyectar aquí
     private cdr: ChangeDetectorRef 
   ) {}
 
@@ -73,85 +72,89 @@ export class Pagos implements OnInit {
     this.cargarHistorial();
   }
 
-  // --- LÓGICA DE GENERACIÓN ---
+  // --- Navegación ---
+  cambiarTab(modo: 'generar' | 'historial' | 'adelantos'): void {
+    this.viewMode = modo;
+    if (modo === 'historial') this.cargarHistorial();
+  }
+
+  // --- Carga de Datos ---
   cargarListaPersonal(): void {
-    this.administrativoService.listarConContrato().subscribe({
-      next: (data) => {
-        this.listaAdministrativos = data;
-        if (data.length > 0 && !this.usuarioSeleccionadoId) {
-          this.usuarioSeleccionadoId = data[0].id;
-        }
-        this.cargarInformacionTodo();
+    this.administrativoService.listarConContrato().subscribe(data => {
+      this.listaAdministrativos = data;
+      if (data.length > 0 && !this.usuarioSeleccionadoId) {
+        this.usuarioSeleccionadoId = data[0].id;
       }
+      this.obtenerDatosPlanilla();
     });
   }
 
-  cargarInformacionTodo(): void {
-    if (!this.usuarioSeleccionadoId) return;
-
-    this.sueldoBase = 0;
-    this.netoProyectado = 0;
-    this.totalAdelantos = 0;
-    this.adelantosPendientes = [];
-
-    this.adelantoService.listarPendientesPorUsuario(this.usuarioSeleccionadoId).subscribe({
-      next: (adelantos) => {
-        this.adelantosPendientes = adelantos;
-        this.totalAdelantos = adelantos.reduce((sum, item) => sum + item.monto, 0);
-        this.obtenerDatosPlanilla();
-      },
-      error: (err) => console.error(err)
-    });
+  /**
+   * RECIBE datos del componente hijo Adelanto.
+   * Centraliza la actualización de la planilla cuando algo cambia en los vales.
+   */
+  onCambioAdelantos(event: { lista: AdelantoResponse[], total: number }): void {
+    this.adelantosPendientes = event.lista;
+    this.totalAdelantos = event.total;
+    this.obtenerDatosPlanilla();
   }
 
-  obtenerDatosPlanilla(): void {
-    const mesNum = this.obtenerNumeroMes();
-    const anio = this.anioSeleccionado;
-    const inicio = `${anio}-${mesNum}-01`;
-    const ultimoDia = new Date(anio, parseInt(mesNum), 0).getDate();
-    const fin = `${anio}-${mesNum}-${ultimoDia}`;
+ obtenerDatosPlanilla(): void {
+  if (!this.usuarioSeleccionadoId) return;
 
+  const mesNum = this.obtenerNumeroMes();
+  const inicio = `${this.anioSeleccionado}-${mesNum}-01`;
+  const ultimoDia = new Date(this.anioSeleccionado, parseInt(mesNum), 0).getDate();
+  const fin = `${this.anioSeleccionado}-${mesNum}-${ultimoDia}`;
+
+  // --- NUEVO: Cargar adelantos directamente desde el padre ---
+  this.adelantoService.listarPendientesPorUsuario(this.usuarioSeleccionadoId).subscribe(data => {
+    const mesBusqueda = parseInt(mesNum);
+    
+    // Filtramos igual que en el hijo para tener consistencia
+    this.adelantosPendientes = data.filter(a => {
+      if (!a.fechaCreacion) return false;
+      const partes = a.fechaCreacion.split('-');
+      return parseInt(partes[0]) === this.anioSeleccionado && parseInt(partes[1]) === mesBusqueda;
+    });
+
+    this.totalAdelantos = this.adelantosPendientes.reduce((sum, item) => sum + item.monto, 0);
+
+    // Ahora pedimos el cálculo de la planilla una vez que ya sabemos los adelantos
     this.planillaService.calcularPlanilla(this.usuarioSeleccionadoId!, inicio, fin).subscribe({
-      next: (data: PlanillaAdministrativoDTO) => {
-        this.sueldoBase = data.sueldoBase;
-        this.montoTardanzas = data.descuentoFaltas + data.descuentoTardanza;
-        this.netoProyectado = data.sueldoNeto - this.totalAdelantos;
-        this.cdr.detectChanges(); 
+      next: (dataPlanilla) => {
+        this.sueldoBase = dataPlanilla.sueldoBase;
+        this.montoTardanzas = dataPlanilla.descuentoFaltas + dataPlanilla.descuentoTardanza;
+        this.netoProyectado = dataPlanilla.sueldoNeto - this.totalAdelantos;
+        this.cdr.detectChanges();
       }
     });
-  }
+  });
+}
 
+  // --- Acciones de Pago ---
   onGenerarPago(): void {
-    if (!this.usuarioSeleccionadoId) return;
-    const adminActual = this.listaAdministrativos.find(a => Number(a.id) === Number(this.usuarioSeleccionadoId));
+    const admin = this.listaAdministrativos.find(a => a.id === this.usuarioSeleccionadoId);
+    if (!admin?.contratoId) return alert("El usuario no tiene un contrato activo.");
 
-    if (!adminActual || !adminActual.contratoId) {
-      alert("Error: El usuario no tiene un contrato activo.");
-      return;
-    }
-
-    const payload: PagoRequest = {
+    const payload = {
       fecha: `${this.anioSeleccionado}-${this.obtenerNumeroMes()}-${new Date(this.anioSeleccionado, parseInt(this.obtenerNumeroMes()), 0).getDate()}`, 
-      contratoId: adminActual.contratoId,
+      contratoId: admin.contratoId,
       adelantoIds: this.adelantosPendientes.map(a => a.id),
       deducciones: [], 
       bonificaciones: []
     };
 
-    this.pagosService.crear(payload).subscribe({
-      next: (response) => {
-        this.pagoGenerado = response;
-        this.modalVisible = true;
-        this.cargarHistorial(); // Refrescar historial tras pagar
-      }
+    this.pagosService.crear(payload).subscribe(response => {
+      this.pagoGenerado = response;
+      this.modalVisible = true;
+      this.cargarHistorial();
     });
   }
 
- // --- LÓGICA DE HISTORIAL (CORREGIDA PARA EVITAR 403) ---
+  // --- Historial ---
   cargarHistorial(): void {
     this.cargandoHistorial = true;
-    
-    // Usamos el rango del año seleccionado para consultar al endpoint /api/pagos/rango
     const inicio = `${this.anioSeleccionado}-01-01`;
     const fin = `${this.anioSeleccionado}-12-31`;
 
@@ -161,28 +164,29 @@ export class Pagos implements OnInit {
         this.cargandoHistorial = false;
         this.cdr.detectChanges();
       },
-      error: () => {
-        this.cargandoHistorial = false;
-        this.cdr.detectChanges();
-      }
+      error: () => this.cargandoHistorial = false
     });
   }
 
-  get pagosFiltrados() {
-    if (!this.busqueda.trim()) return this.listaPagos;
-    const term = this.busqueda.toLowerCase();
-    return this.listaPagos.filter(p => 
-      p.nombreCompleto.toLowerCase().includes(term) || p.dni.includes(term)
-    );
+  get pagosFiltrados(): PagoResponse[] {
+    const term = this.busqueda.toLowerCase().trim();
+    return term 
+      ? this.listaPagos.filter(p => p.nombreCompleto.toLowerCase().includes(term) || p.dni.includes(term))
+      : this.listaPagos;
   }
 
-  verDetalleHistorial(pago: PagoResponse) {
+  verDetalleHistorial(pago: PagoResponse): void {
     this.pagoGenerado = pago;
     this.modalVisible = true;
   }
 
   private obtenerNumeroMes(): string {
-    const mesEncontrado = this.mesesDelAnio.find(m => m.valor === this.mesSeleccionado);
-    return mesEncontrado ? mesEncontrado.num : '01';
+    return this.mesesDelAnio.find(m => m.valor === this.mesSeleccionado)?.num || '01';
   }
+
+  alCambiarFiltro() {
+  this.totalAdelantos = 0; // Resetear para evitar que reste el monto del mes anterior
+  this.adelantosPendientes = [];
+  this.obtenerDatosPlanilla();
+}
 }

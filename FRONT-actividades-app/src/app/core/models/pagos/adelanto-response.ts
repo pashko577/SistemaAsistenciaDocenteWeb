@@ -5,6 +5,7 @@ export interface AdelantoResponse {
   nombre: string;
   monto: number;
   estado: EstadoAdelanto;
+  fechaCreacion: string;
   usuarioId: number;
   nombreCompletoPersonal: string;
   dniPersonal: string;

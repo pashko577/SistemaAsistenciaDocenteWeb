@@ -24,7 +24,10 @@ public class AdelantoController {
     public ResponseEntity<AdelantoResponseDTO> registrar(@Valid @RequestBody AdelantoRequestDTO request) {
         return new ResponseEntity<>(adelantoService.registrar(request), HttpStatus.CREATED);
     }
-
+@PutMapping("/actualizar/{id}")
+public ResponseEntity<AdelantoResponseDTO> actualizar(@PathVariable Long id, @RequestBody AdelantoRequestDTO request) {
+    return ResponseEntity.ok(adelantoService.actualizar(id, request));
+}
     @GetMapping("/todos")
     public ResponseEntity<List<AdelantoResponseDTO>> listarTodos() {
         return ResponseEntity.ok(adelantoService.listarTodos());

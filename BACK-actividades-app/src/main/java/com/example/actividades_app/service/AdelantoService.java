@@ -11,6 +11,9 @@ public interface AdelantoService {
 
     // Para el registro manual de un adelanto
     AdelantoResponseDTO registrar(AdelantoRequestDTO request);
+
+    // Agregar a la interfaz
+AdelantoResponseDTO actualizar(Long id, AdelantoRequestDTO request);
     
     // Fundamental para el Módulo de Pagos: Trae lo que se debe descontar
     List<AdelantoResponseDTO> listarPendientesPorUsuario(Long usuarioId);

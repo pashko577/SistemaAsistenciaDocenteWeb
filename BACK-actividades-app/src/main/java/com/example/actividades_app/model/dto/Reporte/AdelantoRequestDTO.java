@@ -1,6 +1,7 @@
 package com.example.actividades_app.model.dto.Reporte;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.example.actividades_app.enums.EstadoAdelanto;
 
@@ -22,7 +23,9 @@ public class AdelantoRequestDTO {
     @NotNull(message = "Debe especificar el usuario (ID)")
     private Long usuarioId;
 
-    // Por defecto suele ser PENDIENTE al crear, 
-    // pero lo incluimos por si se requiere editar el estado.
+    // NUEVO: Para definir cuándo se dio el adelanto
+    @NotNull(message = "La fecha del adelanto es obligatoria")
+    private LocalDate fechaCreacion; 
+
     private EstadoAdelanto estado;
 }
