@@ -17,7 +17,10 @@ export class AdelantoService {
   registrar(request: AdelantoRequest): Observable<AdelantoResponse> {
     return this.http.post<AdelantoResponse>(`${this.URL}/registrar`, request);
   }
-
+// Actualizar un adelanto existente (Monto o Concepto)
+actualizar(id: number, request: AdelantoRequest): Observable<AdelantoResponse> {
+  return this.http.put<AdelantoResponse>(`${this.URL}/actualizar/${id}`, request);
+}
   // Para el historial general de adelantos
   listarTodos(): Observable<AdelantoResponse[]> {
     return this.http.get<AdelantoResponse[]>(`${this.URL}/todos`);

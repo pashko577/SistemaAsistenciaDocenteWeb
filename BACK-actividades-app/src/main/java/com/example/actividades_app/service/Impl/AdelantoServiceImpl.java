@@ -39,11 +39,35 @@ public class AdelantoServiceImpl implements AdelantoService {
                 .monto(request.getMonto())
                 .estado(EstadoAdelanto.PENDIENTE)
                 .usuario(usuario)
+                // 🔥 CAMBIO: Seteamos la fecha que viene del DTO
+                .fechaCreacion(request.getFechaCreacion()) 
                 .build();
 
         return mapToResponse(adelantoRepository.save(adelanto));
     }
 
+    @Override
+@Transactional
+public AdelantoResponseDTO actualizar(Long id, AdelantoRequestDTO request) {
+    Adelanto adelanto = adelantoRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Adelanto no encontrado"));
+
+    // Regla de oro: Si ya se pagó, no se toca.
+    if (adelanto.getEstado() == EstadoAdelanto.APLICADO) {
+        throw new RuntimeException("No se puede editar un adelanto que ya ha sido aplicado a un pago.");
+    }
+
+    // Actualizamos los campos permitidos
+    adelanto.setNombre(request.getNombre());
+    adelanto.setMonto(request.getMonto());
+    
+    // Si permites cambiar la fecha del descuento:
+    if (request.getFechaCreacion() != null) {
+        adelanto.setFechaCreacion(request.getFechaCreacion());
+    }
+
+    return mapToResponse(adelantoRepository.save(adelanto));
+}
     @Override
     @Transactional(readOnly = true)
     public List<AdelantoResponseDTO> listarPendientesPorUsuario(Long usuarioId) {
@@ -106,8 +130,7 @@ public void aplicarAdelantosAPago(Long usuarioId, Long pagoId) {
     // ======================
     // MAPPER TO RESPONSE (Siguiendo tu patrón)
     // ======================
-    private AdelantoResponseDTO mapToResponse(Adelanto adelanto) {
-        // Extraemos las relaciones para facilitar el acceso
+   private AdelantoResponseDTO mapToResponse(Adelanto adelanto) {
         Usuario usuario = adelanto.getUsuario();
         Persona persona = usuario.getPersona();
         Pago pago = adelanto.getPago();
@@ -117,15 +140,16 @@ public void aplicarAdelantosAPago(Long usuarioId, Long pagoId) {
                 .nombre(adelanto.getNombre())
                 .monto(adelanto.getMonto())
                 .estado(adelanto.getEstado())
+                // 🔥 CAMBIO: Mapeamos la fecha al DTO de respuesta
+                .fechaCreacion(adelanto.getFechaCreacion()) 
 
-                // Datos de Usuario / Persona vinculada
                 .usuarioId(usuario.getId())
                 .dniPersonal(persona.getDni())
-                // Nombre completo para buscadores o tablas
                 .nombreCompletoPersonal(persona.getNombres() + " " + persona.getApellidos())
 
-                // Datos del Pago (Solo si ya fue aplicado)
                 .pagoId(pago != null ? pago.getId() : null)
+                // 🔥 CAMBIO: Usamos la fecha del objeto pago si existe
+                .fechaPago(pago != null ? pago.getFecha() : null) 
                 .build();
     }
 }

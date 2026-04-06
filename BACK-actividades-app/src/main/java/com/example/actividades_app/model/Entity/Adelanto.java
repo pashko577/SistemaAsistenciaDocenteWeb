@@ -3,6 +3,7 @@ package com.example.actividades_app.model.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import com.example.actividades_app.enums.EstadoAdelanto;
 @Entity
@@ -27,6 +28,9 @@ public class Adelanto {
     @Enumerated(EnumType.STRING) // Importante para guardar el texto (PENDIENTE/APLICADO)
     @Column(name = "estado", nullable = false)
     private EstadoAdelanto estado;
+
+    @Column(name = "fecha_creacion", nullable = false)
+    private LocalDate fechaCreacion;
 
     // RELACIÓN CON USUARIO (La que unificamos)
     @ManyToOne(fetch = FetchType.LAZY)

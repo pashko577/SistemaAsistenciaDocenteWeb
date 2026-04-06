@@ -15,6 +15,8 @@ public interface AdelantoRepository extends JpaRepository<Adelanto, Long> {
     List<Adelanto> findByUsuarioIdAndEstado(Long usuarioId, EstadoAdelanto estado);
     
     List<Adelanto> findByPagoId(Long pagoId);
+
+    
     
     boolean existsByPagoId(Long pagoId);
 }

@@ -3,6 +3,7 @@ package com.example.actividades_app.model.dto.Reporte;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import com.example.actividades_app.enums.EstadoAdelanto;
@@ -22,15 +23,14 @@ public class AdelantoResponseDTO {
     private String nombre;
     private BigDecimal monto;
     private EstadoAdelanto estado;
-
     
-    // Información simplificada del Usuario/Persona
+    // NUEVO: Para mostrar en la tabla de adelantos
+    private LocalDate fechaCreacion; 
+
     private Long usuarioId;
     private String nombreCompletoPersonal;
     private String dniPersonal;
 
-    // Información del Pago (si ya fue aplicado)
     private Long pagoId;
-    private LocalDateTime fechaPago; // Para saber cuándo se descontó
-
+    private LocalDate fechaPago; // Cambiado a LocalDate para consistencia
 }

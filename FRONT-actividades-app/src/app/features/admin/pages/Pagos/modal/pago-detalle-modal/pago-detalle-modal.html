@@ -1,76 +1,133 @@
-<div *ngIf="visible && pago" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4">
+<div *ngIf="visible && pago" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 no-print">
   
-  <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+  <div class="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300 flex flex-col max-h-[90vh]">
     
-    <div class="bg-[#004d40] p-6 text-white flex justify-between items-center">
-      <div>
-        <h2 class="text-xl font-bold">RECIBO DE PAGO #{{pago.pagoId}}</h2>
-        <p class="text-xs opacity-80 uppercase tracking-widest">Documento Interno de Planilla</p>
-      </div>
-      <button (click)="cerrar()" class="hover:bg-[#00332a] p-2 rounded-full transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+    <div class="bg-[#004d40] p-4 text-white flex justify-between items-center no-print">
+      <span class="font-bold">Vista Previa de Recibo</span>
+      <button (click)="cerrar()" class="hover:bg-white/20 p-1 rounded-full transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
 
-    <div class="p-8 space-y-6" id="boleta-imprimible">
-      <div class="flex justify-between border-b pb-4">
-        <div>
-          <p class="text-gray-500 text-xs uppercase font-bold">Colaborador</p>
-          <p class="text-lg font-semibold text-gray-800">
-            {{ pago.adelantos[0]?.nombreCompletoPersonal || 'Personal Administrativo' }}
+    <div class="overflow-y-auto bg-gray-200 p-4 md:p-8">
+      
+      <div class="bg-white p-6 md:p-10 shadow-lg mx-auto w-full" id="boleta-final" style="max-width: 800px; min-height: 29.7cm;">
+        
+        <div class="text-center mb-6">
+          <h1 class="text-xl font-bold text-gray-800 border-b-2 border-gray-100 pb-2 uppercase">
+            RESUMEN DEL MES DE {{ pago.fecha | date:'MMMM' : '':'es' }} DEL {{ pago.fecha | date:'yyyy' : '':'es' }}
+          </h1>
+          <p class="text-[9px] text-left mt-2 text-gray-500 leading-tight">
+            Se envió a su correo Institucional los siguientes archivos:<br>
+            1. Resumen de Actividades... 2. Reporte de Asistencia... 3. Resumen Consolidado (TESORERIA)
           </p>
-          <p class="text-sm text-gray-600">DNI: {{ pago.adelantos[0]?.dniPersonal || '--------' }}</p>
-        </div>
-        <div class="text-right">
-          <p class="text-gray-500 text-xs uppercase font-bold">Periodo</p>
-          <p class="text-lg font-semibold text-gray-800">{{ pago.fecha | date:'MMMM yyyy' | uppercase }}</p>
-          <p class="text-sm text-gray-600">Contrato: #{{pago.contratoId}}</p>
-        </div>
-      </div>
-
-      <div class="space-y-3">
-        <div class="flex justify-between text-sm font-bold text-gray-400 pb-2 border-b">
-          <span>DESCRIPCIÓN</span>
-          <span>MONTO</span>
         </div>
 
-        <div class="flex justify-between text-gray-700">
-          <span>Sueldo Base ({{pago.tipoPago}})</span>
-          <span class="font-medium">S/ {{pago.montoBase | number:'1.2-2'}}</span>
-        </div>
+        <table class="w-full text-[11px] mb-4 border-collapse border border-black">
+          <thead>
+            <tr class="bg-amarillo-institucional border-b border-black">
+              <th colspan="2" class="py-1 px-2 text-center font-bold text-black">DATOS DEL EMPLEADOR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-black">
+              <td class="p-2 font-bold w-1/3 bg-gris-claro border-r border-black uppercase">Nombre Comercial</td>
+              <td class="p-2 uppercase">I.E.Pr. James Baldwin</td>
+            </tr>
+            <tr>
+              <td class="p-2 font-bold bg-gris-claro border-r border-black uppercase">Razón Social</td>
+              <td class="p-2 uppercase">JAMES BALDWIN S.A.C.</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div *ngFor="let adelanto of pago.adelantos" class="flex justify-between text-red-600">
-          <span>(-) Adelanto: {{adelanto.nombre}}</span>
-          <span class="font-medium">- S/ {{adelanto.monto | number:'1.2-2'}}</span>
-        </div>
+        <table class="w-full text-[11px] mb-4 border-collapse border border-black">
+          <thead>
+            <tr class="bg-amarillo-institucional border-b border-black">
+              <th colspan="2" class="py-1 px-2 text-center font-bold text-black">DATOS DEL TRABAJADOR</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-black">
+              <td class="p-2 font-bold w-1/3 bg-gris-claro border-r border-black uppercase">Mes:</td>
+              <td class="p-2 uppercase">{{ pago.fecha | date:'MMMM yyyy' : '':'es' }}</td>
+            </tr>
+            <tr class="border-b border-black">
+              <td class="p-2 font-bold bg-gris-claro border-r border-black uppercase">Apellidos y Nombres:</td>
+              <td class="p-2 font-bold uppercase">{{ pago.nombreCompleto || pago.adelantos?.[0]?.nombreCompletoPersonal }}</td>
+            </tr>
+            <tr class="border-b border-black">
+              <td class="p-2 font-bold bg-gris-claro border-r border-black uppercase">DNI:</td>
+              <td class="p-2">{{ pago.dni || pago.adelantos?.[0]?.dniPersonal }}</td>
+            </tr>
+            <tr>
+              <td class="p-2 font-bold bg-gris-claro border-r border-black uppercase">Cargo:</td>
+              <td class="p-2 uppercase">{{ pago.tipoPago || 'PERSONAL' }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-        <div *ngFor="let deduc of pago.deducciones" class="flex justify-between text-red-600">
-          <div class="flex flex-col">
-            <span>(-) Deducción: {{deduc.observaciones}}</span>
+        <table class="w-full text-[11px] mb-4 border-collapse border border-black">
+          <thead>
+            <tr class="bg-amarillo-institucional border-b border-black text-black">
+              <th class="py-1 px-2 text-center font-bold uppercase">Reporte del Trabajador</th>
+              <th class="py-1 px-2 text-right font-bold w-32 border-l border-black uppercase">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-white">
+              <td class="p-2 border-r border-black uppercase">Sueldo Base según Actividad Académica</td>
+              <td class="p-2 text-right font-bold">S/ {{ (pago.montoActividad || pago.montoBase || 0) | number:'1.2-2' }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="w-full text-[11px] mb-4 border-collapse border border-black">
+          <thead>
+            <tr class="bg-amarillo-institucional border-b border-black text-black">
+              <th class="py-1 px-2 text-center font-bold uppercase">Descuentos</th>
+              <th class="py-1 px-2 text-right font-bold w-32 border-l border-black uppercase">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let adelanto of pago.adelantos" class="border-b border-black">
+              <td class="p-2 border-r border-black uppercase">Adelanto: {{ adelanto.nombre || 'VALE PENDIENTE' }}</td>
+              <td class="p-2 text-right text-red-600">- {{ adelanto.monto | number:'1.2-2' }}</td>
+            </tr>
+            
+            <tr *ngFor="let deduc of pago.deducciones" class="border-b border-black last:border-0">
+              <td class="p-2 border-r border-black uppercase">{{ deduc.observaciones }}</td>
+              <td class="p-2 text-right text-red-600">- {{ deduc.monto | number:'1.2-2' }}</td>
+            </tr>
+
+            <tr *ngIf="(!pago.adelantos || pago.adelantos.length === 0) && (!pago.deducciones || pago.deducciones.length === 0)">
+              <td class="p-2 border-r border-black text-gray-400 italic">Sin descuentos registrados en el periodo</td>
+              <td class="p-2 text-right">0.00</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="flex justify-end items-center gap-4 mt-8">
+          <span class="text-sm font-bold uppercase">Neto a Pagar:</span>
+          <div class="border-2 border-black px-8 py-2 text-2xl font-black bg-gray-50 shadow-inner">
+            S/ {{ (pago.netoPagar || 0) | number:'1.2-2' }}
           </div>
-          <span class="font-medium">- S/ {{deduc.monto | number:'1.2-2'}}</span>
         </div>
-      </div>
 
-      <div class="bg-gray-50 p-6 rounded-xl border-2 border-dashed border-gray-200 mt-6">
-        <div class="flex justify-between items-center">
-          <span class="text-xl font-bold text-[#004d40]">NETO A PAGAR</span>
-          <span class="text-3xl font-black text-[#004d40]">S/ {{pago.netoPagar | number:'1.2-2'}}</span>
+        <div class="mt-20 text-[9px] flex justify-between text-gray-400 border-t pt-4">
+          <p>Correo Institucional: tesoreria_iep@baldwin.edu.pe</p>
+          <p>Generado el: {{ today | date:'dd/MM/yyyy HH:mm' : '':'es' }}</p>
         </div>
       </div>
     </div>
 
-    <div class="p-6 bg-gray-100 flex gap-3 justify-end">
-      <button (click)="imprimir()" class="flex items-center gap-2 px-6 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all font-bold">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-        </svg>
-        IMPRIMIR
+    <div class="p-4 bg-gray-100 flex gap-3 justify-end no-print border-t">
+      <button (click)="imprimir()" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
+        IMPRIMIR BOLETA
       </button>
-      <button (click)="cerrar()" class="px-6 py-2 bg-[#004d40] text-white rounded-lg hover:bg-[#00332a] transition-all font-bold shadow-md">
-        ENTENDIDO
+      <button (click)="cerrar()" class="px-6 py-2 bg-gray-500 text-white rounded-lg font-bold hover:bg-gray-600 transition-colors">
+        CERRAR
       </button>
     </div>
 

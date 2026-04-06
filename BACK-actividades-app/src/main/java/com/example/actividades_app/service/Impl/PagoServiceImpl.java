@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +58,8 @@ public class PagoServiceImpl implements PagoService {
         // =====================================================
         @Override
         public PagoResponseDTO crear(PagoRequestDTO dto) {
-
+                int mesPlanilla = dto.getFecha().getMonthValue();
+                int anioPlanilla = dto.getFecha().getYear();
                 // -----------------------------
                 // OBTENER CONTRATO
                 // -----------------------------
@@ -105,21 +107,21 @@ public class PagoServiceImpl implements PagoService {
                 // ADELANTOS
                 // -----------------------------
                 // 1. Buscamos los adelantos que están PENDIENTES en la BD para este usuario
-                List<Adelanto> adelantosPendientes = adelantoRepository
-                                .findByUsuarioIdAndEstado(usuario.getId(), EstadoAdelanto.PENDIENTE);
+              if (dto.getAdelantoIds() != null && !dto.getAdelantoIds().isEmpty()) {
+        List<Adelanto> adelantosSeleccionados = adelantoRepository.findAllById(dto.getAdelantoIds());
 
-                // 2. Calculamos el monto total acumulado para el neto
-                totalAdelantos = adelantosPendientes.stream()
-                                .map(Adelanto::getMonto)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                // 3. Vinculamos cada adelanto al pago actual
-                for (Adelanto adelanto : adelantosPendientes) {
-                        adelanto.setPago(pago);
-                        adelanto.setEstado(EstadoAdelanto.APLICADO); // Marcamos que ya se cobrará
-                        listaAdelantos.add(adelanto);
-                }
-
+        for (Adelanto adelanto : adelantosSeleccionados) {
+            // FIX 2: Vincular bidireccionalmente
+            adelanto.setPago(pago); 
+            adelanto.setEstado(EstadoAdelanto.APLICADO);
+            
+            // Acumular para el cálculo del neto
+            totalAdelantos = totalAdelantos.add(adelanto.getMonto());
+            listaAdelantos.add(adelanto); // Agregar a la lista que se asociará al pago
+        }
+        // Guardar cambios en los adelantos (setear pagoid y estado)
+        adelantoRepository.saveAll(adelantosSeleccionados);
+    }
                 // -----------------------------
                 // BONIFICACIONES
                 // -----------------------------
