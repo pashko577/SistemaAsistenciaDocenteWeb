@@ -24,10 +24,25 @@ import { MatButtonModule } from '@angular/material/button';
           formControlName="nombre" 
           type="text" 
           [placeholder]="'Ej: ' + data.placeholder"
-          class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+          class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all uppercase"
         >
         <span *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid" class="text-red-500 text-xs mt-1">
           El nombre es obligatorio (mín. 3 caracteres)
+        </span>
+      </div>
+
+      <div *ngIf="data.mostrarPlanilla" class="flex flex-col">
+        <label class="text-xs font-bold text-gray-600 uppercase mb-1">Tipo de Planilla</label>
+        <select 
+          formControlName="tipoPlanilla" 
+          class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white font-medium"
+        >
+          <option [ngValue]="null" disabled>-- Seleccione Tipo --</option>
+          <option value="ADMINISTRATIVO">ADMINISTRATIVO</option>
+          <option value="DOCENTE">DOCENTE</option>
+        </select>
+        <span *ngIf="form.get('tipoPlanilla')?.touched && form.get('tipoPlanilla')?.invalid" class="text-red-500 text-xs mt-1">
+          Debe seleccionar un tipo de planilla
         </span>
       </div>
     </div>
@@ -52,16 +67,31 @@ export class SimpleFormConfig {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<SimpleFormConfig>,
-    @Inject(MAT_DIALOG_DATA) public data: { titulo: string, placeholder: string }
+    @Inject(MAT_DIALOG_DATA) public data: { 
+      titulo: string, 
+      placeholder: string, 
+      mostrarPlanilla?: boolean, 
+      planillaSugerida?: string 
+    }
   ) {
+    // 1. Creamos el formulario con el campo base
     this.form = this.fb.group({
       nombre: ['', [Validators.required, Validators.minLength(3)]]
     });
+
+    // 2. Si la data pide planilla, agregamos el control dinámicamente
+    if (this.data.mostrarPlanilla) {
+      this.form.addControl(
+        'tipoPlanilla', 
+        this.fb.control(this.data.planillaSugerida || null, Validators.required)
+      );
+    }
   }
 
   guardar() {
     if (this.form.valid) {
-      this.dialogRef.close(this.form.value.nombre);
+      // Devolvemos el objeto completo (nombre y planilla si existe)
+      this.dialogRef.close(this.form.value);
     }
   }
 }

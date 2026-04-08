@@ -13,6 +13,15 @@ import { Estado, TipoPago } from '../../../../../core/models/enums/contrato-enum
 
 import { forkJoin } from 'rxjs';
 import { DocenteService } from '../../../../../core/services/docente';
+import { TipoActividadFormComponent } from '../modal-tipo-actividad/tipo-actividad-form';
+import { SimpleFormConfig } from '../../gestion-administrativo/simple-form-config/simple-form-config';
+// Ajusta la ruta según donde tengas tus interfaces/enums
+import { TipoPlanilla } from '../../../../../core/models/enums/contrato-enums';
+import { TipoActividadRequest } from '../../../../../core/models/Contratos/tipo-actividad-request';
+
+// contrato-form.component.ts
+
+// Ajusta la ruta (../) según tu estructura de carpetas
 
 @Component({
   selector: 'app-contrato-form',
@@ -22,7 +31,8 @@ import { DocenteService } from '../../../../../core/services/docente';
     ReactiveFormsModule, 
     MatDialogModule, 
     MatIconModule, 
-    MatButtonModule
+    MatButtonModule,
+    TipoActividadFormComponent
   ],
   templateUrl: './contrato-form.html'
 })
@@ -62,6 +72,66 @@ export class ContratoFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatosIniciales();
+  }
+
+
+app(tipo: 'Actividad') {
+  // Determinamos la sugerencia inicial
+  let sugerencia = null;
+  if (this.usuarioSeleccionado) {
+    sugerencia = (!!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad)) 
+                 ? 'DOCENTE' : 'ADMINISTRATIVO';
+  }
+
+  const dialogRefConfig = this.dialog.open(SimpleFormConfig, {
+    width: '400px',
+    data: { 
+      titulo: 'Área / Actividad', 
+      placeholder: 'Matemática, Limpieza...',
+      mostrarPlanilla: true,    // <-- Activa el selector en el modal
+      planillaSugerida: sugerencia 
+    }
+  });
+
+  dialogRefConfig.afterClosed().subscribe(resultado => {
+    // resultado ahora es un objeto: { nombre: '...', tipoPlanilla: '...' }
+    if (!resultado || !resultado.nombre) return;
+
+    const payload: any = {
+      nombre: resultado.nombre.toUpperCase(),
+      tipoPlanilla: resultado.tipoPlanilla,
+      estado: 'ACTIVO'
+    };
+
+    this.tipoActividadService.registrar(payload).subscribe({
+      next: (res) => {
+        // 1. Agregar a la lista maestra
+        this.tiposActividad.push(res);
+        
+        // 2. Refrescar el filtro visual
+        this.refiltrarActividades(); 
+
+        // 3. Selección automática inteligente:
+        // Solo seleccionamos si la nueva área coincide con lo que el usuario actual necesita
+        if (!this.usuarioSeleccionado || res.tipoPlanilla === sugerencia) {
+          this.contratoForm.get('tipoActividadId')?.setValue(res.id);
+          this.onActividadChange(); // Disparar lógica de pago
+        }
+        
+        this.cd.detectChanges();
+      },
+      error: (err) => this.procesarError(err)
+    });
+  });
+}
+  private refiltrarActividades() {
+    if (this.usuarioSeleccionado) {
+       const esDocente = !!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad);
+       const planillaSugerida = esDocente ? 'DOCENTE' : 'ADMINISTRATIVO';
+       this.tiposActividadFiltrados = this.tiposActividad.filter(t => t.tipoPlanilla === planillaSugerida);
+    } else {
+       this.tiposActividadFiltrados = [...this.tiposActividad];
+    }
   }
 
  cargarDatosIniciales() {
@@ -194,10 +264,42 @@ private verificarEdicion() {
     console.log('Abriendo modal de nuevo administrativo/docente...');
   }
 
-  agregarNuevaArea() {
-    // Aquí abrirías el modal de nueva área
-    console.log('Abriendo modal de nueva área...');
-  }
+ // Importa el componente del modal de actividad arriba
+// import { TipoActividadFormComponent } from '../tipo-actividad-form/tipo-actividad-form.component';
+
+agregarNuevaArea() {
+  const dialogRef = this.dialog.open(TipoActividadFormComponent, {
+    width: '450px',
+    // Puedes pasarle el tipo de planilla sugerido si ya hay un usuario seleccionado
+    data: { 
+      sugerirPlanilla: this.usuarioSeleccionado ? 
+        (!!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad) ? 'DOCENTE' : 'ADMINISTRATIVO') 
+        : null 
+    }
+  });
+
+  dialogRef.afterClosed().subscribe(result => {
+    if (result) {
+      // 1. Volvemos a pedir las actividades al servidor
+      this.tipoActividadService.listar().subscribe({
+        next: (actividades) => {
+          this.tiposActividad = actividades;
+          
+          // 2. Si hay un usuario seleccionado, volvemos a filtrar la lista
+          if (this.usuarioSeleccionado) {
+            const esDocente = !!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad);
+            const planillaSugerida = esDocente ? 'DOCENTE' : 'ADMINISTRATIVO';
+            this.tiposActividadFiltrados = this.tiposActividad.filter(t => t.tipoPlanilla === planillaSugerida);
+          } else {
+            this.tiposActividadFiltrados = [...this.tiposActividad];
+          }
+          
+          this.cd.detectChanges();
+        }
+      });
+    }
+  });
+}
 
 guardar() {
   if (this.contratoForm.invalid) return;

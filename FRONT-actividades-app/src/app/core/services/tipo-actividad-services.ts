@@ -34,6 +34,11 @@ export class TipoActividadService {
     return this.http.get<TipoActividadResponse>(`${this.API_URL}/${id}`);
   }
 
+
+actualizar(id: number, tipo: TipoActividadRequest): Observable<TipoActividadResponse> {
+  return this.http.put<TipoActividadResponse>(`${this.API_URL}/${id}`, tipo);
+}
+
   eliminar(id: number): Observable<any> {
     return this.http.delete(`${this.API_URL}/${id}`);
   }

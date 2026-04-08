@@ -1,0 +1,77 @@
+<div class="bg-white rounded-xl overflow-hidden shadow-2xl animate-in fade-in zoom-in duration-200">
+  
+  <div class="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
+    <div class="flex items-center gap-2">
+      <span class="material-icons">settings_suggest</span>
+      <h2 class="text-xl font-bold tracking-tight">
+        {{ isEdit ? 'Actualizar Actividad' : 'Nueva Actividad / Área' }}
+      </h2>
+    </div>
+    <button (click)="dialogRef.close()" class="hover:bg-white/20 p-1 rounded-full transition-colors">
+      <span class="material-icons">close</span>
+    </button>
+  </div>
+
+  <form [formGroup]="actividadForm" (ngSubmit)="guardar()" class="p-6 space-y-5">
+    
+    <div class="space-y-1">
+      <label class="text-xs font-bold text-gray-500 uppercase flex items-center gap-1 ml-1">
+        <span class="material-icons text-[14px]">label</span> 
+        Nombre de la Actividad
+      </label>
+      <div class="relative">
+        <input 
+          type="text" 
+          formControlName="nombre"
+          placeholder="Ej: MATEMÁTICA, SECRETARÍA, LIMPIEZA"
+          class="w-full pl-3 pr-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all uppercase font-medium text-gray-700 bg-gray-50/30"
+        >
+      </div>
+      <p *ngIf="actividadForm.get('nombre')?.invalid && actividadForm.get('nombre')?.touched" class="text-[10px] text-red-500 font-bold ml-1">
+        * El nombre debe tener al menos 3 caracteres.
+      </p>
+    </div>
+
+    <div class="space-y-1">
+      <label class="text-xs font-bold text-gray-500 uppercase flex items-center gap-1 ml-1">
+        <span class="material-icons text-[14px]">account_balance_wallet</span> 
+        Asignación de Planilla
+      </label>
+      <div class="relative">
+        <select 
+          formControlName="tipoPlanilla" 
+          class="w-full p-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer text-gray-700 font-medium"
+        >
+          <option value="ADMINISTRATIVO">PLANILLA ADMINISTRATIVA</option>
+          <option value="DOCENTE">PLANILLA DOCENTE</option>
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+          <span class="material-icons text-gray-400">expand_more</span>
+        </div>
+      </div>
+      <p class="text-[10px] text-gray-400 italic ml-1">
+        Determina en qué sección aparecerá esta actividad al crear contratos.
+      </p>
+    </div>
+
+    <div class="flex gap-3 pt-6 border-t border-gray-100">
+      <button 
+        type="button" 
+        (click)="dialogRef.close()"
+        class="flex-1 py-2.5 text-gray-500 font-bold hover:bg-gray-100 rounded-lg transition-colors border border-gray-200"
+      >
+        CANCELAR
+      </button>
+      
+      <button 
+        type="submit"
+        [disabled]="actividadForm.invalid"
+        class="flex-1 py-2.5 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95 flex items-center justify-center gap-2"
+      >
+        <span class="material-icons text-sm">{{ isEdit ? 'save' : 'add_circle' }}</span>
+        {{ isEdit ? 'ACTUALIZAR' : 'GUARDAR' }}
+      </button>
+    </div>
+
+  </form>
+</div>
