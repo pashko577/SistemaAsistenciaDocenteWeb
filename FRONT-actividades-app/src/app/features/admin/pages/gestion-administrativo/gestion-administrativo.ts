@@ -70,9 +70,9 @@ manejarFiltros(filtros: any) {
 
   this.listaFiltrada = this.listaAdmins.filter(admin => {
     const term = busqueda?.toLowerCase().trim() || '';
-    const cumpleBusqueda = !term || 
-      admin.nombres.toLowerCase().includes(term) || 
-      admin.apellidos.toLowerCase().includes(term) || 
+    const cumpleBusqueda = !term ||
+      admin.nombres.toLowerCase().includes(term) ||
+      admin.apellidos.toLowerCase().includes(term) ||
       admin.dni.includes(term);
 
     const cumpleSede = !sedeId || Number(admin.sedeId) === Number(sedeId);
@@ -81,8 +81,8 @@ manejarFiltros(filtros: any) {
     // NUEVA LÓGICA DE ESTADO:
     // 1. Si el usuario eligió un estado específico (ej. 'INACTIVO'), se muestra.
     // 2. Si el selector está vacío (!estado), mostramos todo MENOS los inactivos.
-    const cumpleEstado = estado 
-      ? admin.estado === estado 
+    const cumpleEstado = estado
+      ? admin.estado === estado
       : admin.estado !== 'INACTIVO';
 
     return cumpleBusqueda && cumpleSede && cumpleCargo && cumpleEstado;
@@ -111,7 +111,7 @@ manejarFiltros(filtros: any) {
 
       // FILTRO INICIAL: Solo mostrar los que NO están INACTIVOS al entrar
       this.listaFiltrada = this.listaAdmins.filter(a => a.estado !== 'INACTIVO');
-      
+
       this.cdr.detectChanges();
     },
     error: (err) => console.error('❌ Error:', err)
@@ -170,7 +170,7 @@ manejarFiltros(filtros: any) {
     if (result) {
       // 1. Buscamos el índice en la lista maestra
       const index = this.listaAdmins.findIndex(a => a.id === result.id);
-      
+
       if (index !== -1) {
         // 2. Reemplazamos el objeto con los nuevos datos mapeados
         this.listaAdmins[index] = {
@@ -192,20 +192,20 @@ manejarFiltros(filtros: any) {
       }
     }
   });
-    
+
   }
 // Método para limpiar desde el botón "Ver todos" o "Limpiar" del padre
 limpiarFiltros() {
   if (this.buscadorComponente) {
     this.buscadorComponente.limpiar(); // Esto debe poner el estado en 'ACTIVO' o null
   }
-  
+
   // En lugar de copiar toda la listaAdmins, filtramos los inactivos
   this.listaFiltrada = this.listaAdmins.filter(admin => admin.estado !== 'INACTIVO');
-  
+
   this.cdr.detectChanges();
 }
-  
+
   // --- MÉTODOS DE APOYO ---
 
   obtenerNombreCargo(cargoId: number): string {
@@ -241,7 +241,7 @@ eliminarAdmin(id: number) {
       next: () => {
         // Buscamos al administrativo en la lista maestra
         const index = this.listaAdmins.findIndex(a => a.id === id);
-        
+
         if (index !== -1) {
           // Cambiamos el estado localmente
           this.listaAdmins[index].estado = 'INACTIVO';
@@ -253,7 +253,7 @@ eliminarAdmin(id: number) {
           } else {
             this.listaFiltrada = this.listaAdmins.filter(a => a.estado !== 'INACTIVO');
           }
-          
+
           this.cdr.detectChanges();
         }
       },
