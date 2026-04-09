@@ -27,10 +27,10 @@ import { TipoActividadRequest } from '../../../../../core/models/Contratos/tipo-
   selector: 'app-contrato-form',
   standalone: true,
   imports: [
-    CommonModule, 
-    ReactiveFormsModule, 
-    MatDialogModule, 
-    MatIconModule, 
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatIconModule,
     MatButtonModule,
     TipoActividadFormComponent
   ],
@@ -75,52 +75,73 @@ export class ContratoFormComponent implements OnInit {
   }
 
 
-app(tipo: 'Actividad') {
-  // Determinamos la sugerencia inicial
+// 1. Cambiamos la firma para que acepte los 3 tipos
+app(tipo: 'Sede' | 'Cargo' | 'Actividad') {
+
+  // Determinamos la sugerencia de planilla (solo relevante para Actividad)
   let sugerencia = null;
   if (this.usuarioSeleccionado) {
-    sugerencia = (!!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad)) 
+    sugerencia = (!!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad))
                  ? 'DOCENTE' : 'ADMINISTRATIVO';
   }
 
   const dialogRefConfig = this.dialog.open(SimpleFormConfig, {
     width: '400px',
-    data: { 
-      titulo: 'Área / Actividad', 
-      placeholder: 'Matemática, Limpieza...',
-      mostrarPlanilla: true,    // <-- Activa el selector en el modal
-      planillaSugerida: sugerencia 
+    data: {
+      titulo: tipo === 'Actividad' ? 'Área / Actividad' : `Registrar ${tipo}`,
+      placeholder: tipo === 'Actividad' ? 'Matemática, Limpieza...' : `Ej: Sede ${tipo}`,
+      // SOLO mostramos el selector de planilla si el tipo es 'Actividad'
+      mostrarPlanilla: tipo === 'Actividad',
+      planillaSugerida: sugerencia
     }
   });
 
   dialogRefConfig.afterClosed().subscribe(resultado => {
-    // resultado ahora es un objeto: { nombre: '...', tipoPlanilla: '...' }
     if (!resultado || !resultado.nombre) return;
 
+    // --- CONSTRUCCIÓN DEL PAYLOAD LIMPIO ---
     const payload: any = {
       nombre: resultado.nombre.toUpperCase(),
-      tipoPlanilla: resultado.tipoPlanilla,
       estado: 'ACTIVO'
     };
 
-    this.tipoActividadService.registrar(payload).subscribe({
-      next: (res) => {
-        // 1. Agregar a la lista maestra
-        this.tiposActividad.push(res);
-        
-        // 2. Refrescar el filtro visual
-        this.refiltrarActividades(); 
+    // CRUCIAL: Solo agregamos tipoPlanilla si estamos creando una Actividad
+    // Esto evita el Error 400 en Sede y Cargo
+    if (tipo === 'Actividad') {
+      payload.tipoPlanilla = resultado.tipoPlanilla;
+    }
 
-        // 3. Selección automática inteligente:
-        // Solo seleccionamos si la nueva área coincide con lo que el usuario actual necesita
-        if (!this.usuarioSeleccionado || res.tipoPlanilla === sugerencia) {
-          this.contratoForm.get('tipoActividadId')?.setValue(res.id);
-          this.onActividadChange(); // Disparar lógica de pago
+    // --- SELECCIÓN DINÁMICA DEL SERVICIO ---
+    // Asegúrate de tener inyectados estos servicios en el constructor
+    const servicio = tipo === 'Sede' ? (this as any).sedeService :
+                     tipo === 'Cargo' ? (this as any).cargoService :
+                     this.tipoActividadService;
+
+    if (!servicio) {
+      console.error(`El servicio para ${tipo} no está inyectado en el constructor.`);
+      return;
+    }
+
+    servicio.registrar(payload).subscribe({
+      next: (res: any) => {
+        if (tipo === 'Actividad') {
+          // Lógica específica para Actividades
+          this.tiposActividad.push(res);
+          this.refiltrarActividades();
+
+          if (!this.usuarioSeleccionado || res.tipoPlanilla === sugerencia) {
+            this.contratoForm.get('tipoActividadId')?.setValue(res.id);
+            this.onActividadChange();
+          }
+        } else {
+          // Lógica para Sede o Cargo (puedes añadir refresco de listas aquí)
+          console.log(`${tipo} creado con éxito:`, res);
+          // Si tienes listas de sedes/cargos en este componente, actualízalas aquí
         }
-        
+
         this.cd.detectChanges();
       },
-      error: (err) => this.procesarError(err)
+      error: (err: any) => this.procesarError(err)
     });
   });
 }
@@ -147,7 +168,7 @@ app(tipo: 'Actividad') {
 
         // IMPORTANTE: Si estamos editando, los datos ya deben estar listos
         this.verificarEdicion();
-        
+
         this.cd.detectChanges();
       },
       error: (err) => console.error('Error al cargar datos iniciales:', err)
@@ -176,8 +197,8 @@ app(tipo: 'Actividad') {
 seleccionarUsuario(u: any) {
     this.usuarioSeleccionado = u;
     this.textoBusqueda = `${u.nombres || u.persona?.nombres} ${u.apellidos || u.persona?.apellidos}`;
-    
-    const idFinal = u.usuarioId || u.id; 
+
+    const idFinal = u.usuarioId || u.id;
     this.contratoForm.get('usuarioId')?.setValue(idFinal);
 
     // DETERMINAR FILTRO INICIAL
@@ -210,26 +231,26 @@ limpiarSeleccion() {
 private verificarEdicion() {
   if (this.data?.contratoSelected) {
     const selected = this.data.contratoSelected;
-    
+
     // 1. Buscamos al usuario usando el usuarioId del contrato
     const usuario = this.usuarios.find(u => (u.usuarioId || u.id) === selected.usuarioId);
-    
+
     if (usuario) {
       this.usuarioSeleccionado = usuario;
       this.textoBusqueda = `${usuario.nombres || usuario.persona?.nombres} ${usuario.apellidos || usuario.persona?.apellidos}`;
-      
+
       // 2. FILTRO CRUCIAL: Generar la lista filtrada ANTES de parchar el formulario
       // Verificamos si es docente por sus propiedades únicas
       const esDocente = !!(usuario.especialidadId || usuario.nombreEspecialidad);
       const planillaRequerida = esDocente ? 'DOCENTE' : 'ADMINISTRATIVO';
 
       this.tiposActividadFiltrados = this.tiposActividad.filter(t => t.tipoPlanilla === planillaRequerida);
-      
+
       // 3. Habilitar el control para que acepte el valor
       this.contratoForm.get('tipoActividadId')?.enable();
     }
 
-    // 4. Parchamos los valores. 
+    // 4. Parchamos los valores.
     // IMPORTANTE: Asegúrate de que selected.tipoActividadId sea un número.
     this.contratoForm.patchValue({
       usuarioId: selected.usuarioId,
@@ -252,7 +273,7 @@ private verificarEdicion() {
 
     if (actividad?.tipoPlanilla === 'ADMINISTRATIVO') {
       this.contratoForm.get('tipoPago')?.setValue(TipoPago.PAGO_MENSUAL);
-      this.contratoForm.get('tipoPago')?.disable(); 
+      this.contratoForm.get('tipoPago')?.disable();
     } else {
       this.contratoForm.get('tipoPago')?.enable();
     }
@@ -271,10 +292,10 @@ agregarNuevaArea() {
   const dialogRef = this.dialog.open(TipoActividadFormComponent, {
     width: '450px',
     // Puedes pasarle el tipo de planilla sugerido si ya hay un usuario seleccionado
-    data: { 
-      sugerirPlanilla: this.usuarioSeleccionado ? 
-        (!!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad) ? 'DOCENTE' : 'ADMINISTRATIVO') 
-        : null 
+    data: {
+      sugerirPlanilla: this.usuarioSeleccionado ?
+        (!!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad) ? 'DOCENTE' : 'ADMINISTRATIVO')
+        : null
     }
   });
 
@@ -284,7 +305,7 @@ agregarNuevaArea() {
       this.tipoActividadService.listar().subscribe({
         next: (actividades) => {
           this.tiposActividad = actividades;
-          
+
           // 2. Si hay un usuario seleccionado, volvemos a filtrar la lista
           if (this.usuarioSeleccionado) {
             const esDocente = !!(this.usuarioSeleccionado.especialidadId || this.usuarioSeleccionado.nombreEspecialidad);
@@ -293,7 +314,7 @@ agregarNuevaArea() {
           } else {
             this.tiposActividadFiltrados = [...this.tiposActividad];
           }
-          
+
           this.cd.detectChanges();
         }
       });
@@ -338,15 +359,15 @@ guardar() {
 
 private procesarError(err: any) {
   console.error('Detalle del Error 400:', err);
-  
+
   // Intentar obtener el mensaje de la RuntimeException de Java
   let msg = "Error en la solicitud (400).";
-  
+
   if (err.error) {
     if (typeof err.error === 'string') msg = err.error;
     else if (err.error.message) msg = err.error.message;
   }
-  
+
   alert(msg);
 }
 }

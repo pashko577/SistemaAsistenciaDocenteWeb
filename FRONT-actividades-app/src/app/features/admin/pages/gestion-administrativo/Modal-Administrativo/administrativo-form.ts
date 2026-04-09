@@ -66,9 +66,9 @@ export class AdministrativoFormComponent implements OnInit {
    */
   app(tipo: 'Sede' | 'Cargo' | 'Documento') {
     const configs = {
-      Sede: { titulo: 'Sede', placeholder: 'Sede Central' },
-      Cargo: { titulo: 'Cargo', placeholder: 'Administrador' },
-      Documento: { titulo: 'Tipo de Documento', placeholder: 'PTP' }
+      Sede: { titulo: 'Sede', placeholder: 'Sede Central', mostrarPlanilla: false },
+      Cargo: { titulo: 'Cargo', placeholder: 'Administrador', mostrarPlanilla: false },
+      Documento: { titulo: 'Tipo de Documento', placeholder: 'PTP', mostrarPlanilla: false }
     };
 
     const dialogRefConfig = this.dialog.open(SimpleFormConfig, {
@@ -76,30 +76,36 @@ export class AdministrativoFormComponent implements OnInit {
       data: configs[tipo]
     });
 
-    dialogRefConfig.afterClosed().subscribe(nombreNuevo => {
-      if (!nombreNuevo) return;
+    dialogRefConfig.afterClosed().subscribe(res => {
+      // 1. Validamos que el resultado del modal exista
+      if (!res || !res.nombre) return;
+
+      // 2. Extraemos solo el texto y lo pasamos a mayúsculas
+      const nombreTexto = res.nombre.toUpperCase();
 
       if (tipo === 'Sede') {
-        this.sedeService.crearSede({ nombreSede: nombreNuevo }).subscribe(res => {
-          this.data.sedes.push(res);
-          this.adminForm.get('sedeId')?.setValue(res.id);
+        // Tu sedeService parece recibir un objeto
+        this.sedeService.crearSede({ nombreSede: nombreTexto }).subscribe(resSede => {
+          this.data.sedes.push(resSede);
+          this.adminForm.get('sedeId')?.setValue(resSede.id);
         });
-      } 
+      }
       else if (tipo === 'Cargo') {
-        this.cargoService.registrarCargo(nombreNuevo).subscribe(res => {
-          this.data.cargos.push(res);
-          this.adminForm.get('cargoAdministrativoId')?.setValue(res.id);
+        // AQUÍ: Pasamos solo el string 'nombreTexto' para que coincida con tu Service
+        this.cargoService.registrarCargo(nombreTexto).subscribe(resCargo => {
+          this.data.cargos.push(resCargo);
+          this.adminForm.get('cargoAdministrativoId')?.setValue(resCargo.id);
         });
       }
       else if (tipo === 'Documento') {
-        this.tipoDocService.crearTipoDocumento({ nombreTD: nombreNuevo }).subscribe(res => {
-          this.data.tiposDoc.push(res);
-          this.adminForm.get('tipoDocumentoId')?.setValue(res.id);
+        // Tu tipoDocService parece recibir un objeto
+        this.tipoDocService.crearTipoDocumento({ nombreTD: nombreTexto }).subscribe(resTD => {
+          this.data.tiposDoc.push(resTD);
+          this.adminForm.get('tipoDocumentoId')?.setValue(resTD.id);
         });
       }
     });
   }
-
   guardar() {
   if (this.adminForm.invalid) {
     this.adminForm.markAllAsTouched();
@@ -116,7 +122,7 @@ export class AdministrativoFormComponent implements OnInit {
       estado: formValues.estado || 'ACTIVO'
     };
 
-    const operacion = this.data.adminSelected 
+    const operacion = this.data.adminSelected
       ? this.adminService.actualizar(this.data.adminSelected.id, payload)
       : this.adminService.registrar(payload);
 
