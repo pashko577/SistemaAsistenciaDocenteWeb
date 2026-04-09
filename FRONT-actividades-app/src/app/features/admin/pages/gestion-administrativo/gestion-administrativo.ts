@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AdministrativoService } from '../../../../core/services/administrativo_services';
@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AdministrativoFormComponent } from './Modal-Administrativo/administrativo-form';
 import { SearchAdministrativo } from "./search-adminsitrativo/search-adminsitrativo";
+import { ThemeService } from '../../../../core/services/theme_service';
 
 export interface AdministrativoCard {
   id: number;
@@ -43,6 +44,12 @@ export interface AdministrativoCard {
   templateUrl: './gestion-administrativo.html'
 })
 export class GestionAdministrativo implements OnInit {
+
+  @HostBinding('class.dark') get isDarkMode() {
+    return this.themeService.isDarkMode();
+  }
+
+
   @ViewChild(SearchAdministrativo) buscadorComponente!: SearchAdministrativo;
   listaAdmins: AdministrativoCard[] = [];
   listaFiltrada: AdministrativoCard[] = [];
@@ -53,6 +60,7 @@ export class GestionAdministrativo implements OnInit {
 
   constructor(
     private adminService: AdministrativoService,
+     public themeService: ThemeService,
     private cdr: ChangeDetectorRef,
     private dialog: MatDialog
   ) { }

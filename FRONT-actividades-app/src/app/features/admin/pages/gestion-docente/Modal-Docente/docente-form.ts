@@ -9,6 +9,7 @@ import { SedeService } from '../../../../../core/services/sede-service';
 import { SimpleFormConfig } from '../../gestion-administrativo/simple-form-config/simple-form-config';
 import { EspecialidadDocenteService } from '../../../../../core/services/especialidad-docente';
 import { EspecialidadDocenteResponse } from '../../../../../core/models/especialidad-docente-response';
+import { TipoDocumentoService } from '../../../../../core/services/tipo-documento';
 
 @Component({
     selector: 'app-formulario-docente',
@@ -28,6 +29,7 @@ export class DocenteForm implements OnInit {
         private docenteService: DocenteService,
         private sedeService: SedeService, // Añadido
         private dialog: MatDialog, // Añadido
+        private tipoDocumentoService: TipoDocumentoService,
         private especialidadService: EspecialidadDocenteService,
         private dialogRef: MatDialogRef<DocenteForm>,
         @Inject(MAT_DIALOG_DATA) public data: any
@@ -134,41 +136,46 @@ ngOnInit(): void {
         this.dialogRef.close();
     }
 
-  app(tipo: 'Sede' | 'Especialidad') {
+// docente-form.ts
+app(tipo: 'Sede' | 'Especialidad' | 'TipoDocumento') {
   const configs = {
-    Sede: { titulo: 'Sede', placeholder: 'Ej. Sede Central' },
-    Especialidad: { titulo: 'Especialidad', placeholder: 'Ej. Matemáticas' }
+    Sede: { titulo: 'Sede', placeholder: 'Ej. Sede Central', icon: 'business' },
+    Especialidad: { titulo: 'Especialidad', placeholder: 'Ej. Matemática', icon: 'psychology' },
+    TipoDocumento: { titulo: 'Tipo de Documento', placeholder: 'Ej. PEX', icon: 'description' }
   };
 
-  const dialogRefConfig = this.dialog.open(SimpleFormConfig, {
+  const dialogRef = this.dialog.open(SimpleFormConfig, {
     width: '400px',
     data: configs[tipo]
   });
 
-  dialogRefConfig.afterClosed().subscribe(nombreNuevo => {
-    if (!nombreNuevo) return;
+  dialogRef.afterClosed().subscribe(res => {
+    // IMPORTANTE: Ahora 'res' es un objeto { nombre: string }, no un string simple.
+    if (!res || !res.nombre) return;
+    
+    const nombreNuevo = res.nombre.toUpperCase(); // Estandarizamos a Mayúsculas
 
     if (tipo === 'Sede') {
-      this.sedeService.crearSede({ nombreSede: nombreNuevo }).subscribe(res => {
-        // Asegúrate de que this.data.sedes exista en el objeto data que pasaste al abrir este modal
-        this.data.sedes.push(res);
-        this.docenteForm.get('sedeId')?.setValue(res.id);
+      this.sedeService.crearSede({ nombreSede: nombreNuevo }).subscribe(resSede => {
+        this.data.sedes.push(resSede);
+        this.docenteForm.get('sedeId')?.setValue(resSede.id);
       });
     } 
     else if (tipo === 'Especialidad') {
-  this.especialidadService.crear({ nombreEspecialidad: nombreNuevo }).subscribe({
-    next: (res: EspecialidadDocenteResponse) => {
-      // 1. Agregamos la respuesta tal cual a la lista del modal
-      this.data.especialidades.push(res);
-      
-      // 2. Usamos el ID exacto de tu interfaz EspecialidadDocenteResponse
-      this.docenteForm.get('especialidadId')?.setValue(res.especialidadDocenteId);
-    },
-    error: (err) => {
-      this.backendError.set('Error al crear la especialidad');
+      this.especialidadService.crear({ nombreEspecialidad: nombreNuevo }).subscribe(resEsp => {
+        this.data.especialidades.push(resEsp);
+        this.docenteForm.get('especialidadId')?.setValue(resEsp.especialidadDocenteId);
+      });
     }
-  });
-}
+    else if (tipo === 'TipoDocumento') {
+      this.tipoDocumentoService.crearTipoDocumento({ nombreTD: nombreNuevo }).subscribe({
+        next: (resTD) => {
+          this.data.tiposDoc.push(resTD);
+          this.docenteForm.get('tipoDocumentoId')?.setValue(resTD.id);
+        },
+        error: (err) => this.backendError.set('Error al crear el tipo de documento')
+      });
+    }
   });
 }
 }

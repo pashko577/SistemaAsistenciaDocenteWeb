@@ -80,3 +80,40 @@ header {
 .rotate-180 {
   transform: rotate(180deg);
 }
+
+/* header.css */
+/* Transiciones suaves para cambios de tema */
+* {
+  transition: background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* Estilos para scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+/* Modo oscuro para scrollbar */
+:host-context(.dark) .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(75, 85, 99, 0.5);
+}
+
+/* Animación del toggle de tema */
+.theme-toggle-icon {
+  transition: transform 0.3s ease;
+}
+
+button:hover .theme-toggle-icon {
+  transform: rotate(12deg);
+}

@@ -1,62 +1,322 @@
-/* You can add global styles to this file, and also import other style files */
+/* styles.css - Archivo global optimizado */
 @import "tailwindcss";
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
-/* En tu archivo de estilos globales o específico del componente */
 
-/* Animación de fade-in más suave */
+/* Configuración del modo oscuro para Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ============================================
+   VARIABLES CSS - TEMA CLARO (POR DEFECTO)
+   ============================================ */
+:root {
+  /* Fondos */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --card-bg: #ffffff;
+  --hover-bg: #f9fafb;
+  
+  /* Textos */
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  
+  /* Bordes */
+  --border-light: #e5e7eb;
+  --border-medium: #d1d5db;
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+  
+  /* Estados */
+  --success-light: #f0fdf4;
+  --success-text: #166534;
+  --success-border: #bbf7d0;
+  
+  --warning-light: #fefce8;
+  --warning-text: #854d0e;
+  --warning-border: #fef08a;
+  
+  --error-light: #fef2f2;
+  --error-text: #991b1b;
+  --error-border: #fecaca;
+  
+  --info-light: #eff6ff;
+  --info-text: #1e40af;
+  --info-border: #bfdbfe;
+}
+
+/* ============================================
+   VARIABLES CSS - TEMA OSCURO
+   ============================================ */
+.dark {
+  /* Fondos */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --card-bg: #1f2937;
+  --hover-bg: #374151;
+  
+  /* Textos */
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+  
+  /* Bordes */
+  --border-light: #374151;
+  --border-medium: #4b5563;
+  
+  /* Sombras */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+  
+  /* Estados */
+  --success-light: #022c22;
+  --success-text: #4ade80;
+  --success-border: #14532d;
+  
+  --warning-light: #422006;
+  --warning-text: #fbbf24;
+  --warning-border: #713f12;
+  
+  --error-light: #2e0a0a;
+  --error-text: #f87171;
+  --error-border: #7f1d1d;
+  
+  --info-light: #0f172a;
+  --info-text: #60a5fa;
+  --info-border: #1e3a8a;
+}
+
+/* ============================================
+   ESTILOS BASE
+   ============================================ */
+html, body { 
+  height: 100%; 
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Transiciones suaves globales */
+* {
+  transition: background-color 0.2s ease, 
+              border-color 0.2s ease, 
+              color 0.2s ease,
+              box-shadow 0.2s ease;
+}
+
+/* ============================================
+   CLASES UTILITARIAS
+   ============================================ */
+
+/* Fondos */
+.bg-primary { background-color: var(--bg-primary); }
+.bg-secondary { background-color: var(--bg-secondary); }
+.bg-tertiary { background-color: var(--bg-tertiary); }
+
+/* Textos */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+
+/* Bordes */
+.border-light { border-color: var(--border-light); }
+.border-medium { border-color: var(--border-medium); }
+
+/* Cards y contenedores */
+.card { 
+  background-color: var(--card-bg); 
+  border: 1px solid var(--border-light);
+}
+
+.hover-bg:hover { 
+  background-color: var(--hover-bg); 
+}
+
+/* Estados - Fondos */
+.bg-success-light { background-color: var(--success-light); }
+.bg-warning-light { background-color: var(--warning-light); }
+.bg-error-light { background-color: var(--error-light); }
+.bg-info-light { background-color: var(--info-light); }
+
+/* Estados - Textos */
+.text-success { color: var(--success-text); }
+.text-warning { color: var(--warning-text); }
+.text-error { color: var(--error-text); }
+.text-info { color: var(--info-text); }
+
+/* Estados - Bordes */
+.border-success { border-color: var(--success-border); }
+.border-warning { border-color: var(--warning-border); }
+.border-error { border-color: var(--error-border); }
+.border-info { border-color: var(--info-border); }
+
+/* Sombras */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.98);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1);
-    }
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) rotate(45deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(45deg);
+  }
 }
 
 .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.5s ease-out forwards;
 }
 
-/* Mejora para el efecto de shake */
-@keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
-    20%, 40%, 60%, 80% { transform: translateX(2px); }
+.animate-slide-in {
+  animation: slideIn 0.3s ease-out forwards;
 }
 
-.animate-shake {
-    animation: shake 0.5s ease-in-out;
+/* ============================================
+   UTILIDADES ADICIONALES
+   ============================================ */
+
+/* Transiciones específicas para elementos de tema */
+.card,
+.bg-primary,
+.bg-secondary,
+.bg-tertiary,
+.text-primary,
+.text-secondary,
+.text-muted,
+.border-light,
+.border-medium {
+  transition: background-color 0.3s ease, 
+              border-color 0.3s ease, 
+              color 0.3s ease,
+              box-shadow 0.3s ease;
 }
 
-/* Efecto hover para el logo */
-.backdrop-blur-sm {
-    transition: all 0.3s ease;
+/* Placeholder estilizado */
+::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 
-.backdrop-blur-sm:hover {
-    transform: scale(1.05);
-    background-color: rgba(255, 255, 255, 0.15);
+/* Focus visible para accesibilidad */
+*:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-/* Mejora para los inputs */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0px 1000px white inset;
-    transition: background-color 5000s ease-in-out 0s;
+.dark *:focus-visible {
+  outline-color: #60a5fa;
 }
 
-/* Responsive para móviles */
-@media (max-width: 768px) {
-    .min-h-screen {
-        padding: 1rem;
-    }
-    
-    .w-48 {
-        width: 6rem;
-        height: 6rem;
-    }
+/* Selección de texto */
+::selection {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.dark ::selection {
+  background-color: #60a5fa;
+  color: black;
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* ============================================
+   ACCESIBILIDAD - REDUCCIÓN DE MOVIMIENTO
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ============================================
+   MODO IMPRESIÓN
+   ============================================ */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+  
+  .card {
+    break-inside: avoid;
+    box-shadow: none !important;
+    border: 1px solid #e5e7eb;
+  }
 }
