@@ -49,7 +49,7 @@ export class Pagos implements OnInit {
   netoProyectado: number = 0;
 
   // --- Configuración ---
-  aniosDisponibles = [2025, 2026, 2027];
+  aniosDisponibles = [2026, 2027,2028,2029];
   mesesDelAnio = [
     { nombre: 'Enero', valor: 'ENERO', num: '01' }, { nombre: 'Febrero', valor: 'FEBRERO', num: '02' },
     { nombre: 'Marzo', valor: 'MARZO', num: '03' }, { nombre: 'Abril', valor: 'ABRIL', num: '04' },
