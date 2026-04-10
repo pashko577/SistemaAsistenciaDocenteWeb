@@ -14,6 +14,7 @@ import com.example.actividades_app.repository.RolModuloRepository;
 import com.example.actividades_app.repository.RolRepository;
 import com.example.actividades_app.service.RolModuloService;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -56,6 +57,17 @@ public class RolModuloServiceImpl implements RolModuloService {
                 .toList();
     }
 
+        @Override
+    @Transactional // Requerido para operaciones de borrado
+    public void desasignarModulo(Long rolId, Long moduloId) {
+        // Verificamos si existe antes de intentar borrar
+        if (!rolModuloRepository.existsByRolIdAndModuloId(rolId, moduloId)) {
+            throw new RuntimeException("La asignación de permiso no existe");
+        }
+        
+        rolModuloRepository.deleteByRolIdAndModuloId(rolId, moduloId);
+    }
+    
     private RolModuloResponseDTO mapToResponse(RolModulo rm) {
 
         return RolModuloResponseDTO.builder()
@@ -66,4 +78,6 @@ public class RolModuloServiceImpl implements RolModuloService {
                 .moduloNombre(rm.getModulo().getNombre())
                 .build();
     }
+
+
 }

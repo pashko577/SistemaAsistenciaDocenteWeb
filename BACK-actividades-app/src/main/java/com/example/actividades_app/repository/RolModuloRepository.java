@@ -13,4 +13,7 @@ public interface RolModuloRepository extends JpaRepository<RolModulo, Long> {
     List<RolModulo> findByRolId(Long rolId);
 
     boolean existsByRolIdAndModuloId(Long rolId, Long moduloId);
+
+
+    void deleteByRolIdAndModuloId(Long rolId, Long moduloId);
 }
