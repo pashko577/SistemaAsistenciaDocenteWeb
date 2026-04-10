@@ -42,7 +42,7 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/pages/Pagos/pagos/pagos') // Ajusta si la carpeta se llama distinto
           .then(m => m.Pagos)
       },
-    
+
       {
         path: 'gestionDocente',
         loadComponent: () => import('./features/admin/pages/gestion-docente/gestion-docente')
@@ -58,6 +58,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/admin/pages/gestion-contrato/gestion-contrato')
           .then(m => m.GestionContrato)
       },
+      {
+      path: 'permisos', // <--- QUITAMOS 'admin/' de aquí
+      loadComponent: () => import('./features/admin/pages/gestion-permisos/permisos/permisos')
+        .then(m => m.PermisosComponent),
+    }
     ]
   },
 

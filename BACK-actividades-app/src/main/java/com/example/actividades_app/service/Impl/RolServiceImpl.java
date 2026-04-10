@@ -2,40 +2,32 @@ package com.example.actividades_app.service.Impl;
 
 import com.example.actividades_app.service.RolService;
 import com.example.actividades_app.repository.RolRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.example.actividades_app.model.Entity.Rol;
 import com.example.actividades_app.model.dto.ModuloUsuario.RegistrarRolRequestDTO;
-
-import org.springframework.stereotype.Service;
-
-import java.util.Optional;
-
 import com.example.actividades_app.config.exception.RoleNotFoundException;
 import com.example.actividades_app.config.exception.RoleAlreadyExistsException;
 
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor; // 1. Importa esto
 
+import java.util.Optional;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor // 2. Genera el constructor para campos 'final'
 public class RolServiceImpl implements RolService {
 
-    @Autowired
-    private RolRepository rolRepository;
+    // 3. Quita @Autowired. Al ser final, @RequiredArgsConstructor lo inyectará.
+    private final RolRepository rolRepository;
 
     @Override
     public Rol registrarRol(RegistrarRolRequestDTO dto) {
-
-        // Regla: evitar duplicados
         if (rolRepository.existsByNombreRol(dto.getName())) {
             throw new RoleAlreadyExistsException("El rol ya existe");
         }
 
-        // Crear entidad
         Rol rol = new Rol();
         rol.setNombreRol(dto.getName());
-
-        // Guardar
         return rolRepository.save(rol);
     }
 
@@ -52,9 +44,7 @@ public class RolServiceImpl implements RolService {
     @Override
     public void eliminarRol(Long id) {
         Rol rol = rolRepository.findById(id)
-                .orElseThrow(() -> new RoleNotFoundException("El rol con ID" + id + " no existe"));
-
+                .orElseThrow(() -> new RoleNotFoundException("El rol con ID " + id + " no existe"));
         rolRepository.delete(rol);
     }
-
 }

@@ -10,4 +10,7 @@ public interface RolModuloService {
     RolModuloResponseDTO asignarModulo(RolModuloRequestDTO dto);
 
     List<RolModuloResponseDTO> listarPorRol(Long rolId);
+
+    void desasignarModulo(Long rolId, Long moduloId);
+    
 }

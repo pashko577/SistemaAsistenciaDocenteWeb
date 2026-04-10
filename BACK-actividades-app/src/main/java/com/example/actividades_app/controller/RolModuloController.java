@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,4 +41,15 @@ public class RolModuloController {
 
         return ResponseEntity.ok(rolModuloService.listarPorRol(rolId));
     }
+
+    @DeleteMapping("/rol/{rolId}/modulo/{moduloId}")
+public ResponseEntity<Void> desasignarModulo(
+        @PathVariable Long rolId, 
+        @PathVariable Long moduloId) {
+    
+    rolModuloService.desasignarModulo(rolId, moduloId);
+    
+    // Devolvemos 204 No Content porque la eliminación fue exitosa y no hay cuerpo que retornar
+    return ResponseEntity.noContent().build();
 }
+}   
