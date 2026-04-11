@@ -1,3 +1,4 @@
+
 export interface RolModuloResponse {
   id: number;
   rolId: number;

@@ -3,3 +3,4 @@ export interface ModuloRequest {
   descripcion: string;
   ruta: string;
 }
+

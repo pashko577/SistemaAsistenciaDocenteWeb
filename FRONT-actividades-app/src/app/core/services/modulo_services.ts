@@ -1,27 +1,25 @@
+import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ModuloResponse } from '../models/RolModule/modulo-response';
 import { ModuloRequest } from '../models/RolModule/modulo-request';
 
-@Injectable({ providedIn: 'root' })
-export class ModulosService {
-  private http = inject(HttpClient);
-  private url = 'http://localhost:8080/api/modulos';
 
-  crear(dto: ModuloRequest): Observable<ModuloResponse> {
-    return this.http.post<ModuloResponse>(this.url, dto);
-  }
+@Injectable({ providedIn: 'root' })
+export class ModuloService {
+  private readonly URL = 'http://localhost:8080/api/modulos';
+
+  constructor(private http: HttpClient) {}
 
   listar(): Observable<ModuloResponse[]> {
-    return this.http.get<ModuloResponse[]>(this.url);
+    return this.http.get<ModuloResponse[]>(this.URL);
   }
 
-  obtenerPorId(id: number): Observable<ModuloResponse> {
-    return this.http.get<ModuloResponse>(`${this.url}/${id}`);
+  crear(dto: ModuloRequest): Observable<ModuloResponse> {
+    return this.http.post<ModuloResponse>(this.URL, dto);
   }
 
   eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.url}/${id}`);
+    return this.http.delete<void>(`${this.URL}/${id}`);
   }
 }

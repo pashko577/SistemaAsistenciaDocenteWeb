@@ -1,12 +1,12 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin, finalize } from 'rxjs'; // Importamos forkJoin
 import { RolesService } from '../../../../../core/services/roles_services';
-import { ModulosService } from '../../../../../core/services/modulo_services';
+import { ModuloService } from '../../../../../core/services/modulo_services';
 import { RolModuloService } from '../../../../../core/services/rol_modulo_services';
 import { Rol } from '../../../../../core/models/RolModule/rol';
 import { ModuloResponse } from '../../../../../core/models/RolModule/modulo-response';
-
 
 @Component({
   selector: 'app-permisos',
@@ -16,60 +16,77 @@ import { ModuloResponse } from '../../../../../core/models/RolModule/modulo-resp
 })
 export class PermisosComponent implements OnInit {
   private rolesService = inject(RolesService);
-  private modulosService = inject(ModulosService);
+  private modulosService = inject(ModuloService);
   private rolModuloService = inject(RolModuloService);
 
   roles: Rol[] = [];
   modulos: ModuloResponse[] = [];
   rolSeleccionadoId?: number;
 
-  // Mapa para rastrear qué módulos están activos para el rol seleccionado
-  permisosActivos: { [key: number]: boolean } = {};
+  // Signals para reactividad inmediata
+  permisosActivos = signal<{ [key: number]: boolean }>({});
+  isLoading = signal<boolean>(false);
 
-  ngOnInit() {
-    // Carga inicial de datos maestros
-    this.rolesService.obtenerTodos().subscribe(data => this.roles = data);
-    this.modulosService.listar().subscribe(data => this.modulos = data);
-  }
+ngOnInit() {
+  this.isLoading.set(true);
 
-onRolChange() {
-  if (!this.rolSeleccionadoId) return;
-
-  this.permisosActivos = {};
-
-  // Asegurémonos de que los módulos existan antes de marcar los activos
-  this.modulosService.listar().subscribe(modulos => {
-    this.modulos = modulos; // <--- Refrescar la lista de módulos
-
-    this.rolModuloService.listarPorRol(this.rolSeleccionadoId!).subscribe(asignaciones => {
-      asignaciones.forEach(a => {
-        this.permisosActivos[a.moduloId] = true;
-      });
-    });
+  // Ejecutamos ambas peticiones en paralelo
+  forkJoin({
+    roles: this.rolesService.obtenerTodos(),
+    modulos: this.modulosService.listar()
+  })
+  .pipe(finalize(() => this.isLoading.set(false)))
+  .subscribe({
+    next: (res) => {
+      this.roles = res.roles;
+      this.modulos = res.modulos;
+    },
+    error: (err) => console.error('Error al cargar datos:', err)
   });
 }
 
- togglePermiso(moduloId: number) {
-  if (!this.rolSeleccionadoId) return;
+  onRolChange() {
+    if (!this.rolSeleccionadoId) {
+      this.permisosActivos.set({});
+      return;
+    }
 
-  const estaActivo = this.permisosActivos[moduloId];
+    this.isLoading.set(true);
 
-  if (!estaActivo) {
-    // Activar permiso
-    this.rolModuloService.asignarModulo({
-      rolId: this.rolSeleccionadoId,
-      moduloId
-    }).subscribe(() => {
-      this.permisosActivos[moduloId] = true;
-    });
-  } else {
-    // Desactivar permiso (Llamada al endpoint DELETE)
-    this.rolModuloService.desasignarModulo(this.rolSeleccionadoId, moduloId).subscribe({
-      next: () => {
-        this.permisosActivos[moduloId] = false;
-      },
-      error: (err) => console.error('Error al quitar permiso', err)
-    });
+    this.rolModuloService.listarPorRol(Number(this.rolSeleccionadoId))
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (asignaciones) => {
+          const mapa: { [key: number]: boolean } = {};
+          asignaciones.forEach(a => mapa[a.moduloId] = true);
+          this.permisosActivos.set(mapa);
+        }
+      });
   }
-}
+
+  togglePermiso(moduloId: number) {
+    if (!this.rolSeleccionadoId) return;
+
+    const estaActivo = !!this.permisosActivos()[moduloId];
+
+    if (!estaActivo) {
+      this.rolModuloService.asignar({
+        rolId: Number(this.rolSeleccionadoId),
+        moduloId
+      }).subscribe(() => {
+        // Actualización reactiva del Signal
+        this.permisosActivos.update(prev => ({ ...prev, [moduloId]: true }));
+      });
+    } else {
+      this.rolModuloService.desasignar(Number(this.rolSeleccionadoId), moduloId).subscribe({
+        next: () => {
+          this.permisosActivos.update(prev => {
+            const copia = { ...prev };
+            delete copia[moduloId];
+            return copia;
+          });
+        }
+      });
+    }
+  }
 }
