@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Token } from './token';
 import { Router } from '@angular/router';
+import { Rol } from './../models/RolModule/rol';
 
 @Injectable({
   providedIn: 'root',
@@ -29,4 +30,30 @@ export class Auth {
     this.router.navigate(['/login']);
   }
 
+  getRole(): string | null {
+  const token = this.tokenService.getToken();
+  if (!token) return null;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    // Como en tu token es "roles": ["ADMIN"], accedemos al primer elemento
+    return (payload.roles && payload.roles.length > 0) ? payload.roles[0] : null;
+  } catch (e) {
+    console.error("Error al decodificar el token", e);
+    return null;
+  }
+}
+
+getRolId(): number | null {
+  const token = this.tokenService.getToken();
+  if (!token) return null;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    // Asegúrate de que el backend esté enviando 'rolId' o 'id' en el payload
+    return payload.rolId || null; 
+  } catch (e) {
+    return null;
+  }
+}
 }
