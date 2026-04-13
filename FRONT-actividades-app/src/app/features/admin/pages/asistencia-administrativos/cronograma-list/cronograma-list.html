@@ -1,155 +1,172 @@
-<div class="p-6 sm:p-10 bg-[#F1F5F1] min-h-screen">
-  <div class="max-w-6xl mx-auto space-y-8">
+<div class="p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300">
+  <div class="max-w-6xl mx-auto space-y-6">
     
-    <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-emerald-900/5 border border-emerald-100/50 overflow-hidden">
-<div class="bg-emerald-950 p-8 flex items-center justify-between border-b border-white/5">
-  <div class="flex items-center gap-5">
-    
-    <div class="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/30 shadow-[0_0_25px_rgba(16,185,129,0.1)] transition-all hover:scale-105 duration-300">
-      
-      <mat-icon class="!text-emerald-50 !w-9 !h-9 !text-[36px] drop-shadow-[0_0_12px_rgba(52,211,153,0.9)]">
-        more_time
-      </mat-icon>
+    <!-- Header Card -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
+      <div class="p-6 sm:p-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          
+          <div class="flex items-center gap-4">
+            <div class="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg">
+              <mat-icon class="text-white text-2xl">schedule</mat-icon>
+            </div>
+            <div>
+              <h2 class="text-xl font-bold text-slate-800 dark:text-white tracking-tight">Gestión de Horarios</h2>
+              <p class="text-xs text-slate-500 dark:text-gray-400 mt-0.5">Configuración de turnos institucionales</p>
+            </div>
+          </div>
 
-    </div>
-    
-    <div>
-      <h2 class="text-xl font-black text-white tracking-tight uppercase flex items-center gap-2">
-        Gestión de Horarios
-        <span class="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-md border border-emerald-500/20 tracking-[0.1em]">ADMIN</span>
-      </h2>
-      <p class="text-[10px] text-emerald-500/50 uppercase font-black tracking-[0.2em] mt-1">Configuración de turnos institucionales</p>
-    </div>
-  </div>
-
-  <div class="hidden md:flex items-center gap-3 px-5 py-2.5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-    <div class="relative flex h-2 w-2">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_10px_#10b981]"></span>
-    </div>
-    <span class="text-[10px] font-black text-emerald-50/80 uppercase tracking-widest">Servidor Activo</span>
-  </div>
-</div>
-      <div class="p-8 lg:p-10 grid grid-cols-1 md:grid-cols-6 gap-8 items-end bg-white">
-        
-        <div class="md:col-span-2">
-          <label class="block text-[11px] font-black text-emerald-900/40 uppercase mb-3 ml-1 tracking-widest">Personal Administrativo</label>
-          <div class="relative group">
-            <mat-icon class="absolute left-4 top-3.5 text-slate-400 group-focus-within:text-emerald-700 transition-colors">search</mat-icon>
-            <input 
-              type="text"
-              list="adminList" 
-              [(ngModel)]="nombreBusqueda" 
-              (change)="onAdminChange()"
-              placeholder="Buscar por nombre..."
-              class="w-full bg-emerald-50/30 border border-emerald-100 rounded-2xl pl-12 pr-10 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-600 outline-none transition-all shadow-sm"
-              [ngClass]="{'border-emerald-500 ring-2 ring-emerald-500/10': nuevo.administrativoId > 0}"
-            >
-            <datalist id="adminList">
-              <option *ngFor="let admin of administrativos" [value]="admin.nombres + ' ' + admin.apellidos">
-                {{ admin.nombreCargo }}
-              </option>
-            </datalist>
-            
-            <mat-icon *ngIf="nuevo.administrativoId > 0" class="absolute right-4 top-3.5 text-emerald-600 scale-110">check_circle</mat-icon>
+          <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/30 rounded-full">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <span class="text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Sistema Activo</span>
           </div>
         </div>
-
-        <div>
-          <label class="block text-[11px] font-black text-emerald-900/40 uppercase mb-3 ml-1 tracking-widest">Día Laboral</label>
-          <div class="relative">
-            <select [(ngModel)]="nuevo.diaSemana" 
-                    class="w-full bg-emerald-50/30 border border-emerald-100 rounded-2xl px-5 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 outline-none appearance-none cursor-pointer border-r-[40px] border-r-transparent">
-              <option *ngFor="let dia of listaDias" [value]="dia">{{ dia }}</option>
-            </select>
-            <mat-icon class="absolute right-4 top-4 text-emerald-800/40 pointer-events-none">expand_more</mat-icon>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 md:col-span-2">
-          <div>
-            <label class="block text-[11px] font-black text-emerald-900/40 uppercase mb-3 ml-1 tracking-widest">Entrada</label>
-            <input type="time" [(ngModel)]="nuevo.horaEntrada" 
-                   class="w-full bg-emerald-50/30 border border-emerald-100 rounded-2xl px-4 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 outline-none shadow-sm">
-          </div>
-          <div>
-            <label class="block text-[11px] font-black text-emerald-900/40 uppercase mb-3 ml-1 tracking-widest">Salida</label>
-            <input type="time" [(ngModel)]="nuevo.horaSalida" 
-                   class="w-full bg-emerald-50/30 border border-emerald-100 rounded-2xl px-4 py-4 text-sm font-bold text-slate-700 focus:ring-4 focus:ring-emerald-500/10 outline-none shadow-sm">
-          </div>
-        </div>
-
-        <button (click)="guardar()" 
-                [disabled]="nuevo.administrativoId === 0"
-                class="bg-emerald-900 hover:bg-emerald-950 disabled:bg-emerald-50 disabled:text-emerald-200 text-white font-black py-4 px-6 rounded-2xl text-[11px] tracking-widest transition-all shadow-xl shadow-emerald-200/50 flex items-center justify-center gap-3 uppercase active:scale-95">
-          <mat-icon class="!w-5 !h-5 !text-[20px]">add_task</mat-icon>
-          Añadir Turno
-        </button>
       </div>
     </div>
 
-    <div class="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.02)] border border-emerald-100/50 overflow-hidden" *ngIf="cronogramas.length > 0">
-      <div class="px-8 py-6 bg-emerald-50/20 border-b border-emerald-50 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <mat-icon class="text-emerald-800 scale-90">format_list_bulleted</mat-icon>
-          <span class="text-[11px] font-black text-emerald-900/40 uppercase tracking-[0.2em]">Horarios Registrados</span>
+    <!-- Formulario -->
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
+      <div class="p-6 sm:p-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-end">
+          
+          <!-- Personal Administrativo -->
+          <div class="lg:col-span-1">
+            <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Personal Administrativo</label>
+            <div class="relative">
+              <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 text-base">search</mat-icon>
+              <input 
+                type="text"
+                list="adminList" 
+                [(ngModel)]="nombreBusqueda" 
+                (change)="onAdminChange()"
+                placeholder="Buscar por nombre..."
+                class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all"
+                [ngClass]="{'border-emerald-500 ring-2 ring-emerald-500/20': nuevo.administrativoId > 0}">
+              <datalist id="adminList">
+                <option *ngFor="let admin of administrativos" [value]="admin.nombres + ' ' + admin.apellidos">
+                  {{ admin.nombreCargo }}
+                </option>
+              </datalist>
+              <mat-icon *ngIf="nuevo.administrativoId > 0" class="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-base">check_circle</mat-icon>
+            </div>
+          </div>
+
+          <!-- Día Laboral -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Día Laboral</label>
+            <div class="relative">
+              <select [(ngModel)]="nuevo.diaSemana" 
+                      class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none appearance-none cursor-pointer">
+                <option *ngFor="let dia of listaDias" [value]="dia">{{ dia }}</option>
+              </select>
+              <mat-icon class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 pointer-events-none text-base">expand_more</mat-icon>
+            </div>
+          </div>
+
+          <!-- Horario Entrada -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Hora Entrada</label>
+            <input type="time" [(ngModel)]="nuevo.horaEntrada" 
+                   class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+          </div>
+
+          <!-- Horario Salida -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Hora Salida</label>
+            <input type="time" [(ngModel)]="nuevo.horaSalida" 
+                   class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+          </div>
         </div>
-        <span class="px-4 py-1.5 bg-emerald-900 text-emerald-50 rounded-full text-[10px] font-black uppercase tracking-tighter">
-          {{ cronogramas.length }} Turnos asignados
+
+        <!-- Botón Agregar -->
+        <div class="mt-6">
+          <button (click)="guardar()" 
+                  [disabled]="nuevo.administrativoId === 0"
+                  class="w-full md:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 dark:disabled:bg-gray-700 disabled:text-slate-400 dark:disabled:text-gray-500 text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <mat-icon class="text-base">add</mat-icon>
+            Agregar Turno
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla de Horarios -->
+    <div *ngIf="cronogramas.length > 0" class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
+      <div class="px-6 py-4 bg-slate-50 dark:bg-gray-900/50 border-b border-slate-100 dark:border-gray-700 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2">
+          <mat-icon class="text-slate-500 dark:text-gray-400 text-base">list_alt</mat-icon>
+          <span class="text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase tracking-wider">Horarios Registrados</span>
+        </div>
+        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-[10px] font-bold">
+          {{ cronogramas.length }} turno{{ cronogramas.length !== 1 ? 's' : '' }}
         </span>
       </div>
       
       <div class="overflow-x-auto">
-        <table class="w-full text-sm text-left">
+        <table class="w-full">
           <thead>
-            <tr class="text-[10px] font-black text-emerald-900/20 uppercase tracking-[0.2em] border-b border-emerald-50">
-              <th class="px-10 py-6">Día de Trabajo</th>
-              <th class="px-10 py-6">Horario de Ingreso</th>
-              <th class="px-10 py-6">Horario de Salida</th>
-              <th class="px-10 py-6 text-right pr-12">Gestión</th>
+            <tr class="border-b border-slate-100 dark:border-gray-700">
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Día</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Entrada</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Salida</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-emerald-50/50">
-            <tr *ngFor="let c of cronogramas" class="hover:bg-emerald-50/30 transition-all group">
-              <td class="px-10 py-6">
-                <div class="flex items-center gap-4">
-                  <div class="w-2 h-2 rounded-full bg-emerald-600 shadow-[0_0_8px_rgba(5,150,105,0.4)]"></div>
-                  <span class="font-black text-slate-700 uppercase tracking-tight">{{ c.diaSemana }}</span>
+          <tbody class="divide-y divide-slate-50 dark:divide-gray-700">
+            <tr *ngFor="let c of cronogramas" class="hover:bg-slate-50/50 dark:hover:bg-gray-700/30 transition-colors group">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                    <span class="text-xs font-bold text-emerald-700 dark:text-emerald-400">{{ getDiaAbreviado(c.diaSemana) }}</span>
+                  </div>
+                  <span class="font-medium text-slate-700 dark:text-gray-200">{{ c.diaSemana }}</span>
                 </div>
-              </td>
-              <td class="px-10 py-6">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50/50 rounded-xl border border-emerald-100">
-                  <mat-icon class="!w-4 !h-4 !text-[16px] text-emerald-800/40">login</mat-icon>
-                  <span class="font-mono font-bold text-emerald-900">{{ c.horaEntrada }}</span>
+               </td>
+              <td class="px-6 py-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-gray-700 rounded-lg">
+                  <mat-icon class="text-slate-500 dark:text-gray-400 text-xs">login</mat-icon>
+                  <span class="font-mono text-sm font-semibold text-slate-700 dark:text-gray-200">{{ c.horaEntrada }}</span>
                 </div>
-              </td>
-              <td class="px-10 py-6">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50/50 rounded-xl border border-emerald-100">
-                  <mat-icon class="!w-4 !h-4 !text-[16px] text-emerald-800/40">logout</mat-icon>
-                  <span class="font-mono font-bold text-emerald-900">{{ c.horaSalida }}</span>
+               </td>
+              <td class="px-6 py-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 dark:bg-gray-700 rounded-lg">
+                  <mat-icon class="text-slate-500 dark:text-gray-400 text-xs">logout</mat-icon>
+                  <span class="font-mono text-sm font-semibold text-slate-700 dark:text-gray-200">{{ c.horaSalida }}</span>
                 </div>
-              </td>
-              <td class="px-10 py-6 text-right pr-12">
-                <button (click)="eliminar(c.id)" class="inline-flex items-center gap-2 text-emerald-900/20 hover:text-red-600 transition-all font-black text-[10px] uppercase tracking-tighter p-3 hover:bg-red-50 rounded-2xl">
-                  <mat-icon class="!w-5 !h-5 !text-[20px]">delete_outline</mat-icon>
-                  <span>Eliminar</span>
+               </td>
+              <td class="px-6 py-4 text-right">
+                <button (click)="eliminar(c.id)" 
+                        class="p-2 text-slate-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all opacity-0 group-hover:opacity-100">
+                  <mat-icon class="text-base">delete_outline</mat-icon>
                 </button>
-              </td>
-            </tr>
+               </td>
+             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
+    <!-- Estado vacío -->
     <div *ngIf="cronogramas.length === 0 && nuevo.administrativoId > 0" 
-         class="text-center p-20 bg-white rounded-[2.5rem] border-2 border-dashed border-emerald-100 flex flex-col items-center gap-6 shadow-sm">
-      <div class="p-6 bg-emerald-50/50 rounded-[2.5rem]">
-        <mat-icon class="text-emerald-200 !w-16 !h-16 !text-[64px]">calendar_add_on</mat-icon>
+         class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 p-12 text-center">
+      <div class="w-20 h-20 mx-auto mb-4 bg-slate-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center">
+        <mat-icon class="text-slate-400 dark:text-gray-500 text-4xl">schedule</mat-icon>
       </div>
-      <div>
-        <p class="text-emerald-950 text-lg font-black tracking-tight uppercase">Sin Horarios Definidos</p>
-        <p class="text-emerald-800/40 text-xs font-bold mt-1 uppercase tracking-widest">Comienza agregando un turno para este administrativo.</p>
+      <h3 class="text-lg font-semibold text-slate-700 dark:text-gray-200 mb-1">Sin horarios definidos</h3>
+      <p class="text-sm text-slate-500 dark:text-gray-400">Comienza agregando un turno para este administrativo</p>
+    </div>
+
+    <!-- Selecciona un administrativo -->
+    <div *ngIf="nuevo.administrativoId === 0 && cronogramas.length === 0" 
+         class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 p-12 text-center">
+      <div class="w-20 h-20 mx-auto mb-4 bg-slate-100 dark:bg-gray-700 rounded-2xl flex items-center justify-center">
+        <mat-icon class="text-slate-400 dark:text-gray-500 text-4xl">person_search</mat-icon>
       </div>
+      <h3 class="text-lg font-semibold text-slate-700 dark:text-gray-200 mb-1">Seleccione un administrativo</h3>
+      <p class="text-sm text-slate-500 dark:text-gray-400">Busque y seleccione un administrativo para gestionar sus horarios</p>
     </div>
   </div>
 </div>

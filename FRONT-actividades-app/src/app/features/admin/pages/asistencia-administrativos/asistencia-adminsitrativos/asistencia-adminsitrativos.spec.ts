@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AsistenciaAdminsitrativos } from './asistencia-adminsitrativos';
+import { AsistenciaAdministrativosMain } from './asistencia-adminsitrativos';
 
 describe('AsistenciaAdminsitrativos', () => {
-  let component: AsistenciaAdminsitrativos;
-  let fixture: ComponentFixture<AsistenciaAdminsitrativos>;
+  let component: AsistenciaAdministrativosMain;
+  let fixture: ComponentFixture<AsistenciaAdministrativosMain>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AsistenciaAdminsitrativos]
+      imports: [AsistenciaAdministrativosMain]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(AsistenciaAdminsitrativos);
+    fixture = TestBed.createComponent(AsistenciaAdministrativosMain);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
