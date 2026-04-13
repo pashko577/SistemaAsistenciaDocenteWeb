@@ -3,6 +3,7 @@ package com.example.actividades_app.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.Entity.Administrativo;
 import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoRequestDTO;
 import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoResponseDTO;
@@ -40,17 +41,18 @@ public class AdministrativoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping
+    @IsStaff
     public ResponseEntity<List<AdministrativoResponseDTO>> listarAdministrativos() {
         return ResponseEntity.ok(administrativoService.listarAdministrativos());
     }
 
+    // 3. FILTROS: También permitimos al ADMINISTRATIVO
     @GetMapping("/con-contrato")
-@PreAuthorize("hasRole('ADMIN')")
-public ResponseEntity<List<AdministrativoResponseDTO>> listarConContrato() {
-    return ResponseEntity.ok(administrativoService.listarSoloConContrato());
-}
+    @IsStaff
+    public ResponseEntity<List<AdministrativoResponseDTO>> listarConContrato() {
+        return ResponseEntity.ok(administrativoService.listarSoloConContrato());
+    }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")

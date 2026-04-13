@@ -2,8 +2,10 @@ package com.example.actividades_app.controller;
 
 import java.util.List;
 
+import org.hibernate.validator.constraints.ISBN;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.ModuloCurso.NivelRequestDTO;
 import com.example.actividades_app.model.dto.ModuloCurso.NivelResponseDTO;
 import com.example.actividades_app.service.NivelService;
@@ -28,28 +31,33 @@ public class NivelController {
     private final NivelService nivelService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NivelResponseDTO> crear(@Valid @RequestBody NivelRequestDTO dto) {
         NivelResponseDTO response = nivelService.crear(dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping
+    @IsStaff
     public ResponseEntity<List<NivelResponseDTO>> listar() {
         return ResponseEntity.ok(nivelService.listar());
     }
 
     @GetMapping("/{id}")
+    @IsStaff
     public ResponseEntity<NivelResponseDTO> obtener(@PathVariable Long id) {
         return ResponseEntity.ok(nivelService.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<NivelResponseDTO> actualizar(@PathVariable Long id,
                                                        @Valid @RequestBody NivelRequestDTO dto) {
         return ResponseEntity.ok(nivelService.actualizar(id, dto));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         nivelService.eliminar(id);
         return ResponseEntity.noContent().build();

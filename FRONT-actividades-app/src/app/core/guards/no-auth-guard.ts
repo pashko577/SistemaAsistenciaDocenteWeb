@@ -13,23 +13,14 @@ export class NoAuthGuard implements CanActivate {
     private router: Router
   ){}
 
-  canActivate(): boolean  {
-    if (this.tokenService.isLogged()){
 
-      const roles = this.tokenService.getRoles();
-      // Si YA está logueado → redirigir
-
-      if (roles.includes('ADMIN')) {
-        this.router.navigate(['/admin']);
-      } else if (roles.includes('USER')) {
-        this.router.navigate(['/user']);        
-      } else {
-        this.router.navigate(['/'])
-      }
-      return false;
-    }
-
-    // No está logueado → puede entrar a login/register
-    return true;    
+canActivate(): boolean {
+  if (this.tokenService.isLogged()) {
+    // Si ya está logueado, lo mandamos al dashboard global.
+    // El AuthGuard se encargará de validar si tiene permiso allí.
+    this.router.navigate(['/dashboard']); 
+    return false;
   }
+  return true;
+}
 }

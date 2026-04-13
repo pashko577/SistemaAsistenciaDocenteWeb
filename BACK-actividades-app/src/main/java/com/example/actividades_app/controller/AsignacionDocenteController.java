@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.ModuloDocente.AsignacionDocenteRequestDTO;
 import com.example.actividades_app.model.dto.ModuloDocente.AsignacionDocenteResponseDTO;
 import com.example.actividades_app.service.AsignacionDocenteService;
@@ -27,6 +28,7 @@ public class AsignacionDocenteController {
 private final AsignacionDocenteService asignacionService;
 
     @PostMapping
+    @IsStaff
     public ResponseEntity<AsignacionDocenteResponseDTO> registrar(
             @Valid @RequestBody AsignacionDocenteRequestDTO dto) {
         AsignacionDocenteResponseDTO response = asignacionService.registrar(dto);
@@ -34,16 +36,19 @@ private final AsignacionDocenteService asignacionService;
     }
 
     @GetMapping("/{id}")
+    @IsStaff
     public ResponseEntity<AsignacionDocenteResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(asignacionService.obtenerPorId(id));
     }
 
     @GetMapping
+    @IsStaff
     public ResponseEntity<List<AsignacionDocenteResponseDTO>> listar() {
         return ResponseEntity.ok(asignacionService.listar());
     }
 
     @PutMapping("/{id}")
+    @IsStaff
     public ResponseEntity<AsignacionDocenteResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody AsignacionDocenteRequestDTO dto) {
@@ -51,6 +56,7 @@ private final AsignacionDocenteService asignacionService;
     }
 
     @DeleteMapping("/{id}")
+    @IsStaff
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         asignacionService.eliminar(id);
         return ResponseEntity.noContent().build();

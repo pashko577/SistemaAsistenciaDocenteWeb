@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.ModuloRegistroAsistencia.AsistenciaDocenteRequestDTO;
 import com.example.actividades_app.model.dto.ModuloRegistroAsistencia.AsistenciaDocenteResponseDTO;
 import com.example.actividades_app.service.AsistenciaDocenteService;
@@ -25,6 +26,7 @@ public class AsistenciaDocenteController {
     private final AsistenciaDocenteService asistenciaService;
 
     @PostMapping
+    @IsStaff
     public ResponseEntity<AsistenciaDocenteResponseDTO> registrar(
             @Valid @RequestBody AsistenciaDocenteRequestDTO dto) {
         AsistenciaDocenteResponseDTO response = asistenciaService.registrar(dto);
@@ -32,6 +34,7 @@ public class AsistenciaDocenteController {
     }
 
     @GetMapping
+    @IsStaff
     public ResponseEntity<List<AsistenciaDocenteResponseDTO>> listar() {
         return ResponseEntity.ok(asistenciaService.listar());
     }

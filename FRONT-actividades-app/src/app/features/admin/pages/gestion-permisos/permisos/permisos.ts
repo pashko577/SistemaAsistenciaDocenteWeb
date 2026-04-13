@@ -72,7 +72,7 @@ export class PermisosComponent implements OnInit {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe(asignaciones => {
         // Obtenemos los IDs de los módulos que tiene permitidos
-        const idsPermitidos = asignaciones.map(a => a.moduloId);
+        const idsPermitidos = asignaciones.map(a => a.modulo.id);
         
         // Filtramos la lista total para que solo vea los suyos, pero con TODA la info (ruta, desc)
         this.modulos = todosLosModulos.filter(m => idsPermitidos.includes(m.id));
@@ -92,7 +92,7 @@ export class PermisosComponent implements OnInit {
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe(asignaciones => {
         const mapa: { [key: number]: boolean } = {};
-        asignaciones.forEach(a => mapa[a.moduloId] = true);
+        asignaciones.forEach(a => mapa[a.modulo.id] = true);
         this.permisosActivos.set(mapa);
       });
   }
@@ -108,6 +108,7 @@ export class PermisosComponent implements OnInit {
     this.rolModuloService.desasignar(rolId, moduloId).subscribe({
       next: () => this.actualizarEstadoLocal(moduloId, false),
       error: (err) => console.error('Error al desasignar:', err)
+      
     });
   } else {
     // Caso: Asignar permiso

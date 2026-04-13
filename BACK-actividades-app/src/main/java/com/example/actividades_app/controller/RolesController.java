@@ -20,7 +20,8 @@ import org.springframework.web.bind.annotation.PathVariable;
     import org.springframework.web.bind.annotation.PostMapping;
     import org.springframework.web.bind.annotation.RequestBody;
 
-    import com.example.actividades_app.model.Entity.Rol;
+import com.example.actividades_app.config.IsStaff;
+import com.example.actividades_app.model.Entity.Rol;
     import com.example.actividades_app.model.dto.ModuloUsuario.RegistrarRolRequestDTO;
 
     @RestController
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.PathVariable;
         private RolService rolService;
 
         @GetMapping
+        @IsStaff
     public ResponseEntity<List<Rol>> obtenerTodos() {
         return ResponseEntity.ok(rolService.obtenerTodosLosRoles());
     }

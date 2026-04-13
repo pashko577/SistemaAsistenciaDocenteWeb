@@ -3,4 +3,5 @@ export interface ModuloResponse {
   nombre: string;
   descripcion: string;
   ruta: string;
+  icono: string; 
 }

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
+
 public class ModuloRequestDTO {
 
     @NotBlank(message = "El nombre del módulo es obligatorio")
@@ -16,4 +17,6 @@ public class ModuloRequestDTO {
 
     @Size(max = 100)
     private String ruta;
+
+    private String icono; 
 }

@@ -26,7 +26,7 @@ export class Auth {
   }
 
   logout(): void{
-    this.tokenService.removeToken();
+    this.tokenService.logOut();
     this.router.navigate(['/login']);
   }
 
@@ -42,6 +42,18 @@ export class Auth {
     console.error("Error al decodificar el token", e);
     return null;
   }
+}
+
+// auth.service.ts
+hasRole(targetRole: string): boolean {
+  const currentRole = this.getRole(); // Ej: "ROLE_ADMIN"
+  if (!currentRole) return false;
+
+  // Lógica de jerarquía manual para el Frontend
+  if (currentRole === 'ROLE_ADMIN') return true; 
+  
+  // Si no es admin, debe ser exactamente el rol solicitado
+  return currentRole === targetRole;
 }
 
 getRolId(): number | null {

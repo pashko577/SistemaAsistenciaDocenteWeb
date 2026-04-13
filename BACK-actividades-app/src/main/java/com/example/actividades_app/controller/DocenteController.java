@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.ModuloDocente.DocenteRequestDTO;
 import com.example.actividades_app.model.dto.ModuloDocente.DocenteResponseDTO;
 import com.example.actividades_app.service.DocenteService;
@@ -38,7 +39,7 @@ public class DocenteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<DocenteResponseDTO>> listarDocentes() {
         return ResponseEntity.ok(docenteService.listarTodos());
     }

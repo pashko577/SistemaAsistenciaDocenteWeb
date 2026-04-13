@@ -3,6 +3,7 @@ package com.example.actividades_app.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.ModuloDocente.EspecialidadDocenteRequestDTO;
 import com.example.actividades_app.model.dto.ModuloDocente.EspecialidadDocenteResponseDTO;
 import com.example.actividades_app.service.EspecialidadDocenteService;
@@ -36,14 +37,14 @@ public class EspecialidadDocenteController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<EspecialidadDocenteResponseDTO>> listar() {
         // Devuelve la lista de DTOs limpia, sin recursión infinita
         return ResponseEntity.ok(especialidadDocenteService.listarEspecialidadDocente());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<EspecialidadDocenteResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(especialidadDocenteService.obtenerPorId(id));
     }
