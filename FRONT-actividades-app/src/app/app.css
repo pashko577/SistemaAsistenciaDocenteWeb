@@ -1,0 +1,16 @@
+/* styles.css o app.css */
+.bg-primary { 
+  background-color: var(--bg-main) !important; 
+}
+
+.text-primary { 
+  /* Aquí es donde forzamos que el texto sea legible */
+  color: var(--text-main) !important; 
+}
+
+/* Opcional: añade una transición suave para que el cambio no sea brusco */
+.transition-colors {
+  transition-property: background-color, color, border-color;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 300ms;
+}

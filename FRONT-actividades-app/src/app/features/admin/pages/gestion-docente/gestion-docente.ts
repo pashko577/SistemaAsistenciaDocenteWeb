@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, computed, OnInit, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, computed, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
@@ -16,6 +16,8 @@ import { MatButtonModule } from '@angular/material/button';
 
 import { DocenteForm } from './Modal-Docente/docente-form'; 
 import { SearchDocente } from "./search-docente/search-docente";
+import { ThemeService } from '../../../../core/services/theme_service'; // Ajusta la ruta según tu carpeta
+
 
 @Component({
   selector: 'app-gestion-docente',
@@ -35,6 +37,7 @@ export class GestionDocente implements OnInit {
   // Signals para estado reactivo
   docentes = signal<DocenteResponse[]>([]);
   loadingTable = signal(false);
+  public themeService = inject(ThemeService);
 
   // Signal para manejar todos los filtros simultáneamente
   filtros = signal({
@@ -55,7 +58,7 @@ export class GestionDocente implements OnInit {
     private especialidadService: EspecialidadDocenteService,
     private tipoDocumentoService: TipoDocumentoService,
     private dialog: MatDialog,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {

@@ -13,6 +13,7 @@ import { TipoActividadService } from '../../../../../core/services/tipo-activida
 export class TipoActividadFormComponent implements OnInit {
   actividadForm: FormGroup;
   isEdit: boolean = false;
+  
 
   constructor(
     private fb: FormBuilder,

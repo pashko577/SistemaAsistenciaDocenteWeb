@@ -45,9 +45,6 @@ export interface AdministrativoCard {
 })
 export class GestionAdministrativo implements OnInit {
 
-  @HostBinding('class.dark') get isDarkMode() {
-    return this.themeService.isDarkMode();
-  }
 
 
   @ViewChild(SearchAdministrativo) buscadorComponente!: SearchAdministrativo;

@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ThemeService } from '../../../../../core/services/theme_service';
 
 @Component({
   selector: 'app-search-docente',
@@ -14,6 +15,8 @@ export class SearchDocente implements OnInit {
   @Input() sedes: any[] = [];
   @Input() especialidades: any[] = []; // Recibe especialidades en lugar de cargos
   @Output() onFilter = new EventEmitter<any>();
+    public themeService = inject(ThemeService);
+
 
   filtroForm: FormGroup;
 

@@ -1,4 +1,3 @@
-/* styles.css - Archivo global optimizado */
 @import "tailwindcss";
 
 /* Configuración del modo oscuro para Tailwind v4 */
@@ -8,91 +7,29 @@
    VARIABLES CSS - TEMA CLARO (POR DEFECTO)
    ============================================ */
 :root {
-  /* Fondos */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --card-bg: #ffffff;
-  --hover-bg: #f9fafb;
-  
-  /* Textos */
-  --text-primary: #111827;
-  --text-secondary: #4b5563;
-  --text-muted: #6b7280;
-  
-  /* Bordes */
-  --border-light: #e5e7eb;
-  --border-medium: #d1d5db;
-  
-  /* Sombras */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-  
-  /* Estados */
-  --success-light: #f0fdf4;
-  --success-text: #166534;
-  --success-border: #bbf7d0;
-  
-  --warning-light: #fefce8;
-  --warning-text: #854d0e;
-  --warning-border: #fef08a;
-  
-  --error-light: #fef2f2;
-  --error-text: #991b1b;
-  --error-border: #fecaca;
-  
-  --info-light: #eff6ff;
-  --info-text: #1e40af;
-  --info-border: #bfdbfe;
-  
+  /* Marca Baldwin */
+  --brand-primary: #2A6F4F;
+  --brand-secondary: #2B58C1;
+  --brand-accent: #C99738;
+
+  /* Semántica de Colores (Claro por defecto) */
+  --bg-main: #ffffff;
+  --bg-soft: #f8fafc;
+  --text-main: #0f172a;
+  --text-soft: #64748b;
+  --border-main: #e2e8f0;
+  --shadow-main: 0 4px 6px -1px rgb(0 0 0 / 0.1);
 }
 
-/* ============================================
-   VARIABLES CSS - TEMA OSCURO
-   ============================================ */
 .dark {
-  /* Fondos */
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
-  --bg-tertiary: #374151;
-  --card-bg: #1f2937;
-  --hover-bg: #374151;
-  
-  /* Textos */
-  --text-primary: #f9fafb;
-  --text-secondary: #e5e7eb;
-  --text-muted: #9ca3af;
-  
-  /* Bordes */
-  --border-light: #374151;
-  --border-medium: #4b5563;
-  
-  /* Sombras */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5);
-  
-  /* Estados */
-  --success-light: #022c22;
-  --success-text: #4ade80;
-  --success-border: #14532d;
-  
-  --warning-light: #422006;
-  --warning-text: #fbbf24;
-  --warning-border: #713f12;
-  
-  --error-light: #2e0a0a;
-  --error-text: #f87171;
-  --error-border: #7f1d1d;
-  
-  --info-light: #0f172a;
-  --info-text: #60a5fa;
-  --info-border: #1e3a8a;
+  /* Semántica de Colores (Oscuro) */
+  --bg-main: #111827;
+  --bg-soft: #1f2937;
+  --text-main: #f9fafb;
+  --text-soft: #9ca3af;
+  --border-main: #374151;
+  --shadow-main: 0 4px 6px -1px rgb(0 0 0 / 0.5);
 }
-
 /* ============================================
    ESTILOS BASE
    ============================================ */
@@ -101,13 +38,18 @@ html, body {
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Roboto', sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-main); }
+::-webkit-scrollbar-thumb { 
+  background: var(--border-main); 
+  border-radius: 10px; 
+}
 /* Transiciones suaves globales */
 * {
   transition: background-color 0.2s ease, 
@@ -171,22 +113,11 @@ body {
 /* ============================================
    SCROLLBAR PERSONALIZADO
    ============================================ */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--text-muted);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { 
+  background: var(--border-light); 
+  border-radius: 10px; 
 }
 
 /* ============================================

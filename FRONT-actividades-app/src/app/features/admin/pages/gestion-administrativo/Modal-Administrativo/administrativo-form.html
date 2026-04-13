@@ -1,5 +1,5 @@
 <!-- modal-administrativo.component.html -->
-<div class="card rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
+<div class="card rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden bg-white dark:bg-gray-800 transition-colors duration-300">
     <!-- Header del Modal -->
     <div class="p-6 bg-gradient-to-r from-blue-600 to-blue-700 flex justify-between items-center">
         <h3 class="text-xl font-bold text-white flex items-center">
@@ -20,12 +20,12 @@
             
             <!-- DNI -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">badge</mat-icon>
                     DNI
                 </label>
                 <input formControlName="dni" type="text" maxlength="8" placeholder="12345678"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-muted text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-500 text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
                 <div *ngIf="adminForm.get('dni')?.touched && adminForm.get('dni')?.invalid" 
                      class="flex items-center gap-1 mt-1.5 text-red-500 dark:text-red-400">
                     <mat-icon class="text-xs" style="font-size: 12px; width: 12px; height: 12px;">error_outline</mat-icon>
@@ -35,12 +35,12 @@
 
             <!-- Contraseña -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">lock</mat-icon>
                     Contraseña
                 </label>
                 <input formControlName="password" type="password" placeholder="********"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
                 <div *ngIf="adminForm.get('password')?.touched && adminForm.get('password')?.invalid" 
                      class="flex items-center gap-1 mt-1.5 text-red-500 dark:text-red-400">
                     <mat-icon class="text-xs" style="font-size: 12px; width: 12px; height: 12px;">error_outline</mat-icon>
@@ -50,27 +50,27 @@
 
             <!-- Nombres -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">person</mat-icon>
                     Nombres
                 </label>
                 <input formControlName="nombres" type="text" placeholder="Juan Carlos"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
             </div>
 
             <!-- Apellidos -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">people</mat-icon>
                     Apellidos
                 </label>
                 <input formControlName="apellidos" type="text" placeholder="Pérez Rodríguez"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
             </div>
 
             <!-- Sede -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center justify-between">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center justify-between">
                     <span class="flex items-center">
                         <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">business</mat-icon>
                         Sede
@@ -82,15 +82,15 @@
                     </button>
                 </label>
                 <select formControlName="sedeId" 
-                        class="w-full px-4 py-3 bg-secondary border border-light rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-primary">
-                    <option [ngValue]="null" class="text-muted">Seleccione Sede</option>
-                    <option *ngFor="let s of data.sedes" [ngValue]="s.id" class="text-primary">{{ s.nombreSede }}</option>
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-200">
+                    <option [ngValue]="null" class="text-gray-400 dark:text-gray-500">Seleccione Sede</option>
+                    <option *ngFor="let s of data.sedes" [ngValue]="s.id" class="text-gray-800 dark:text-gray-200">{{ s.nombreSede }}</option>
                 </select>
             </div>
 
             <!-- Cargo -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center justify-between">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center justify-between">
                     <span class="flex items-center">
                         <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">work</mat-icon>
                         Cargo
@@ -102,45 +102,45 @@
                     </button>
                 </label>
                 <select formControlName="cargoAdministrativoId" 
-                        class="w-full px-4 py-3 bg-secondary border border-light rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-primary">
-                    <option [ngValue]="null" class="text-muted">Seleccione Cargo</option>
-                    <option *ngFor="let c of data.cargos" [ngValue]="c.id" class="text-primary">{{ c.nombreCargo }}</option>
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-200">
+                    <option [ngValue]="null" class="text-gray-400 dark:text-gray-500">Seleccione Cargo</option>
+                    <option *ngFor="let c of data.cargos" [ngValue]="c.id" class="text-gray-800 dark:text-gray-200">{{ c.nombreCargo }}</option>
                 </select>
             </div>
 
             <!-- Celular -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">phone_android</mat-icon>
                     Celular
                 </label>
                 <input formControlName="celular" type="text" placeholder="987654321"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
             </div>
 
             <!-- Correo -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">email</mat-icon>
                     Correo
                 </label>
                 <input formControlName="email" type="email" placeholder="ejemplo@correo.com"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
             </div>
 
             <!-- Dirección -->
             <div class="flex flex-col md:col-span-2">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">home</mat-icon>
                     Dirección
                 </label>
                 <input formControlName="direccion" type="text" placeholder="Av. Principal 123"
-                    class="w-full px-4 py-3 bg-secondary border border-light rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-primary placeholder:text-muted">
+                    class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-gray-800 dark:text-gray-200 placeholder:text-gray-400 dark:placeholder:text-gray-600">
             </div>
 
             <!-- Tipo Documento -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center justify-between">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center justify-between">
                     <span class="flex items-center">
                         <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">description</mat-icon>
                         Tipo Documento
@@ -152,22 +152,22 @@
                     </button>
                 </label>
                 <select formControlName="tipoDocumentoId" 
-                        class="w-full px-4 py-3 bg-secondary border border-light rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-primary">
-                    <option *ngFor="let td of data.tiposDoc" [ngValue]="td.id" class="text-primary">{{ td.nombreTD }}</option>
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-200">
+                    <option *ngFor="let td of data.tiposDoc" [ngValue]="td.id" class="text-gray-800 dark:text-gray-200">{{ td.nombreTD }}</option>
                 </select>
             </div>
 
             <!-- Estado -->
             <div class="flex flex-col">
-                <label class="text-xs font-bold text-secondary uppercase mb-1.5 flex items-center">
+                <label class="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase mb-1.5 flex items-center">
                     <mat-icon class="mr-1.5 text-blue-600 dark:text-blue-400" style="font-size: 16px; width: 16px; height: 16px;">toggle_on</mat-icon>
                     Estado
                 </label>
                 <select formControlName="estado" 
-                        class="w-full px-4 py-3 bg-secondary border border-light rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-primary">
-                    <option value="ACTIVO" class="text-green-600 dark:text-green-400">✅ ACTIVO</option>
-                    <option value="NUEVO" class="text-yellow-600 dark:text-yellow-400">🆕 NUEVO</option>
-                    <option value="INACTIVO" class="text-red-600 dark:text-red-400">❌ INACTIVO</option>
+                        class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-gray-800 dark:text-gray-200">
+                    <option value="ACTIVO" class="text-green-600 dark:text-green-400">ACTIVO</option>
+                    <option value="NUEVO" class="text-yellow-600 dark:text-yellow-400">NUEVO</option>
+                    <option value="INACTIVO" class="text-red-600 dark:text-red-400">INACTIVO</option>
                 </select>
             </div>
         </div>
@@ -175,7 +175,7 @@
         <!-- Botones de acción -->
         <div class="mt-8 flex gap-3">
             <button type="button" (click)="cerrar()" 
-                    class="flex-1 px-4 py-3 border-2 border-light text-secondary hover:bg-secondary rounded-xl font-bold transition-all flex items-center justify-center gap-2">
+                    class="flex-1 px-4 py-3 border-2 border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-xl font-bold transition-all flex items-center justify-center gap-2">
                 <mat-icon>cancel</mat-icon> 
                 Cancelar
             </button>
