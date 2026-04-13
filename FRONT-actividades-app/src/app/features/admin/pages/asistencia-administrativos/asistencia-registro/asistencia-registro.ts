@@ -1,6 +1,6 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'; // Añadido ReactiveFormsModule
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, forkJoin, map, startWith } from 'rxjs';
 import { AsistenciaAdministrativoService } from '../../../../../core/services/asistencia-administrativos';
 import { CronogramaAdministrativoService } from '../../../../../core/services/cronograma-administrativo';
@@ -11,7 +11,7 @@ import { AdministrativoService } from '../../../../../core/services/administrati
 @Component({
   selector: 'app-asistencia-registro',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIcon], // Añadido ReactiveFormsModule
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MatIcon],
   templateUrl: './asistencia-registro.html'
 })
 export class AsistenciaRegistro implements OnInit {
@@ -26,7 +26,11 @@ export class AsistenciaRegistro implements OnInit {
   administrativos: any[] = [];
   asistenciasView: any[] = [];
   cargando = false;
-  mostrarResultados = false; // Control para la visibilidad del dropdown
+  mostrarResultados = false;
+  
+  // Propiedades para el dropdown flotante
+  showDropdown = false;
+  dropdownPosition = { top: 0, left: 0, width: 0, maxHeight: 300 };
 
   public TipoAsistencia = TipoAsistencia;
   listaTipos = Object.values(TipoAsistencia);
@@ -48,10 +52,55 @@ export class AsistenciaRegistro implements OnInit {
     this.setupBuscador();
   }
 
+  // Calcular posición del dropdown
+  onInputFocus() {
+    setTimeout(() => {
+      const inputElement = document.querySelector('.search-input') as HTMLElement;
+      if (inputElement) {
+        const rect = inputElement.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const spaceBelow = viewportHeight - rect.bottom;
+        const dropdownHeight = 300;
+        
+        this.dropdownPosition = {
+          top: rect.bottom + window.scrollY + 5,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+          maxHeight: spaceBelow > dropdownHeight ? dropdownHeight : spaceBelow - 20
+        };
+        this.showDropdown = true;
+      }
+    }, 100);
+  }
+
+  // Cerrar dropdown al hacer click fuera
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    if (!target.closest('.search-container')) {
+      this.showDropdown = false;
+    }
+  }
+
+  // Cerrar dropdown al hacer scroll
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    if (this.showDropdown) {
+      this.onInputFocus();
+    }
+  }
+
+  // Cerrar dropdown al redimensionar
+  @HostListener('window:resize', [])
+  onWindowResize() {
+    if (this.showDropdown) {
+      this.onInputFocus();
+    }
+  }
+
   cargarAdministrativos() {
     this.adminService.listar().subscribe(res => {
       this.administrativos = res;
-      // Forzar una primera actualización del filtro al cargar los datos
       this.adminControl.updateValueAndValidity();
     });
   }
@@ -61,14 +110,17 @@ export class AsistenciaRegistro implements OnInit {
       startWith(''),
       debounceTime(300),
       map(value => {
-        // Si el valor es un string y no el nombre completo del seleccionado, filtramos
         const nombre = typeof value === 'string' ? value : '';
         return this._filtrar(nombre);
       })
     ).subscribe(filtrados => {
       this.administrativosFiltrados = filtrados;
-      this.mostrarResultados = true;
       this.cdr.detectChanges();
+      
+      // Actualizar posición del dropdown si está visible
+      if (this.showDropdown && this.adminControl.value) {
+        this.onInputFocus();
+      }
     });
   }
 
@@ -82,22 +134,17 @@ export class AsistenciaRegistro implements OnInit {
 
   seleccionarAdmin(admin: any) {
     this.adminIdSeleccionado = admin.id;
-    this.mostrarResultados = false; // Cerramos la lista al seleccionar
-    
-    // Seteamos el valor sin disparar de nuevo el buscador infinito
+    this.showDropdown = false;
     this.adminControl.setValue(`${admin.nombres} ${admin.apellidos}`, { emitEvent: false });
-    
     this.cargarDatosMensuales();
   }
 
-  // Limpiar buscador
   limpiarSeleccion() {
     this.adminIdSeleccionado = null;
     this.adminControl.setValue('');
+    this.showDropdown = false;
     this.asistenciasView = [];
   }
-
-  // --- Lógica de Negocio (Asistencia) ---
 
   marcarEditado(f: any) {
     f.editado = true;

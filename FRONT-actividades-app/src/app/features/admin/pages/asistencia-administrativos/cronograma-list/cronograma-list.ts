@@ -105,4 +105,17 @@ export class CronogramaList implements OnInit {
       });
     }
   }
+  // Agrega este método a tu componente
+getDiaAbreviado(dia: string): string {
+  const dias: { [key: string]: string } = {
+    'LUNES': 'L',
+    'MARTES': 'M',
+    'MIERCOLES': 'M',
+    'JUEVES': 'J',
+    'VIERNES': 'V',
+    'SABADO': 'S',
+    'DOMINGO': 'D'
+  };
+  return dias[dia] || dia.substring(0, 1);
+}
 }
