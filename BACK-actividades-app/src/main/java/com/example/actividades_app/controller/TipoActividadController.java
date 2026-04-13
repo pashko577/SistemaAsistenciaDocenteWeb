@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.enums.TipoPlanilla;
 import com.example.actividades_app.model.dto.Contrato.TipoActividadRequestDTO;
 import com.example.actividades_app.model.dto.Contrato.TipoActividadResponseDTO;
@@ -30,18 +31,18 @@ public class TipoActividadController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<TipoActividadResponseDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(tipoActividadService.buscarPorId(id));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<TipoActividadResponseDTO>> listar() {
         return ResponseEntity.ok(tipoActividadService.listar());
     }
     @GetMapping("/planilla/{planilla}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<TipoActividadResponseDTO>> listarPorPlanilla(@PathVariable TipoPlanilla planilla) {
         return ResponseEntity.ok(tipoActividadService.listarPorPlanilla(planilla));
     }

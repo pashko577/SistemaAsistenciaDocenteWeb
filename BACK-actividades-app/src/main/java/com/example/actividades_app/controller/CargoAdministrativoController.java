@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.Adminitrativo.CargoAdministrativoRequestDTO;
 import com.example.actividades_app.model.dto.Adminitrativo.CargoAdministrativoResponseDTO;
 import com.example.actividades_app.service.CargoAdministrativoService;
@@ -24,7 +25,7 @@ public class CargoAdministrativoController {
 
     // 1. LISTAR TODOS
     @GetMapping
-   @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<CargoAdministrativoResponseDTO>> listarCargos() {
         return ResponseEntity.ok(cargoAdministrativoService.listarTodosCargos());
     }
@@ -40,7 +41,7 @@ public class CargoAdministrativoController {
 
     // 3. ACTUALIZAR POR ID
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+   @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CargoAdministrativoResponseDTO> actualizarCargo(
             @PathVariable("id") Long id,
             @RequestBody CargoAdministrativoRequestDTO dto) {

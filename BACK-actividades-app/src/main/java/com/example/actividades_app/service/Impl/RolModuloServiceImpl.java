@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.example.actividades_app.model.Entity.Modulo;
 import com.example.actividades_app.model.Entity.Rol;
 import com.example.actividades_app.model.Entity.RolModulo;
+import com.example.actividades_app.model.dto.Permisos.ModuloResponseDTO;
 import com.example.actividades_app.model.dto.Permisos.RolModuloRequestDTO;
 import com.example.actividades_app.model.dto.Permisos.RolModuloResponseDTO;
 import com.example.actividades_app.repository.ModuloRepository;
@@ -48,14 +49,30 @@ public class RolModuloServiceImpl implements RolModuloService {
         return mapToResponse(rolModulo);
     }
 
-    @Override
-    public List<RolModuloResponseDTO> listarPorRol(Long rolId) {
+  @Override
+public List<RolModuloResponseDTO> listarPorRol(Long rolId) {
+    // 1. Buscamos el rol actual para verificar su nombre
+    Rol rolActual = rolRepository.findById(rolId)
+            .orElseThrow(() -> new RuntimeException("Rol no encontrado"));
 
-        return rolModuloRepository.findByRolId(rolId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    List<Long> idsABuscar = new java.util.ArrayList<>();
+    idsABuscar.add(rolId);
+
+    // 2. Si es ADMIN, agregamos los IDs de los roles subordinados
+    if ("ADMIN".equals(rolActual.getNombreRol()) || "ROLE_ADMIN".equals(rolActual.getNombreRol())) {
+        // Buscamos los otros roles por nombre y añadimos sus IDs
+        rolRepository.findAll().stream()
+            .filter(r -> r.getNombreRol().contains("ADMINISTRATIVO") || r.getNombreRol().contains("DOCENTE"))
+            .forEach(r -> idsABuscar.add(r.getId()));
     }
+
+    // 3. Consultamos el repositorio con la lista completa de IDs
+    return rolModuloRepository.findByRolIdIn(idsABuscar)
+            .stream()
+            .distinct() // Evitamos duplicados si un módulo está asignado a varios roles
+            .map(this::mapToResponse)
+            .toList();
+}
 
         @Override
     @Transactional // Requerido para operaciones de borrado
@@ -68,16 +85,20 @@ public class RolModuloServiceImpl implements RolModuloService {
         rolModuloRepository.deleteByRolIdAndModuloId(rolId, moduloId);
     }
     
-    private RolModuloResponseDTO mapToResponse(RolModulo rm) {
-
-        return RolModuloResponseDTO.builder()
-                .id(rm.getId())
-                .rolId(rm.getRol().getId())
-                .rolNombre(rm.getRol().getNombreRol())
-                .moduloId(rm.getModulo().getId())
-                .moduloNombre(rm.getModulo().getNombre())
-                .build();
-    }
+   private RolModuloResponseDTO mapToResponse(RolModulo rm) {
+    return RolModuloResponseDTO.builder()
+            .id(rm.getId())
+            .rolId(rm.getRol().getId())
+            .rolNombre(rm.getRol().getNombreRol())
+            .modulo(ModuloResponseDTO.builder()
+                    .id(rm.getModulo().getId())
+                    .nombre(rm.getModulo().getNombre())
+                    .ruta(rm.getModulo().getRuta())
+                    .descripcion(rm.getModulo().getDescripcion())
+                    .icono(rm.getModulo().getIcono()) // Asegúrate de que este campo exista en tu entidad Modulo
+                    .build())
+            .build();
+}
 
 
 }

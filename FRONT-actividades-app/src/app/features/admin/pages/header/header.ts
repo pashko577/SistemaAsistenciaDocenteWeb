@@ -1,10 +1,11 @@
 // header.ts
-import { RouterModule } from '@angular/router';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { Token } from '../../../../core/services/token';
 import { Auth } from '../../../../core/services/auth';
 import { ThemeService } from '../../../../core/services/theme_service';
+import { ALL_MODULES, NavModule } from './nav-config'; 
 
 @Component({
   selector: 'app-header',
@@ -14,34 +15,75 @@ import { ThemeService } from '../../../../core/services/theme_service';
   styleUrl: './header.css',
 })
 export class Header implements OnInit {
-  username: string | null = '';
-  roles: string[] = [];
+  username = signal<string | null>('');
+  roles = signal<string[]>([]);
   isMenuOpen = false;
   
-  // NO inicializar aquí - solo declarar el tipo
-  currentTheme: any; 
+  // 1. Signal para la búsqueda
+  searchQuery = signal<string>('');
+
+  private allowedPaths = signal<string[]>([]);
+
+  // 2. Módulos filtrados por ROL, PERMISOS y ahora también por BÚSQUEDA
+  readonly filteredModules = computed(() => {
+    const paths = this.allowedPaths();
+    const userRoles = this.roles();
+    const query = this.searchQuery().toLowerCase();
+
+    // Primero obtenemos la base según permisos
+    let baseModules = userRoles.includes('ADMIN') 
+      ? ALL_MODULES 
+      : ALL_MODULES.filter(m => paths.includes(m.path));
+
+    if (paths.length === 0 && !userRoles.includes('ADMIN')) {
+      baseModules = ALL_MODULES.filter(m => m.path === '/dashboard');
+    }
+
+    // Luego aplicamos el filtro de búsqueda si hay texto
+    if (!query) return baseModules;
+    return baseModules.filter(m => 
+      m.label.toLowerCase().includes(query) || 
+      m.section.toLowerCase().includes(query)
+    );
+  });
+
+  readonly sections = computed(() => {
+    return [...new Set(this.filteredModules().map(m => m.section))];
+  });
+
+  // 3. Función para actualizar la búsqueda desde el HTML
+  onSearch(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(value);
+  }
 
   constructor(
     private tokenService: Token,
     private authService: Auth,
-    public themeService: ThemeService // ✅ Se inyecta correctamente
-  ) {
-    this.username = this.tokenService.getUser();
-    this.roles = this.tokenService.getRoles();
-  }
+    public themeService: ThemeService
+  ) {}
 
   ngOnInit(): void {
-    // ✅ Inicializar después de que el servicio esté disponible
-    this.currentTheme = this.themeService.currentTheme;
-    console.log('🎯 Tema actual en Header:', this.currentTheme());
+    this.username.set(this.tokenService.getUser());
+    this.roles.set(this.tokenService.getRoles());
+
+    // 4. Cargamos las rutas desde el localStorage
+    const savedRoutes = localStorage.getItem('rutas_permitidas');
+    if (savedRoutes) {
+      try {
+        const parsed = JSON.parse(savedRoutes);
+        this.allowedPaths.set(parsed);
+      } catch (e) {
+        console.error("Error al parsear rutas_permitidas", e);
+      }
+    }
   }
 
-  toggleTheme(): void {
-    console.log('🖱️ Toggle theme clickeado');
-    this.themeService.toggleTheme();
+  // Ahora filtramos sobre la lista ya validada
+  getModulesBySection(section: string): NavModule[] {
+    return this.filteredModules().filter(m => m.section === section);
   }
 
-  logout(): void {
-    this.authService.logout();
-  }
+  toggleTheme = () => this.themeService.toggleTheme();
+  logout = () => this.authService.logout();
 }

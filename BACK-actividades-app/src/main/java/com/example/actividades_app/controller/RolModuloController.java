@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class RolModuloController {
     private final RolModuloService rolModuloService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RolModuloResponseDTO> asignarModulo(
             @Valid @RequestBody RolModuloRequestDTO dto) {
 
@@ -36,6 +38,7 @@ public class RolModuloController {
     }
 
     @GetMapping("/rol/{rolId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<RolModuloResponseDTO>> listarPorRol(
             @PathVariable Long rolId) {
 
@@ -43,6 +46,7 @@ public class RolModuloController {
     }
 
     @DeleteMapping("/rol/{rolId}/modulo/{moduloId}")
+    @PreAuthorize("hasRole('ADMIN')")
 public ResponseEntity<Void> desasignarModulo(
         @PathVariable Long rolId, 
         @PathVariable Long moduloId) {

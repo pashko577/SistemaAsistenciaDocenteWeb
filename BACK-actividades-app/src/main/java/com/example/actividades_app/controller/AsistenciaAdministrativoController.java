@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.Adminitrativo.AsistenciaAdministrativoRequestDTO;
 import com.example.actividades_app.model.dto.Adminitrativo.AsistenciaAdministrativoResponseDTO;
 import com.example.actividades_app.service.AsistenciaAdministrativoService;
@@ -24,6 +25,7 @@ public class AsistenciaAdministrativoController {
     // REGISTRAR ASISTENCIA
     // =========================
     @PostMapping
+    @IsStaff
     public ResponseEntity<AsistenciaAdministrativoResponseDTO> registrar(
             @RequestBody AsistenciaAdministrativoRequestDTO dto) {
 
@@ -34,6 +36,7 @@ public class AsistenciaAdministrativoController {
     // ACTUALIZAR
     // =========================
     @PutMapping("/{id}")
+    @IsStaff
     public ResponseEntity<AsistenciaAdministrativoResponseDTO> actualizar(
             @PathVariable Long id,
             @RequestBody AsistenciaAdministrativoRequestDTO dto) {
@@ -45,6 +48,7 @@ public class AsistenciaAdministrativoController {
     // ELIMINAR
     // =========================
     @DeleteMapping("/{id}")
+    @IsStaff
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 
         asistenciaService.eliminar(id);
@@ -55,6 +59,7 @@ public class AsistenciaAdministrativoController {
     // BUSCAR POR ID
     // =========================
     @GetMapping("/{id}")
+    @IsStaff
     public ResponseEntity<AsistenciaAdministrativoResponseDTO> buscarPorId(
             @PathVariable Long id) {
 
@@ -65,6 +70,7 @@ public class AsistenciaAdministrativoController {
     // LISTAR POR ADMINISTRATIVO
     // =========================
     @GetMapping("/administrativo/{administrativoId}")
+    @IsStaff
     public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorAdministrativo(
             @PathVariable Long administrativoId) {
 
@@ -75,6 +81,7 @@ public class AsistenciaAdministrativoController {
     // Agrega esto a AsistenciaAdministrativoController.java
 
     @GetMapping("/fecha/{fecha}")
+    @IsStaff
     public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorFecha(
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
         // Nota: Necesitas agregar este método a tu Service y Repository de Java
@@ -85,6 +92,7 @@ public class AsistenciaAdministrativoController {
     // LISTAR POR PERIODO
     // =========================
     @GetMapping("/periodo/{administrativoId}")
+    @IsStaff
     public ResponseEntity<List<AsistenciaAdministrativoResponseDTO>> listarPorPeriodo(
             @PathVariable Long administrativoId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inicio,

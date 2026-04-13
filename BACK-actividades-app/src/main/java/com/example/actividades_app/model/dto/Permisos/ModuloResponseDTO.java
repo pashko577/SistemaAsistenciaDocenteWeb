@@ -10,4 +10,5 @@ public class ModuloResponseDTO {
     private String nombre;
     private String descripcion;
     private String ruta;
+    private String icono; // <-- Esencial para el Sidebar de Angular
 }

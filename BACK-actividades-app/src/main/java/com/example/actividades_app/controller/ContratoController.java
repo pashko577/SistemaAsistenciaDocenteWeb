@@ -3,10 +3,12 @@ package com.example.actividades_app.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.Contrato.ContratoRequestDTO;
 import com.example.actividades_app.model.dto.Contrato.ContratoResponseDTO;
 import com.example.actividades_app.service.ContratoService;
@@ -22,6 +24,7 @@ public class ContratoController {
     // CREAR CONTRATO
     // =========================
     @PostMapping
+   @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContratoResponseDTO> crear(
             @RequestBody ContratoRequestDTO dto) {
                 
@@ -32,6 +35,7 @@ public class ContratoController {
     // ACTUALIZAR CONTRATO
     // =========================
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ContratoResponseDTO> actualizar(
             @PathVariable Long id,
             @RequestBody ContratoRequestDTO dto) {
@@ -43,6 +47,7 @@ public class ContratoController {
     // ELIMINAR CONTRATO
     // =========================
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 
         contratoService.eliminar(id);
@@ -53,6 +58,7 @@ public class ContratoController {
     // BUSCAR POR ID
     // =========================
     @GetMapping("/{id}")
+    @IsStaff
     public ResponseEntity<ContratoResponseDTO> buscarPorId(
             @PathVariable Long id) {
 
@@ -63,6 +69,7 @@ public class ContratoController {
     // LISTAR CONTRATOS
     // =========================
     @GetMapping
+    @IsStaff
     public ResponseEntity<List<ContratoResponseDTO>> listar() {
 
         return ResponseEntity.ok(contratoService.listar());
@@ -72,6 +79,7 @@ public class ContratoController {
     // BUSCAR POR USUARIO
     // =========================
     @GetMapping("/usuario/{usuarioId}")
+    @IsStaff
     public ResponseEntity<ContratoResponseDTO> buscarPorUsuario(
             @PathVariable Long usuarioId) {
 

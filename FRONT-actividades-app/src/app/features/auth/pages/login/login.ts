@@ -37,34 +37,40 @@ export class Login {
     });
   }
 
-  login() {
-    if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-      return;
-    }
+// features/auth/pages/login/login.ts
 
-    this.loading = true;
-    this.backendError.set(null);
+// features/auth/pages/login/login.ts
 
-    this.authService.login(this.loginForm.value)
+login() {
+  if (this.loginForm.invalid) {
+    this.loginForm.markAllAsTouched();
+    return;
+  }
+
+  this.loading = true;
+  this.backendError.set(null);
+
+  this.authService.login(this.loginForm.value)
     .subscribe({
       next: (res) => {
         this.TokenService.saveToken(res.token);
         this.TokenService.saveRoles(res.roles);
         this.TokenService.saveUser(res.dni);
+        
+        // ✅ CORRECCIÓN: Usar 'rutas_permitidas' que es lo que envía el Backend
+        if (res.rutas_permitidas) {
+          // Extraemos solo los strings de las rutas (ej: ["/dashboard", "/gestion-docente"])
+          const rutas = res.rutas_permitidas.map((m: any) => m.ruta);
+          localStorage.setItem('rutas_permitidas', JSON.stringify(rutas));
+          console.log('Rutas guardadas:', rutas); // Para que verifiques en consola
+        }
+
         this.loading = false;
 
-        if (res.roles.includes('ADMIN')) {
-          this.router.navigate(['/admin']);
-          console.log('Login ADMIN exitoso');
-        } else if (res.roles.includes('DOCENTE')) {
-          this.router.navigate(['/user/docente']);
-          console.log('Login DOCENTE exitoso');
-        } else if (res.roles.includes('ADMINISTRATIVO')) {
-          this.router.navigate(['/user/administrativo']);
-          console.log('Login ADMINISTRATIVO exitoso');
-        }
-         else {
+        if (res.roles && res.roles.length > 0) {
+          console.log('Login exitoso. Redirigiendo a Dashboard Global');
+          this.router.navigate(['/dashboard']);
+        } else {
           this.router.navigate(['/login']);
         }
       },
@@ -73,5 +79,5 @@ export class Login {
         this.backendError.set('DNI o contraseña incorrectos');
       },
     });
-  }
+}
 }

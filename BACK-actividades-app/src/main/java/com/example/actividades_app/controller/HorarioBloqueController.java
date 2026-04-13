@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.ModuloHorario.HorarioBloqueRequestDTO;
 import com.example.actividades_app.model.dto.ModuloHorario.HorarioBloqueResponseDTO;
 import com.example.actividades_app.service.HorarioBloqueService;
@@ -28,23 +30,28 @@ public class HorarioBloqueController {
     private final HorarioBloqueService horarioService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<HorarioBloqueResponseDTO> crear(
-            @Valid @RequestBody   HorarioBloqueRequestDTO dto) {
+            @Valid @RequestBody HorarioBloqueRequestDTO dto) {
         HorarioBloqueResponseDTO response = horarioService.crear(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
+    @IsStaff
     public ResponseEntity<List<HorarioBloqueResponseDTO>> listar() {
         return ResponseEntity.ok(horarioService.listar());
     }
 
     @GetMapping("/{id}")
+    @IsStaff
     public ResponseEntity<HorarioBloqueResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(horarioService.obtenerPorId(id));
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<HorarioBloqueResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody HorarioBloqueRequestDTO dto) {
@@ -52,6 +59,9 @@ public class HorarioBloqueController {
     }
 
     @DeleteMapping("/{id}")
+
+    @PreAuthorize("hasRole('ADMIN')")
+
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         horarioService.eliminar(id);
         return ResponseEntity.noContent().build();

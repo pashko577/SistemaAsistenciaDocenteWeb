@@ -16,13 +16,16 @@ import org.springframework.stereotype.Service;
 import com.example.actividades_app.config.JwtUtils;
 import com.example.actividades_app.model.Entity.Persona;
 import com.example.actividades_app.model.Entity.Rol;
+import com.example.actividades_app.model.Entity.RolModulo;
 import com.example.actividades_app.model.Entity.Sede;
 import com.example.actividades_app.model.Entity.TipoDocumento;
 import com.example.actividades_app.model.Entity.Usuario;
 import com.example.actividades_app.model.dto.ModuloUsuario.AuthResponseDTO;
 import com.example.actividades_app.model.dto.ModuloUsuario.LoginRequestDTO;
 import com.example.actividades_app.model.dto.ModuloUsuario.RegisterRequestDTO;
+import com.example.actividades_app.model.dto.Permisos.ModuloRequestDTO;
 import com.example.actividades_app.repository.PersonaRepository;
+import com.example.actividades_app.repository.RolModuloRepository;
 import com.example.actividades_app.repository.RolRepository;
 import com.example.actividades_app.repository.SedeRepository;
 import com.example.actividades_app.repository.TipoDocumentoRepository;
@@ -44,7 +47,7 @@ public class AuthServiceImpl implements AuthService {
         private final PersonaRepository personaRepository;
         private final SedeRepository sedeRepository;
         private final TipoDocumentoRepository tipoDocumentoRepository;
-
+        private final RolModuloRepository rolModuloRepository;
         @Override
         @Transactional
         public void register(RegisterRequestDTO request) {
@@ -94,29 +97,54 @@ public class AuthServiceImpl implements AuthService {
                 usuarioRepository.save(usuario);
         }
 
-        @Override
-        public AuthResponseDTO login(LoginRequestDTO request) {
-                // 1. Autenticar
-                Authentication authentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(request.getDni(), request.getPassword()));
+// Archivo: AuthServiceImpl.java (Método login)
 
-                // 2. Extraer datos
-                User user = (User) authentication.getPrincipal();
-                String dni = user.getUsername();
-                List<String> roles = user.getAuthorities().stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .map(role -> role.replace("ROLE_", "")) // Limpiamos el prefijo para el token/front
-                                .toList();
+@Override
+public AuthResponseDTO login(LoginRequestDTO request) {
+    // 1. Autenticación (Permanece igual)
+    Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getDni(), request.getPassword()));
+    
+    User userDetails = (User) authentication.getPrincipal();
+    String dni = userDetails.getUsername();
+    Usuario usuario = usuarioRepository.findByPersonaDni(dni)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-                // 3. Generar Token
-                String token = jwtUtils.generateAccessToken(dni, roles);
+    // 2. OBTENER IDS DE ROLES ASIGNADOS AL USUARIO
+    // Extraemos solo los IDs de los roles que el usuario tiene en la DB.
+    List<Long> rolesIds = usuario.getRoles().stream()
+            .map(Rol::getId)
+            .collect(Collectors.toList());
 
-                return AuthResponseDTO.builder()
-                                .token(token)
-                                .dni(dni)
-                                .roles(roles)
-                                .message("Login exitoso")
-                                .build();
-        }
+    // 3. OBTENER MÓDULOS DESDE LA TABLA DE ASIGNACIÓN (rol_modulo)
+    // Aquí es donde se respeta tu pantalla de "Gestión de Accesos".
+    List<ModuloRequestDTO> rutasPermitidas = rolModuloRepository.findByRolIdIn(rolesIds).stream()
+        .map(RolModulo::getModulo)
+        .distinct() // Evita duplicados si el usuario tiene múltiples roles con el mismo módulo
+        .map(m -> {
+            ModuloRequestDTO dto = new ModuloRequestDTO();
+            dto.setNombre(m.getNombre());
+            dto.setRuta(m.getRuta());
+            dto.setDescripcion(m.getDescripcion());
+            dto.setIcono(m.getIcono());
+            return dto;
+        })
+        .collect(Collectors.toList());
+
+    // 4. Generar nombres de roles y Token
+    List<String> rolesNames = usuario.getRoles().stream()
+            .map(Rol::getNombreRol)
+            .toList();
+            
+    String token = jwtUtils.generateAccessToken(dni, rolesNames);
+
+    return AuthResponseDTO.builder()
+            .token(token)
+            .dni(dni)
+            .roles(rolesNames)
+            .rutas_permitidas(rutasPermitidas) 
+            .message("Login exitoso")
+            .build();
+}
 
 }

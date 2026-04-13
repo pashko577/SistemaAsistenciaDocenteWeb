@@ -3,6 +3,7 @@ package com.example.actividades_app.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.Entity.TipoDocumento;
 import com.example.actividades_app.model.dto.ModuloUsuario.TipoDocumentoRequestDTO;
 import com.example.actividades_app.model.dto.ModuloUsuario.TipoDocumentoResponseDTO;
@@ -39,13 +40,13 @@ public class TipoDocumentoController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<TipoDocumentoResponseDTO>> listar() {
         return ResponseEntity.ok(tipoDocumentoService.listarTodas());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<TipoDocumentoResponseDTO> obtenerPorId(@PathVariable Long id) {
         return ResponseEntity.ok(tipoDocumentoService.obtenerPorId(id));
     }

@@ -18,44 +18,42 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initDatabase() {
         return args -> {
-            // Definimos la lista exacta de tu sidebar de Angular
+            // Rutas Globales: Sin prefijos /admin o /user. 
+            // Esto permite que cualquier rol con permiso acceda a la misma URL.
             List<Modulo> modulosConfig = List.of(
-                // SECCIÓN: Principal
-                crearModulo("Dashboard", "Panel principal de control", "/admin/dashboard"),
+                crearModulo("Dashboard", "Panel principal", "/dashboard"),
+                
+                // Gestión (Acceso según rol)
+                crearModulo("Gestión Docente", "Mantenimiento de profesores", "/gestion-docente"),
+                crearModulo("Gestión Administrativo", "Mantenimiento de personal", "/gestion-administrativo"),
+                crearModulo("Gestión de Contratos", "Control de contratos", "/gestion-contratos"),
 
-                // SECCIÓN: Administración
-                crearModulo("Gestión Docente", "Mantenimiento de profesores", "/admin/gestionDocente"),
-                crearModulo("Gestión Administrativo", "Mantenimiento de personal administrativo", "/admin/gestionAdministrativo"),
-                crearModulo("Gestión de Contratos", "Visualización y control de contratos", "/admin/gestionContrato"),
+                // Asistencias
+                crearModulo("Asistencia Docente", "Registro para profesores", "/asistencia-docente"),
+                crearModulo("Asistencia Administrativo", "Registro para administrativos", "/asistencia-administrativo"),
 
-                // SECCIÓN: Asistencias
-                crearModulo("Asistencia Docente", "Registro de asistencia de profesores", "/admin/asistencia/docente"),
-                crearModulo("Asistencia Administrativo", "Registro de asistencia administrativa", "/admin/asistencia-administrativo"),
+                // Reportes y Tesorería
+                crearModulo("Reporte Administrativo", "Generación de reportes", "/reporte-administrativo"),
+                crearModulo("Generar Pagos", "Módulo de pagos", "/pagos"),
 
-                // SECCIÓN: Reportes y Pagos
-                crearModulo("Reporte Administrativo", "Generación de reportes del sistema", "/admin/reporte-administrativo"),
-                crearModulo("Generar Pagos", "Módulo de tesorería y pagos", "/admin/pagos"),
-
-                // SECCIÓN: Configuración
-                crearModulo("Gestión de Permisos", "Administración de accesos por rol", "/admin/permisos"),
-                crearModulo("Mi Perfil", "Configuración de perfil de usuario", "/admin/perfil"),
-                crearModulo("Configuración", "Ajustes generales del sistema", "/admin/configuracion"),
-                crearModulo("Notificaciones", "Centro de alertas y mensajes", "/admin/notificaciones")
+                // Configuración y Perfil
+                crearModulo("Gestión de Permisos", "Administración de roles", "/permisos"),
+                crearModulo("Mi Perfil", "Ajustes de usuario", "/perfil"),
+                crearModulo("Configuración", "Ajustes del sistema", "/configuracion"),
+                crearModulo("Notificaciones", "Alertas", "/notificaciones")
             );
 
             for (Modulo m : modulosConfig) {
                 moduloRepository.findByNombre(m.getNombre())
                     .ifPresentOrElse(
                         existente -> {
-                            // Si el nombre ya existe, verificamos si la ruta cambió para actualizarla
                             if (!existente.getRuta().equals(m.getRuta())) {
                                 existente.setRuta(m.getRuta());
                                 moduloRepository.save(existente);
-                                System.out.println("Ruta actualizada para: " + m.getNombre());
+                                System.out.println("Ruta actualizada: " + m.getNombre());
                             }
                         },
                         () -> {
-                            // Si no existe el nombre, creamos el registro nuevo
                             moduloRepository.save(m);
                             System.out.println("Módulo creado: " + m.getNombre());
                         }

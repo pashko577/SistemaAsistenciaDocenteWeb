@@ -1,5 +1,6 @@
 package com.example.actividades_app.controller;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.dto.Pago.PagoRequestDTO;
 import com.example.actividades_app.model.dto.Pago.PagoResponseDTO;
 import com.example.actividades_app.model.dto.Reporte.ResumenGeneralResponseDTO;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -27,6 +29,7 @@ public class PagoController {
     // CREAR
     // =========================
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PagoResponseDTO> crear(
             @Valid @RequestBody PagoRequestDTO dto) {
 
@@ -39,6 +42,7 @@ public class PagoController {
     // ACTUALIZAR
     // =========================
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PagoResponseDTO> actualizar(
             @PathVariable Long id,
             @Valid @RequestBody PagoRequestDTO dto) {
@@ -51,6 +55,7 @@ public class PagoController {
     // ELIMINAR
     // =========================
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
 
         pagoService.eliminar(id);
@@ -61,6 +66,7 @@ public class PagoController {
     // BUSCAR POR ID
     // =========================
     @GetMapping("/{id}")
+    @IsStaff
     public ResponseEntity<PagoResponseDTO> buscarPorId(
             @PathVariable Long id) {
 
@@ -72,6 +78,7 @@ public class PagoController {
     // LISTAR POR USUARIO
     // =========================
     @GetMapping("/usuario/{usuarioId}")
+    @IsStaff
     public ResponseEntity<List<PagoResponseDTO>> listarPorUsuario(
             @PathVariable Long usuarioId) {
 
@@ -83,6 +90,7 @@ public class PagoController {
     // LISTAR POR FECHA
     // =========================
     @GetMapping("/fecha")
+    @IsStaff
     public ResponseEntity<List<PagoResponseDTO>> listarPorFecha(
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -96,6 +104,7 @@ public class PagoController {
     // LISTAR POR RANGO
     // =========================
     @GetMapping("/rango")
+    @IsStaff
     public ResponseEntity<List<PagoResponseDTO>> listarPorRangoFechas(
             @RequestParam
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -117,6 +126,7 @@ public class PagoController {
     // USUARIO + RANGO
     // =========================
     @GetMapping("/usuario/{usuarioId}/rango")
+    @IsStaff
     public ResponseEntity<List<PagoResponseDTO>> listarPorUsuarioYRango(
             @PathVariable Long usuarioId,
 
@@ -137,6 +147,7 @@ public class PagoController {
     // ÚLTIMO PAGO
     // =========================
     @GetMapping("/usuario/{usuarioId}/ultimo")
+    @IsStaff
     public ResponseEntity<PagoResponseDTO> obtenerUltimoPago(
             @PathVariable Long usuarioId) {
 
@@ -148,6 +159,7 @@ public class PagoController {
     // RESUMEN (BOLETA)
     // =========================
     @GetMapping("/{pagoId}/resumen")
+    @IsStaff
     public ResponseEntity<ResumenGeneralResponseDTO> obtenerResumenPago(
             @PathVariable Long pagoId) {
 

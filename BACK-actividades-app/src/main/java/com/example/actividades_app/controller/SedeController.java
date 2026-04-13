@@ -3,6 +3,7 @@ package com.example.actividades_app.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.actividades_app.config.IsStaff;
 import com.example.actividades_app.model.Entity.Sede;
 import com.example.actividades_app.model.dto.ModuloUsuario.SedeRequestDTO;
 import com.example.actividades_app.service.SedeService;
@@ -37,7 +38,7 @@ public class SedeController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @IsStaff
     public ResponseEntity<List<Sede>> listarSedes() {
         return ResponseEntity.ok(sedeService.listarTodas());
     }

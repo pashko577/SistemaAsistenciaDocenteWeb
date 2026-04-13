@@ -12,6 +12,5 @@ public class RolModuloResponseDTO {
     private Long rolId;
     private String rolNombre;
 
-    private Long moduloId;
-    private String moduloNombre;
+   private ModuloResponseDTO modulo;
 }
