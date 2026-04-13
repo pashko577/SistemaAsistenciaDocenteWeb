@@ -1,165 +1,128 @@
-<!-- gestion-administrativo.component.html -->
-<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-  <div>
-    <h1 class="text-3xl font-extrabold text-primary tracking-tight">Gestión de Administrativos</h1>
-    <p class="text-muted text-sm mt-1">Administra el personal administrativo</p>
-  </div>
-
-  <!-- Botón Registrar -->
-  <button (click)="abrirModal()"
-    class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg flex items-center transition-all transform hover:scale-105">
-    <mat-icon class="mr-2">person_add</mat-icon>
-    Registrar Nuevo Administrativo
-  </button>
-</div>
-
-<!-- Componente de búsqueda -->
-<app-search-administrativo 
-  [sedes]="sedes" 
-  [cargos]="cargos" 
-  (onFilter)="manejarFiltros($event)">
-</app-search-administrativo>
-
-<!-- Contador de resultados -->
-<div class="bg-blue-100 dark:bg-blue-900/30 p-4 rounded-lg mb-4">
-  <p class="font-bold text-blue-800 dark:text-blue-300">
-    Resultados encontrados: {{ listaFiltrada.length }}
-  </p>
-</div>
-
-<!-- Grid de Cards -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mt-6">
-  <div *ngFor="let admin of listaFiltrada"
-    class="group relative card rounded-xl shadow-md hover:shadow-xl border border-light transition-all duration-300 overflow-hidden hover:-translate-y-1">
-
-    <!-- Barra de estado superior -->
-    <div class="absolute top-0 left-0 right-0 h-1" [ngClass]="{
-      'bg-green-500': admin.estado === 'ACTIVO',
-      'bg-yellow-500': admin.estado === 'NUEVO',
-      'bg-red-500': admin.estado === 'INACTIVO',
-      'bg-gray-500': admin.estado === 'SUSPENDIDO'
-    }"></div>
-
-    <!-- Badge de estado -->
-    <div class="absolute top-3 right-3 z-10">
-      <span class="px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm backdrop-blur-sm"
-        [ngClass]="{
-          'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300': admin.estado === 'ACTIVO',
-          'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300': admin.estado === 'NUEVO',
-          'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300': admin.estado === 'INACTIVO',
-          'bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300': admin.estado === 'SUSPENDIDO'
-        }">
-        <mat-icon class="text-xs" style="font-size: 12px; width: 12px; height: 12px;">
-          {{ getEstadoIcon(admin.estado) }}
-        </mat-icon>
-        <span class="hidden sm:inline">{{ admin.estado }}</span>
-      </span>
+<div class="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen transition-colors duration-300">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight">Gestión de Administrativos</h1>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Administra el personal administrativo</p>
     </div>
 
-    <!-- Header de la card -->
-    <div class="p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-light">
-      <div class="flex items-center gap-3">
-        <!-- Avatar -->
-        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-300">
-          <span class="text-white font-bold text-base">
-            {{ obtenerIniciales(admin.nombres, admin.apellidos) }}
+    <button (click)="abrirModal()"
+      class="bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-6 py-3 rounded-xl font-bold shadow-lg flex items-center transition-all transform hover:scale-105 active:scale-95">
+      <mat-icon class="mr-2">person_add</mat-icon>
+      Registrar Nuevo Administrativo
+    </button>
+  </div>
+
+  <app-search-administrativo 
+    [sedes]="sedes" 
+    [cargos]="cargos" 
+    (onFilter)="manejarFiltros($event)">
+  </app-search-administrativo>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    
+   
+
+    @for (admin of listaFiltrada; track admin.id) {
+      <div class="group relative bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl border border-gray-100 dark:border-gray-700 transition-all duration-300 overflow-hidden hover:-translate-y-1">
+        
+        <div class="absolute top-0 left-0 right-0 h-1" [ngClass]="{
+            'bg-green-500': admin.estado === 'ACTIVO',
+            'bg-yellow-500': admin.estado === 'NUEVO',
+            'bg-red-500': admin.estado === 'INACTIVO'
+          }">
+        </div>
+
+        <div class="absolute top-3 right-3 z-10">
+          <span class="px-2 py-1 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm border"
+            [ngClass]="{
+              'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800': admin.estado === 'ACTIVO',
+              'bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800': admin.estado === 'NUEVO',
+              'bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-400 border-red-100 dark:border-red-800': admin.estado === 'INACTIVO'
+            }">
+            <mat-icon style="font-size: 12px; width: 12px; height: 12px;">
+              {{ admin.estado === 'ACTIVO' ? 'check_circle' : (admin.estado === 'NUEVO' ? 'fiber_new' : 'block') }}
+            </mat-icon>
+            <span class="hidden sm:inline">{{ admin.estado }}</span>
           </span>
         </div>
 
-        <!-- Nombre e ID -->
-        <div class="flex-1 min-w-0">
-          <h3 class="font-bold text-sm text-primary truncate">{{ admin.nombres }} {{ admin.apellidos }}</h3>
-          <p class="text-xs text-muted flex items-center gap-1 mt-0.5">
-            <mat-icon class="text-[10px] text-blue-400 dark:text-blue-300" style="font-size: 10px; width: 10px; height: 10px;">badge</mat-icon>
-            <span class="truncate">ID: {{ admin.id }}</span>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Información de contacto -->
-    <div class="p-4 space-y-3">
-      <!-- Celular y Email -->
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-secondary p-2 rounded-lg">
-          <div class="flex items-center gap-1 text-muted mb-0.5">
-            <mat-icon class="text-blue-400 dark:text-blue-300 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">phone_android</mat-icon>
-            <span class="text-[9px] font-medium uppercase tracking-wider">Cel</span>
+        <div class="p-4 bg-gradient-to-r from-blue-50/50 to-indigo-50/50 dark:from-blue-900/20 dark:to-indigo-900/20 border-b border-blue-100/50 dark:border-blue-800/30">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center shadow-sm">
+              <span class="text-white font-bold text-base">
+                {{ admin.nombres[0] }}{{ admin.apellidos[0] }}
+              </span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-sm text-gray-800 dark:text-white truncate">{{ admin.nombres }} {{ admin.apellidos }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 mt-0.5">
+                <mat-icon style="font-size: 10px; width: 10px; height: 10px;" class="text-blue-400 dark:text-blue-400">badge</mat-icon>
+                <span>ID: {{ admin.id }}</span>
+              </p>
+            </div>
           </div>
-          <p class="font-semibold text-primary text-[11px] truncate">{{ admin.celular }}</p>
         </div>
-        <div class="bg-secondary p-2 rounded-lg">
-          <div class="flex items-center gap-1 text-muted mb-0.5">
-            <mat-icon class="text-blue-400 dark:text-blue-300 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">email</mat-icon>
-            <span class="text-[9px] font-medium uppercase tracking-wider">Email</span>
+
+        <div class="p-4 space-y-3">
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-gray-50/80 dark:bg-gray-700/50 p-2 rounded-lg">
+              <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cel</p>
+              <p class="font-semibold text-gray-800 dark:text-gray-200 text-[11px] truncate">{{ admin.celular }}</p>
+            </div>
+            <div class="bg-gray-50/80 dark:bg-gray-700/50 p-2 rounded-lg">
+              <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Email</p>
+              <p class="font-semibold text-gray-800 dark:text-gray-200 text-[11px] truncate">{{ admin.email }}</p>
+            </div>
           </div>
-          <p class="font-semibold text-primary text-[11px] truncate">{{ admin.email }}</p>
-        </div>
-      </div>
 
-      <!-- Sede y Cargo -->
-      <div class="grid grid-cols-2 gap-2">
-        <div class="bg-secondary p-2 rounded-lg">
-          <div class="flex items-center gap-1 text-muted mb-0.5">
-            <mat-icon class="text-blue-400 dark:text-blue-300 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">business</mat-icon>
-            <span class="text-[9px] font-medium uppercase tracking-wider">Sede</span>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="bg-gray-50/80 dark:bg-gray-700/50 p-2 rounded-lg">
+              <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Sede</p>
+              <p class="font-semibold text-gray-800 dark:text-gray-200 text-[11px] truncate">{{ admin.nombreSede || 'No asignada' }}</p>
+            </div>
+            <div class="bg-gray-50/80 dark:bg-gray-700/50 p-2 rounded-lg">
+              <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Cargo</p>
+              <p class="font-semibold text-gray-800 dark:text-gray-200 text-[11px] truncate">{{ admin.nombreCargo || 'No asignado' }}</p>
+            </div>
           </div>
-          <p class="font-semibold text-primary text-[11px] truncate">{{ admin.nombreSede || 'No asignada' }}</p>
-        </div>
-        <div class="bg-secondary p-2 rounded-lg">
-          <div class="flex items-center gap-1 text-muted mb-0.5">
-            <mat-icon class="text-blue-400 dark:text-blue-300 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">work</mat-icon>
-            <span class="text-[9px] font-medium uppercase tracking-wider">Cargo</span>
+
+          <!-- <div class="bg-gray-50/80 dark:bg-gray-700/50 p-2 rounded-lg">
+            <p class="text-[9px] font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dirección</p>
+            <p class="font-semibold text-gray-800 dark:text-gray-200 text-[11px] truncate">{{ admin.direccion || 'No registrada' }}</p>
+          </div> -->
+
+          <div class="flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/20 p-2 rounded-lg border border-blue-100/50 dark:border-blue-800/30">
+            <span class="text-[10px] font-medium text-gray-600 dark:text-gray-400">DNI:</span>
+            <span class="font-mono font-bold text-gray-800 dark:text-gray-200 text-xs">{{ admin.dni }}</span>
           </div>
-          <p class="font-semibold text-primary text-[11px] truncate">{{ admin.nombreCargo || 'No asignado' }}</p>
+        </div>
+
+        <div class="p-3 pt-0 flex gap-1.5">
+          <button (click)="editarAdmin(admin)"
+            class="flex-1 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-blue-600 dark:text-blue-400 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 border border-blue-200/50 dark:border-blue-800/50">
+            <mat-icon style="font-size: 14px; width: 14px; height: 14px;">edit</mat-icon>
+            Editar
+          </button>
+          <button (click)="eliminarAdmin(admin.id)"
+            class="flex-1 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 border border-red-200/50 dark:border-red-800/50">
+            <mat-icon style="font-size: 14px; width: 14px; height: 14px;">delete</mat-icon>
+            Eliminar
+          </button>
         </div>
       </div>
-
-      <!-- Dirección -->
-      <div class="bg-secondary p-2 rounded-lg">
-        <div class="flex items-center gap-1 text-muted mb-0.5">
-          <mat-icon class="text-blue-400 dark:text-blue-300 text-[10px]" style="font-size: 10px; width: 10px; height: 10px;">location_on</mat-icon>
-          <span class="text-[9px] font-medium uppercase tracking-wider">Dirección</span>
+    } @empty {
+      <div class="col-span-full py-20 text-center">
+        <div class="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-6 max-w-sm mx-auto">
+          <mat-icon class="text-gray-300 dark:text-gray-600 text-6xl mb-4" style="width: 60px; height: 60px; font-size: 60px;">person_off</mat-icon>
+          <p class="text-gray-500 dark:text-gray-400 font-medium">No hay administrativos registrados</p>
+          <button (click)="abrirModal()"
+            class="mt-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-semibold flex items-center justify-center gap-1 mx-auto transition-colors">
+            <mat-icon class="text-base">add_circle</mat-icon>
+            Registrar primer administrativo
+          </button>
         </div>
-        <p class="font-semibold text-primary text-[11px] truncate">{{ admin.direccion || 'No registrada' }}</p>
       </div>
+    }
 
-      <!-- DNI -->
-      <div class="flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/20 p-2 rounded-lg">
-        <div class="flex items-center gap-1">
-          <mat-icon class="text-blue-500 dark:text-blue-400 text-xs" style="font-size: 12px; width: 12px; height: 12px;">credit_card</mat-icon>
-          <span class="text-[10px] font-medium text-secondary">DNI:</span>
-        </div>
-        <span class="font-mono font-bold text-primary text-xs">{{ admin.dni }}</span>
-      </div>
-    </div>
-
-    <!-- Acciones -->
-    <div class="p-3 pt-0 flex gap-1.5">
-      <button (click)="editarAdmin(admin)"
-        class="flex-1 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-800/50 text-blue-600 dark:text-blue-400 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 border border-blue-200/50 dark:border-blue-700/50">
-        <mat-icon style="font-size: 14px; width: 14px; height: 14px;">edit</mat-icon>
-        <span>Editar</span>
-      </button>
-
-      <button (click)="eliminarAdmin(admin.id)"
-        class="flex-1 bg-red-50 dark:bg-red-900/30 hover:bg-red-100 dark:hover:bg-red-800/50 text-red-600 dark:text-red-400 py-1.5 rounded-lg text-[11px] font-semibold transition-all flex items-center justify-center gap-1 border border-red-200/50 dark:border-red-700/50">
-        <mat-icon style="font-size: 14px; width: 14px; height: 14px;">delete</mat-icon>
-        <span>Eliminar</span>
-      </button>
-    </div>
-  </div>
-
-  <!-- Mensaje sin resultados -->
-  <div *ngIf="listaAdmins.length === 0" class="col-span-full text-center py-8">
-    <div class="bg-secondary rounded-xl p-6 max-w-sm mx-auto">
-      <mat-icon class="text-4xl text-muted w-full">person_off</mat-icon>
-      <p class="text-secondary text-sm mt-2">No hay administrativos registrados</p>
-      <button (click)="abrirModal()"
-        class="mt-3 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-semibold flex items-center justify-center gap-1 mx-auto">
-        <mat-icon class="text-base">add_circle</mat-icon>
-        Registrar primer administrativo
-      </button>
-    </div>
   </div>
 </div>
