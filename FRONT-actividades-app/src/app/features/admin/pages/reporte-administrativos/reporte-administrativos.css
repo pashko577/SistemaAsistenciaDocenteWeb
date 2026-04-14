@@ -1,30 +1,113 @@
+/* Estilos para impresión */
 @media print {
   .no-print {
     display: none !important;
   }
+  
   body {
     background: white;
-  }
-  #printable-area {
-    border: none;
-    box-shadow: none;
-    width: 100%;
-    margin: 0;
     padding: 0;
+    margin: 0;
+  }
+  
+  #printable-area {
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  .dark\:bg-gray-800 {
+    background: white !important;
+  }
+  
+  .dark\:text-white {
+    color: black !important;
   }
 }
 
-/* Elimina el espacio o "corte" no deseado en el borde superior del outline */
-::ng-deep .mdc-notched-outline__notch {
-  border-right: none !important;
+/* Scrollbar personalizado */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-/* Opcional: Si prefieres que el label no flote para evitar el corte visual */
-mat-form-field {
-  width: 100%;
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
 }
 
-@media print {
-  .no-print { display: none !important; }
-  #printable-area { border: none !important; box-shadow: none !important; }
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Transiciones suaves */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* En reporte-administrativos.css */
+/* Estilos para el panel de autocompletado en modo oscuro */
+::ng-deep .dark .mat-mdc-autocomplete-panel {
+  background-color: #111827 !important; /* gray-900 */
+  border: 1px solid #374151; /* gray-700 */
+}
+
+::ng-deep .dark .mat-mdc-option {
+  border-bottom: 1px solid #1f2937;
+}
+
+::ng-deep .dark .mat-mdc-option:hover {
+  background-color: #1f2937 !important;
+}
+
+/* Corrección para componentes de Angular Material en Modo Oscuro */
+::ng-deep .mat-mdc-autocomplete-panel,
+::ng-deep .mat-mdc-select-panel,
+::ng-deep .mat-mdc-option {
+  background-color: var(--bg-primary) !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+::ng-deep .mat-mdc-option .mdc-list-item__primary-text {
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .mat-mdc-option:hover {
+  background-color: var(--hover-bg) !important;
+}
+
+/* Borde sutil para el panel en modo oscuro */
+.dark ::ng-deep .mat-mdc-autocomplete-panel {
+  border: 1px solid var(--border-light);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+/* Ajuste de texto dentro de las opciones para que no se pierda */
+::ng-deep .dark .mat-mdc-option .mdc-list-item__primary-text {
+  color: #f3f4f6 !important; /* gray-100 */
+}
+/* Permite que el dropdown flote por fuera del card */
+.bg-white.rounded-2xl.shadow-xl.mb-6 {
+    overflow: visible !important;
+}
+
+/* Opcional: Asegura que el contenedor de búsqueda tenga prioridad de apilado */
+.search-container {
+    position: relative;
+    z-index: 50; 
+}
+
+/* Ajuste para que el dropdown no se pegue a los bordes en móviles */
+@media (max-width: 768px) {
+    .search-container div.absolute {
+        position: fixed;
+        left: 1.5rem;
+        right: 1.5rem;
+        top: auto;
+    }
 }
