@@ -11,6 +11,7 @@ import { PlanillaAdministrativoService } from '../../../../../core/services/plan
 import { PagoResponse } from '../../../../../core/models/pagos/pago-response';
 import { AdelantoResponse } from '../../../../../core/models/pagos/adelanto-response';
 import { AdministrativoResponse } from '../../../../../core/models/Administrativos/administrativo-response';
+import { DescuentoRequest } from '../../../../../core/models/pagos/descuento-request';
 
 // Components
 import { PagoDetalleModal } from "../modal/pago-detalle-modal/pago-detalle-modal";
@@ -47,6 +48,52 @@ export class Pagos implements OnInit {
   sueldoBase: number = 0;
   montoTardanzas: number = 0;
   netoProyectado: number = 0;
+  sueldoNetoPlanilla: number = 0;
+
+  // --- Deducciones Manuales ---
+  deduccionesManuales: DescuentoRequest[] = [];
+  mostrarFormDeduccion = false;
+  nuevaDeduccion: DescuentoRequest = { tipoDeduccionId: 1, monto: null as any, observaciones: '' };
+  tiposDeduccion = [
+    { id: 2, nombre: 'ONP o AFP' },
+    { id: 3, nombre: 'ESSALUD' },
+    { id: 4, nombre: 'Descuento por Hijos' },
+    { id: 5, nombre: 'Otros Descuentos / Dirección' }
+  ];
+
+  get totalDeducciones(): number {
+    return this.deduccionesManuales.reduce((sum, item) => {
+      const nombreTipo = this.getNombreDeduccion(item.tipoDeduccionId).toLowerCase();
+      // Regla: ESSALUD / Seguro no se descuenta del neto del administrativo
+      if (nombreTipo.includes('essalud') || nombreTipo.includes('seguro')) {
+        return sum; 
+      }
+      return sum + Number(item.monto);
+    }, 0);
+  }
+
+  getNombreDeduccion(id: number): string {
+    return this.tiposDeduccion.find(t => t.id == Number(id))?.nombre || 'Descuento';
+  }
+
+  recalcularNeto(): void {
+    this.netoProyectado = this.sueldoNetoPlanilla - this.totalAdelantos - this.totalDeducciones;
+  }
+
+  agregarDeduccion(): void {
+    if (this.nuevaDeduccion.monto > 0) {
+      const ded = { ...this.nuevaDeduccion, tipoDeduccionId: Number(this.nuevaDeduccion.tipoDeduccionId), monto: Number(this.nuevaDeduccion.monto) };
+      this.deduccionesManuales.push(ded);
+      this.nuevaDeduccion = { tipoDeduccionId: 1, monto: null as any, observaciones: '' };
+      this.mostrarFormDeduccion = false;
+      this.recalcularNeto();
+    }
+  }
+
+  eliminarDeduccion(index: number): void {
+    this.deduccionesManuales.splice(index, 1);
+    this.recalcularNeto();
+  }
 
   // --- Configuración ---
   aniosDisponibles = [2026, 2027,2028,2029];
@@ -125,7 +172,8 @@ export class Pagos implements OnInit {
       next: (dataPlanilla) => {
         this.sueldoBase = dataPlanilla.sueldoBase;
         this.montoTardanzas = dataPlanilla.descuentoFaltas + dataPlanilla.descuentoTardanza;
-        this.netoProyectado = dataPlanilla.sueldoNeto - this.totalAdelantos;
+        this.sueldoNetoPlanilla = dataPlanilla.sueldoNeto;
+        this.recalcularNeto();
         this.cdr.detectChanges();
       }
     });
@@ -141,7 +189,7 @@ export class Pagos implements OnInit {
       fecha: `${this.anioSeleccionado}-${this.obtenerNumeroMes()}-${new Date(this.anioSeleccionado, parseInt(this.obtenerNumeroMes()), 0).getDate()}`, 
       contratoId: admin.contratoId,
       adelantoIds: this.adelantosPendientes.map(a => a.id),
-      deducciones: [], 
+      deducciones: this.deduccionesManuales, 
       bonificaciones: []
     };
 
@@ -185,8 +233,9 @@ export class Pagos implements OnInit {
   }
 
   alCambiarFiltro() {
-  this.totalAdelantos = 0; // Resetear para evitar que reste el monto del mes anterior
-  this.adelantosPendientes = [];
-  this.obtenerDatosPlanilla();
-}
+    this.totalAdelantos = 0;
+    this.adelantosPendientes = [];
+    this.deduccionesManuales = []; // Limpiar deducciones manuales también
+    this.obtenerDatosPlanilla();
+  }
 }
