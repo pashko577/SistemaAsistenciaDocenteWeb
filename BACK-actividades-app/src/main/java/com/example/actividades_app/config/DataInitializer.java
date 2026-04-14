@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class DataInitializer {
 
     private final ModuloRepository moduloRepository;
+    private final JdbcTemplate jdbcTemplate;
 
     @Bean
     CommandLineRunner initDatabase() {
@@ -58,6 +60,23 @@ public class DataInitializer {
                             System.out.println("Módulo creado: " + m.getNombre());
                         }
                     );
+            }
+
+            // INICIALIZACIÓN DE TIPOS DE DEDUCCIÓN CON IDs ESPECÍFICOS PARA PAGOS
+            String[] queriesDeduccion = {
+                "INSERT IGNORE INTO tipo_deduccion (tipo_deduccionid, nombre) VALUES (1, 'Automática');",
+                "INSERT IGNORE INTO tipo_deduccion (tipo_deduccionid, nombre) VALUES (2, 'ONP o AFP');",
+                "INSERT IGNORE INTO tipo_deduccion (tipo_deduccionid, nombre) VALUES (3, 'ESSALUD');",
+                "INSERT IGNORE INTO tipo_deduccion (tipo_deduccionid, nombre) VALUES (4, 'Descuento por Hijos');",
+                "INSERT IGNORE INTO tipo_deduccion (tipo_deduccionid, nombre) VALUES (5, 'Otros Descuentos Administrativos');"
+            };
+
+            for (String sql : queriesDeduccion) {
+                try {
+                    jdbcTemplate.execute(sql);
+                } catch (Exception e) {
+                    System.out.println("Nota SQL Deducciones (ignorable si ya existen): " + e.getMessage());
+                }
             }
         };
     }

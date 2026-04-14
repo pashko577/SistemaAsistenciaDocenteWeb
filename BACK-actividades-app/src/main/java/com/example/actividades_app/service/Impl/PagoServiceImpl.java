@@ -218,7 +218,12 @@ public class PagoServiceImpl implements PagoService {
                                                 .build();
 
                                 listaDeducciones.add(deduccion);
-                                totalDeducciones = totalDeducciones.add(d.getMonto());
+
+                                // REGLA DE NEGOCIO: "Seguro" o "ESSALUD" no se descuentan del Total Neto del empleado
+                                String nombreTipo = tipo.getNombre().toLowerCase();
+                                if (!nombreTipo.contains("seguro") && !nombreTipo.contains("essalud")) {
+                                        totalDeducciones = totalDeducciones.add(d.getMonto());
+                                }
                         }
                 }
 
