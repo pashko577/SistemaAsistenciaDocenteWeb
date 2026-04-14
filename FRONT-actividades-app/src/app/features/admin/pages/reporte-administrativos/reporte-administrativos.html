@@ -1,164 +1,196 @@
-<div class="p-8 bg-slate-100 min-h-screen">
+<div class="p-6 sm:p-8 bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 min-h-screen transition-colors duration-300">
   
-  <mat-card class="mb-8 no-print !rounded-3xl !shadow-sm !border-none">
-    <mat-card-content class="pt-6 px-6">
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+  <!-- Card de filtros -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 mb-6 overflow-hidden transition-all duration-300">
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
         
-        <mat-form-field appearance="fill" class="md:col-span-4 w-full">
-          <mat-label>Personal Administrativo</mat-label>
-          <input type="text" matInput [matAutocomplete]="auto" [(ngModel)]="terminoBusqueda" (input)="filtrarPersonal()">
-          <mat-icon matSuffix class="text-emerald-800">search</mat-icon>
-          <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarAdministrativo($event.option.value)">
-            <mat-option *ngFor="let admin of administrativosFiltrados" [value]="admin">
-              <div class="flex flex-col py-1">
-                <span class="font-bold text-sm text-slate-700">{{ admin.apellidos }}, {{ admin.nombres }}</span>
-                <span class="text-[10px] text-slate-400 uppercase">ID: {{ admin.id }}</span>
-              </div>
-            </mat-option>
-          </mat-autocomplete>
-        </mat-form-field>
+        <!-- Personal Administrativo -->
+        <div class="md:col-span-5">
+          <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Personal Administrativo</label>
+          <div class="relative">
+            <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 text-base">search</mat-icon>
+            <input type="text" 
+                   matInput 
+                   [matAutocomplete]="auto" 
+                   [(ngModel)]="terminoBusqueda" 
+                   (input)="filtrarPersonal()"
+                   placeholder="Buscar por nombre..."
+                   class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all">
+            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="seleccionarAdministrativo($event.option.value)">
+              <mat-option *ngFor="let admin of administrativosFiltrados" [value]="admin">
+                <div class="flex flex-col py-1">
+                  <span class="font-semibold text-sm text-slate-700 dark:text-gray-200">{{ admin.apellidos }}, {{ admin.nombres }}</span>
+                  <span class="text-[10px] text-slate-400 dark:text-gray-500 uppercase">ID: {{ admin.id }}</span>
+                </div>
+              </mat-option>
+            </mat-autocomplete>
+          </div>
+        </div>
 
-        <mat-form-field appearance="fill" class="md:col-span-3 w-full">
-          <mat-label>Mes</mat-label>
-          <mat-select [(ngModel)]="mesSeleccionado" (selectionChange)="consultarReporte()">
-            <mat-option *ngFor="let m of meses" [value]="m.id">{{ m.nombre }}</mat-option>
-          </mat-select>
-          <mat-icon matSuffix class="text-emerald-800">calendar_month</mat-icon>
-        </mat-form-field>
+        <!-- Mes -->
+        <div class="md:col-span-3">
+          <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Mes</label>
+          <div class="relative">
+            <select [(ngModel)]="mesSeleccionado" (change)="consultarReporte()"
+                    class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none appearance-none cursor-pointer">
+              <option *ngFor="let m of meses" [value]="m.id">{{ m.nombre }}</option>
+            </select>
+            <mat-icon class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 pointer-events-none text-base">calendar_month</mat-icon>
+          </div>
+        </div>
 
-        <mat-form-field appearance="fill" class="md:col-span-2 w-full">
-          <mat-label>Año</mat-label>
-          <mat-select [(ngModel)]="anioSeleccionado" (selectionChange)="consultarReporte()">
-            <mat-option *ngFor="let a of anios" [value]="a">{{ a }}</mat-option>
-          </mat-select>
-        </mat-form-field>
+        <!-- Año -->
+        <div class="md:col-span-2">
+          <label class="block text-xs font-semibold text-slate-600 dark:text-gray-400 uppercase mb-2 tracking-wider">Año</label>
+          <select [(ngModel)]="anioSeleccionado" (change)="consultarReporte()"
+                  class="w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl px-4 py-2.5 text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
+            <option *ngFor="let a of anios" [value]="a">{{ a }}</option>
+          </select>
+        </div>
 
-        <div class="md:col-span-3 flex gap-2 h-[56px] items-center">
-          <button mat-flat-button class="flex-1 !h-full !rounded-2xl !font-bold !bg-emerald-900 !text-white"
-                  [disabled]="!administrativoId" (click)="consultarReporte()">
-            GENERAR
+        <!-- Botones -->
+        <div class="md:col-span-2 flex gap-2">
+          <button (click)="consultarReporte()" 
+                  [disabled]="!administrativoId"
+                  class="flex-1 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 dark:disabled:bg-gray-700 disabled:text-slate-400 dark:disabled:text-gray-500 text-white font-semibold py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 shadow-md active:scale-95">
+            <mat-icon class="text-base">search</mat-icon>
+            Generar
           </button>
 
-          <button mat-stroked-button class="!h-full !rounded-2xl !border-slate-300" 
-                  (click)="imprimir()" matTooltip="Imprimir PDF">
-            <mat-icon class="text-slate-600">print</mat-icon>
+          <button (click)="imprimir()" 
+                  class="px-4 py-2.5 bg-slate-100 dark:bg-gray-700 hover:bg-slate-200 dark:hover:bg-gray-600 text-slate-600 dark:text-gray-300 rounded-xl transition-all"
+                  matTooltip="Imprimir PDF">
+            <mat-icon class="text-base">print</mat-icon>
           </button>
 
-          <button mat-flat-button 
-                  class="!h-full !rounded-2xl !bg-emerald-600 !text-white hover:!bg-emerald-700 disabled:!bg-slate-200"
+          <button (click)="exportarExcel()" 
                   [disabled]="reporte.length === 0"
-                  (click)="exportarExcel()" 
+                  class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 dark:disabled:bg-gray-700 disabled:text-slate-400 dark:disabled:text-gray-500 text-white rounded-xl transition-all"
                   matTooltip="Descargar Excel">
-            <mat-icon>description</mat-icon>
+            <mat-icon class="text-base">description</mat-icon>
           </button>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
+  </div>
 
-  <div class="bg-white shadow-2xl rounded-3xl max-w-5xl mx-auto overflow-hidden border-t-[6px] border-emerald-900" id="printable-area">
+  <!-- Reporte -->
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 overflow-hidden transition-all duration-300" id="printable-area">
     
-    <div class="p-10 border-b border-slate-100 bg-emerald-50/30">
-      <div class="flex justify-between items-start">
+    <!-- Header del reporte -->
+    <div class="p-6 sm:p-8 border-b border-slate-100 dark:border-gray-700 bg-gradient-to-r from-slate-50 to-white dark:from-gray-900/50 dark:to-gray-800">
+      <div class="flex flex-wrap justify-between items-start gap-4">
         <div>
-          <h1 class="text-2xl font-black text-emerald-950 uppercase tracking-tight">Reporte de Asistencia</h1>
-          <p class="text-emerald-700 font-bold mt-1 text-xl">{{ nombreSeleccionado || '---' }}</p>
-          <p class="text-emerald-600/60 text-[10px] font-black uppercase tracking-widest">
-            {{ cargoAdministrativo || 'Cargo no definido' }} | DNI: {{ dniAdministrativo || '---' }}
-          </p>
+          <h1 class="text-2xl font-bold text-slate-800 dark:text-white tracking-tight">Reporte de Asistencia</h1>
+          <p class="text-lg font-semibold text-emerald-700 dark:text-emerald-400 mt-1">{{ nombreSeleccionado || '---' }}</p>
+          <div class="flex flex-wrap gap-2 mt-1">
+            <span class="text-xs text-slate-500 dark:text-gray-400">{{ cargoAdministrativo || 'Cargo no definido' }}</span>
+            <span class="text-xs text-slate-400 dark:text-gray-500">|</span>
+            <span class="text-xs text-slate-500 dark:text-gray-400">DNI: {{ dniAdministrativo || '---' }}</span>
+          </div>
         </div>
         <div class="text-right">
-          <span class="px-5 py-2 bg-emerald-900 text-white font-black rounded-full text-xs shadow-lg shadow-emerald-200">
-            {{ meses[mesSeleccionado-1].nombre }} {{ anioSeleccionado }}
+          <span class="px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 font-bold rounded-full text-xs">
+            {{ obtenerNombreMes(mesSeleccionado) }} {{ anioSeleccionado }}
           </span>
-          <p class="text-[10px] text-emerald-800/50 mt-3 font-bold uppercase tracking-widest">COLEGIO JAMES BALDWIN</p>
+          <p class="text-[10px] text-slate-400 dark:text-gray-500 mt-2 font-semibold uppercase tracking-wider">COLEGIO JAMES BALDWIN</p>
         </div>
       </div>
     </div>
 
-    <div class="p-10">
-      <table class="w-full text-left">
-        <thead>
-          <tr class="text-[11px] font-bold text-emerald-900/40 uppercase tracking-widest border-b-2 border-emerald-50">
-            <th class="pb-5 pl-2">Día / Fecha</th>
-            <th class="pb-5 text-center">Ingreso</th>
-            <th class="pb-5 text-center">Almuerzo</th>
-            <th class="pb-5 text-center">Salida</th>
-            <th class="pb-5 text-center">Terno</th>
-            <th class="pb-5 pr-2 text-right">Tardanza</th>
-          </tr>
-        </thead>
-        <tbody class="text-slate-600">
-          <tr *ngFor="let item of reporte" class="border-b border-slate-50 hover:bg-emerald-50/40 transition-colors">
-            <td class="py-4 pl-2">
-              <div class="font-bold text-slate-800">{{ item.fecha | date:'EEEE':'':'es' | uppercase }}</div>
-              <div class="text-[11px] text-emerald-700/60 font-medium">{{ item.fecha | date:'dd/MM/yyyy' }}</div>
-            </td>
-            <td class="py-4 text-center font-mono text-sm font-semibold text-slate-700">{{ item.horaIngreso || '--:--' }}</td>
-            <td class="py-4 text-center text-xs text-slate-400 font-mono">
-               {{ item.salidaAlmuerzo || '--' }} <span class="text-emerald-200 px-1">|</span> {{ item.retornoAlmuerzo || '--' }}
-            </td>
-            <td class="py-4 text-center font-mono text-sm font-semibold text-slate-700">{{ item.horaSalida || '--:--' }}</td>
-            <td class="py-4 text-center">
-              <span *ngIf="item.terno" class="text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter">
-                👔 SÍ
-              </span>
-              <span *ngIf="!item.terno" class="text-slate-300">-</span>
-            </td>
-            <td class="py-4 text-right pr-2">
-              <span *ngIf="item.tardanza > 0" class="text-red-700 font-black bg-red-50 px-2 py-1 rounded-lg text-xs border border-red-100">
-                +{{ item.tardanza }} min
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <div *ngIf="reporte.length === 0" class="py-20 text-center text-emerald-900/20 italic font-medium">
-        No hay registros para este periodo.
+    <!-- Tabla de asistencias -->
+    <div class="p-6 sm:p-8">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="text-xs font-semibold text-slate-500 dark:text-gray-400 uppercase tracking-wider border-b-2 border-slate-100 dark:border-gray-700">
+              <th class="pb-4 pl-2 text-left">Día / Fecha</th>
+              <th class="pb-4 text-center">Ingreso</th>
+              <th class="pb-4 text-center">Almuerzo</th>
+              <th class="pb-4 text-center">Salida</th>
+              <th class="pb-4 text-center">Terno</th>
+              <th class="pb-4 pr-2 text-right">Tardanza</th>
+            </tr>
+          </thead>
+          <tbody class="text-slate-600 dark:text-gray-300">
+            <tr *ngFor="let item of reporte" class="border-b border-slate-50 dark:border-gray-700 hover:bg-slate-50/50 dark:hover:bg-gray-700/30 transition-colors">
+              <td class="py-4 pl-2">
+                <div class="font-semibold text-slate-800 dark:text-white">{{ item.fecha | date:'EEEE':'':'es' | uppercase }}</div>
+                <div class="text-[11px] text-slate-400 dark:text-gray-500">{{ item.fecha | date:'dd/MM/yyyy' }}</div>
+              </td>
+              <td class="py-4 text-center font-mono text-sm font-semibold">{{ item.horaIngreso || '--:--' }}</td>
+              <td class="py-4 text-center text-xs font-mono text-slate-500 dark:text-gray-400">
+                {{ item.salidaAlmuerzo || '--' }} <span class="text-slate-300 dark:text-gray-600 px-1">|</span> {{ item.retornoAlmuerzo || '--' }}
+               </td>
+              <td class="py-4 text-center font-mono text-sm font-semibold">{{ item.horaSalida || '--:--' }}</td>
+              <td class="py-4 text-center">
+                <span *ngIf="item.terno" class="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 rounded-full text-[10px] font-bold">
+                  <span>👔</span> SÍ
+                </span>
+                <span *ngIf="!item.terno" class="text-slate-300 dark:text-gray-600">—</span>
+               </td>
+              <td class="py-4 text-right pr-2">
+                <span *ngIf="item.tardanza > 0" class="text-red-600 dark:text-red-400 font-bold bg-red-50 dark:bg-red-900/30 px-2 py-1 rounded-lg text-xs">
+                  +{{ item.tardanza }} min
+                </span>
+                <span *ngIf="!item.tardanza || item.tardanza === 0" class="text-slate-400 dark:text-gray-500 text-xs">—</span>
+               </td>
+             </tr>
+            <tr *ngIf="reporte.length === 0">
+              <td colspan="6" class="py-16 text-center text-slate-400 dark:text-gray-500 italic">
+                No hay registros para este periodo
+               </td>
+             </tr>
+          </tbody>
+        </table>
       </div>
 
-      <div class="mt-16 flex justify-end">
-        <div class="w-96 space-y-3">
-          
-          <div class="grid grid-cols-2 gap-3" *ngIf="reporte.length > 0">
-            <div class="flex justify-between items-center px-4 py-2 bg-rose-50 border-l-4 border-rose-500 rounded-r-lg">
-              <span class="text-[10px] font-bold text-rose-600 uppercase">Faltas</span>
-              <span class="text-rose-700 font-black text-lg">{{ conteoFaltas }}</span>
+      <!-- Estadísticas y resumen -->
+      <div *ngIf="reporte.length > 0" class="mt-8 flex flex-wrap justify-end gap-4">
+        <div class="w-72 space-y-3">
+          <!-- Faltas y Permisos -->
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex justify-between items-center px-4 py-3 bg-rose-50 dark:bg-rose-900/20 rounded-xl border-l-4 border-rose-500">
+              <span class="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider">Faltas</span>
+              <span class="text-rose-700 dark:text-rose-400 font-black text-xl">{{ conteoFaltas }}</span>
             </div>
-            <div class="flex justify-between items-center px-4 py-2 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
-              <span class="text-[10px] font-bold text-amber-600 uppercase">Permisos</span>
-              <span class="text-amber-700 font-black text-lg">{{ conteoPermisos }}</span>
+            <div class="flex justify-between items-center px-4 py-3 bg-amber-50 dark:bg-amber-900/20 rounded-xl border-l-4 border-amber-500">
+              <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Permisos</span>
+              <span class="text-amber-700 dark:text-amber-400 font-black text-xl">{{ conteoPermisos }}</span>
             </div>
           </div>
 
-          <div class="flex justify-between items-center px-5 py-3 border-l-4 border-red-500 bg-slate-50 rounded-r-xl" *ngIf="reporte.length > 0">
+          <!-- Tardanza Total -->
+          <div class="flex justify-between items-center px-4 py-3 bg-slate-50 dark:bg-gray-700/50 rounded-xl border-l-4 border-red-500">
             <div class="flex flex-col">
-              <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tardanza Total</span>
-              <span class="text-[9px] text-slate-400 italic font-medium">*Calculado por sistema</span>
+              <span class="text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase tracking-wider">Tardanza Total</span>
+              <span class="text-[9px] text-slate-400 dark:text-gray-500 italic">*Calculado por sistema</span>
             </div>
-            <span class="text-red-700 font-black text-xl">{{ totalMinutosTardanza }} min</span>
+            <span class="text-red-600 dark:text-red-400 font-black text-xl">{{ totalMinutosTardanza }} min</span>
           </div>
-          
-          <div class="flex justify-between items-center px-6 py-5 bg-emerald-900 rounded-2xl shadow-xl shadow-emerald-200">
-            <span class="text-xs font-bold text-emerald-100 uppercase tracking-widest">Monto Descuento</span>
-            <span class="text-white font-black text-3xl tracking-tight">S/ {{ montoDescuento | number:'1.2-2' }}</span>
+
+          <!-- Monto Descuento -->
+          <div class="flex justify-between items-center px-5 py-4 bg-emerald-600 dark:bg-emerald-700 rounded-2xl shadow-lg">
+            <span class="text-xs font-bold text-emerald-100 uppercase tracking-wider">Monto Descuento</span>
+            <span class="text-white font-black text-2xl tracking-tight">S/ {{ montoDescuento | number:'1.2-2' }}</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="p-10 bg-emerald-50/20 border-t border-slate-100">
-        <div class="flex justify-around items-center pt-10 pb-4">
+      <!-- Firmas -->
+      <div *ngIf="reporte.length > 0" class="mt-12 pt-8 border-t border-slate-100 dark:border-gray-700">
+        <div class="flex flex-wrap justify-around gap-8">
           <div class="flex flex-col items-center">
-            <div class="w-52 border-t-2 border-emerald-900/20 mb-3"></div>
-            <span class="text-[10px] text-emerald-900/40 font-black uppercase tracking-widest">Firma del Empleado</span>
+            <div class="w-48 border-t-2 border-emerald-900/30 dark:border-emerald-500/30 mb-3"></div>
+            <span class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold uppercase tracking-wider">Firma del Empleado</span>
           </div>
           <div class="flex flex-col items-center">
-            <div class="w-52 border-t-2 border-emerald-900/20 mb-3"></div>
-            <span class="text-[10px] text-emerald-900/40 font-black uppercase tracking-widest">Recursos Humanos</span>
+            <div class="w-48 border-t-2 border-emerald-900/30 dark:border-emerald-500/30 mb-3"></div>
+            <span class="text-[10px] text-slate-400 dark:text-gray-500 font-semibold uppercase tracking-wider">Recursos Humanos</span>
           </div>
         </div>
+      </div>
     </div>
   </div>
 </div>

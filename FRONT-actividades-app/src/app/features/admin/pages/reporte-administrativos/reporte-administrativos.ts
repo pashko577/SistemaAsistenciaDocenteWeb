@@ -35,7 +35,7 @@ registerLocaleData(localeEs);
     MatIconModule, MatCardModule, MatTooltipModule
   ],
   templateUrl: './reporte-administrativos.html',
-  styleUrl: './reporte-administrativos.css',
+  styleUrls: ['./reporte-administrativos.css'],
 })
 export class ReporteAdministrativos implements OnInit {
   listaAdministrativos: AdministrativoResponse[] = [];
@@ -55,8 +55,9 @@ export class ReporteAdministrativos implements OnInit {
   totalMinutosTardanza: number = 0;
   montoDescuento: number = 0;
   sueldoBase: number = 0;
-  conteoFaltas: number = 0;    // <--- CORREGIDO: Para capturar faltas de Java
-  conteoPermisos: number = 0;  // <--- CORREGIDO: Para capturar permisos de Java
+  conteoFaltas: number = 0;
+  conteoPermisos: number = 0;
+  cargando: boolean = false;
 
   meses = [
     { id: 1, nombre: 'ENERO' }, { id: 2, nombre: 'FEBRERO' }, { id: 3, nombre: 'MARZO' },
@@ -79,7 +80,7 @@ export class ReporteAdministrativos implements OnInit {
   generarListaAnios() {
     const anioActual = new Date().getFullYear();
     this.anios = [];
-    for (let i = 2025; i <= anioActual + 1; i++) {
+    for (let i = 2025; i <= anioActual + 2; i++) {
       this.anios.push(i);
     }
   }
@@ -89,7 +90,8 @@ export class ReporteAdministrativos implements OnInit {
       next: (data) => {
         this.listaAdministrativos = data;
         this.administrativosFiltrados = data;
-      }
+      },
+      error: (err) => console.error('Error cargando administrativos:', err)
     });
   }
 
@@ -112,40 +114,63 @@ export class ReporteAdministrativos implements OnInit {
   consultarReporte() {
     if (!this.administrativoId) return;
     
+    this.cargando = true;
+    
     const mesStr = this.mesSeleccionado.toString().padStart(2, '0');
     const inicio = `${this.anioSeleccionado}-${mesStr}-01`;
     const ultimoDia = new Date(this.anioSeleccionado, this.mesSeleccionado, 0).getDate();
     const fin = `${this.anioSeleccionado}-${mesStr}-${ultimoDia}`;
 
-    // 1. Obtener cálculos detallados (Faltas, Permisos, Tardanzas y Descuentos)
+    // 1. Obtener cálculos detallados
     this.planillaService.calcularPlanilla(this.administrativoId, inicio, fin).subscribe({
       next: (data: PlanillaAdministrativoDTO) => {
         this.sueldoBase = data.sueldoBase;
         this.totalMinutosTardanza = data.minutosTardanza;
-        this.conteoFaltas = data.faltas;         // <--- SINCRONIZADO CON JAVA
-        this.conteoPermisos = data.permisos;     // <--- SINCRONIZADO CON JAVA
-        this.montoDescuento = data.descuentoFaltas + data.descuentoTardanza;
+        this.conteoFaltas = data.faltas;
+        this.conteoPermisos = data.permisos;
+        this.montoDescuento = (data.descuentoFaltas || 0) + (data.descuentoTardanza || 0);
+      },
+      error: (err) => {
+        console.error('Error calculando planilla:', err);
+        this.cargando = false;
       }
     });
 
     // 2. Obtener lista de registros para la tabla
     this.asistenciaService.listarPorPeriodo(this.administrativoId, inicio, fin).subscribe({
-      next: (data) => this.reporte = [...data]
+      next: (data) => {
+        this.reporte = [...data];
+        this.cargando = false;
+      },
+      error: (err) => {
+        console.error('Error cargando asistencias:', err);
+        this.cargando = false;
+      }
     });
   }
 
-  imprimir() { window.print(); }
+  obtenerNombreMes(mesId: number): string {
+    const mes = this.meses.find(m => m.id === mesId);
+    return mes ? mes.nombre : '';
+  }
+
+  imprimir() { 
+    window.print(); 
+  }
 
   async exportarExcel() {
     if (this.reporte.length === 0) return;
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Asistencia');
-    const nombreMes = this.meses[this.mesSeleccionado - 1].nombre;
+    const nombreMes = this.obtenerNombreMes(this.mesSeleccionado);
 
-    // Configuración de columnas
+    // Configuración de estilos
+    worksheet.properties.defaultRowHeight = 25;
+    
+    // Columnas
     worksheet.columns = [
-      { header: 'FECHA', key: 'fecha', width: 20 },
+      { header: 'FECHA', key: 'fecha', width: 25 },
       { header: 'INGRESO', key: 'ingreso', width: 12 },
       { header: 'ALMUERZO', key: 'almuerzo', width: 18 },
       { header: 'SALIDA', key: 'salida', width: 12 },
@@ -153,21 +178,32 @@ export class ReporteAdministrativos implements OnInit {
       { header: 'TARDANZA', key: 'tardanza', width: 15 }
     ];
 
-    // Título y datos del empleado
+    // Estilo del header
+    worksheet.getRow(1).height = 30;
+    worksheet.getRow(1).font = { bold: true, size: 12 };
+    
+    // Título
     worksheet.mergeCells('A1:F1');
     const title = worksheet.getCell('A1');
     title.value = `REPORTE DE ASISTENCIA - ${nombreMes} ${this.anioSeleccionado}`;
-    title.font = { bold: true, size: 14, color: { argb: 'FF064E3B' } }; // Verde esmeralda
-    title.alignment = { horizontal: 'center' };
+    title.font = { bold: true, size: 14, color: { argb: 'FF064E3B' } };
+    title.alignment = { horizontal: 'center', vertical: 'middle' };
 
+    // Datos del empleado
     worksheet.mergeCells('A2:F2');
-    worksheet.getCell('A2').value = `EMPLEADO: ${this.nombreSeleccionado.toUpperCase()} | DNI: ${this.dniAdministrativo}`;
-    worksheet.getCell('A2').alignment = { horizontal: 'center' };
+    worksheet.getCell('A2').value = `EMPLEADO: ${this.nombreSeleccionado.toUpperCase()} | DNI: ${this.dniAdministrativo} | CARGO: ${this.cargoAdministrativo || 'No definido'}`;
+    worksheet.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getCell('A2').font = { size: 11, color: { argb: 'FF4B5563' } };
 
-    // Cuerpo de la tabla
+    // Datos
     this.reporte.forEach(item => {
       worksheet.addRow({
-        fecha: new Date(item.fecha).toLocaleDateString('es-PE', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }).toUpperCase(),
+        fecha: new Date(item.fecha).toLocaleDateString('es-PE', { 
+          weekday: 'long', 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        }).toUpperCase(),
         ingreso: item.horaIngreso || '--:--',
         almuerzo: `${item.salidaAlmuerzo || '--'} | ${item.retornoAlmuerzo || '--'}`,
         salida: item.horaSalida || '--:--',
@@ -176,14 +212,32 @@ export class ReporteAdministrativos implements OnInit {
       });
     });
 
-    // Fila de resumen al final del Excel
+    // Resumen
     worksheet.addRow([]);
     worksheet.addRow({ fecha: 'RESUMEN:', tardanza: `Faltas: ${this.conteoFaltas}` });
     worksheet.addRow({ tardanza: `Permisos: ${this.conteoPermisos}` });
     worksheet.addRow({ tardanza: `Total Tardanza: ${this.totalMinutosTardanza} min` });
-    worksheet.addRow({ tardanza: `DESC. TOTAL: S/ ${this.montoDescuento.toFixed(2)}` });
+    worksheet.addRow({ tardanza: `DESCUENTO TOTAL: S/ ${this.montoDescuento.toFixed(2)}` });
+
+    // Estilos para el resumen
+    const lastRow = worksheet.lastRow;
+    if (lastRow) {
+      lastRow.font = { bold: true, color: { argb: 'FFDC2626' } };
+    }
+
+    // Aplicar bordes
+    worksheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+    });
 
     const buffer = await workbook.xlsx.writeBuffer();
-    saveAs(new Blob([buffer]), `Asistencia_${this.nombreSeleccionado}_${nombreMes}.xlsx`);
+    saveAs(new Blob([buffer]), `Asistencia_${this.nombreSeleccionado.replace(/\s/g, '_')}_${nombreMes}_${this.anioSeleccionado}.xlsx`);
   }
 }

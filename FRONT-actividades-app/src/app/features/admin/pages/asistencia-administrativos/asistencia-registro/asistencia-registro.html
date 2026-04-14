@@ -1,246 +1,193 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 p-4 sm:p-8 transition-colors duration-300">
-<div class="max-w-7xl mx-auto space-y-6">
-    
-    <!-- Header Card -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
-      <div class="p-6">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          
-          <!-- Título -->
-          <div class="flex items-center gap-4">
-            <div class="p-3 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl shadow-lg relative overflow-hidden group">
-              <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-              <mat-icon class="text-white text-2xl relative z-10">calendar_month</mat-icon>
-            </div>
-            <div>
-              <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Asistencia Mensual</h1>
-              <div class="flex items-center gap-2 mt-1">
-                <span class="text-[10px] text-emerald-600 dark:text-emerald-400 uppercase font-black tracking-[0.2em] bg-emerald-50 dark:bg-emerald-900/30 px-2 py-0.5 rounded">Transcripción</span>
-                <span class="text-[10px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-[0.2em]">Administrativos</span>
+<div class="min-h-screen bg-slate-50 dark:bg-gray-900 p-4 sm:p-8 transition-colors duration-300">
+  <div class="max-w-7xl mx-auto space-y-4">
+
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-slate-200 dark:border-gray-700 p-6 transition-colors duration-300">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <div class="p-3 bg-emerald-500/10 dark:bg-emerald-500/20 rounded-xl">
+            <mat-icon class="text-emerald-600 dark:text-emerald-400">calendar_month</mat-icon>
+          </div>
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Asistencia Mensual</h1>
+            <p class="text-[10px] text-slate-400 dark:text-gray-500 uppercase font-black tracking-[0.2em]">Transcripción
+              por Administrativo</p>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-wrap items-center gap-3 bg-slate-50 dark:bg-gray-900/50 p-3 rounded-2xl border border-slate-200 dark:border-gray-700">
+          <div class="flex flex-col gap-1 relative group">
+            <label class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase ml-1">Buscar
+              Personal</label>
+            <div class="relative">
+              <mat-icon
+                class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 !w-4 !h-4 !text-[18px]">search</mat-icon>
+              <input type="text" [formControl]="adminControl" placeholder="Escriba nombre o apellido..."
+                class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-gray-200 text-sm rounded-lg pl-10 pr-4 p-2 outline-none focus:ring-2 focus:ring-emerald-500 min-w-[280px] w-full transition-colors">
+
+              <div *ngIf="adminControl.value && administrativosFiltrados.length > 0 && !adminIdSeleccionado"
+                class="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl shadow-xl max-h-60 overflow-y-auto">
+                <div *ngFor="let a of administrativosFiltrados" (click)="seleccionarAdmin(a)"
+                  class="px-4 py-3 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer flex items-center gap-3 border-b border-slate-50 dark:border-gray-700 last:border-0 transition-colors">
+                  <div
+                    class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 flex items-center justify-center text-[10px] font-bold">
+                    {{ a.nombres[0] }}{{ a.apellidos[0] }}
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-700 dark:text-gray-200">{{ a.nombres }} {{ a.apellidos
+                      }}</span>
+                    <span class="text-[9px] text-slate-400 dark:text-gray-500 uppercase">{{ a.cargo || 'Personal'
+                      }}</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <button *ngIf="adminIdSeleccionado" (click)="limpiarSeleccion()"
+              class="absolute -right-2 -top-1 bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 rounded-full p-0.5 hover:bg-rose-200 dark:hover:bg-rose-800 transition-colors shadow-sm z-10">
+              <mat-icon class="!w-3 !h-3 !text-[12px]">close</mat-icon>
+            </button>
           </div>
 
-          <!-- Filtros -->
-          <div class="flex flex-wrap items-start gap-3 bg-slate-50 dark:bg-gray-900/50 p-3 rounded-2xl border border-slate-200 dark:border-gray-700">
-            
-            <!-- Buscador de Personal - Versión Mejorada -->
-           <!-- Buscador de Personal - Versión Definitiva -->
-<div class="relative search-container" style="min-width: 280px;">
-  <label class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase ml-1 block mb-1">Buscar Personal</label>
-  <div class="relative">
-    <mat-icon class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-gray-500 !w-4 !h-4 !text-[18px]">search</mat-icon>
-    <input type="text"
-           [formControl]="adminControl"
-           placeholder="Escriba nombre o apellido..."
-           autocomplete="off"
-           (focus)="onInputFocus()"
-           (click)="onInputFocus()"
-           class="search-input bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-gray-200 text-sm rounded-xl pl-10 pr-4 p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 w-full transition-all">
-  </div>
-  
-  <!-- Botón limpiar selección -->
-  <button *ngIf="adminIdSeleccionado" 
-          (click)="limpiarSeleccion()"
-          class="absolute -right-2 -top-1 bg-rose-100 dark:bg-rose-900/50 text-rose-600 dark:text-rose-400 rounded-full p-1 hover:bg-rose-200 dark:hover:bg-rose-800 transition-colors shadow-md z-10">
-    <mat-icon class="!w-3 !h-3 !text-[12px]">close</mat-icon>
-  </button>
-</div>
-            <!-- Selector Mes -->
-            <div class="flex flex-col gap-1">
-              <label class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase ml-1">Mes</label>
-              <select [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarDatosMensuales()"
-                      class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-gray-200 text-sm rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
-                <option *ngFor="let m of meses" [value]="m.v">{{ m.n }}</option>
-              </select>
-            </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase ml-1">Mes</label>
+            <select [(ngModel)]="mesSeleccionado" (ngModelChange)="cargarDatosMensuales()"
+              class="bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-gray-200 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer">
+              <option *ngFor="let m of meses" [value]="m.v">{{ m.n }}</option>
+            </select>
+          </div>
 
-            <!-- Selector Año -->
-            <div class="flex flex-col gap-1">
-              <label class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase ml-1">Año</label>
-              <input type="number" [(ngModel)]="anioSeleccionado" (ngModelChange)="cargarDatosMensuales()"
-                     class="w-24 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-gray-200 text-sm rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-emerald-500 text-center">
-            </div>
+          <div class="flex flex-col gap-1">
+            <label class="text-[9px] font-black text-slate-400 dark:text-gray-500 uppercase ml-1">Año</label>
+            <input type="number" [(ngModel)]="anioSeleccionado" (ngModelChange)="cargarDatosMensuales()"
+              class="w-20 bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 text-slate-700 dark:text-gray-200 text-sm rounded-lg p-2 outline-none focus:ring-2 focus:ring-emerald-500 text-center">
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Tabla de Asistencias Rediseñada -->
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-slate-100 dark:border-gray-700 overflow-hidden transition-all duration-300">
+    <div
+      class="bg-white dark:bg-gray-800 shadow-xl rounded-2xl overflow-hidden border border-slate-100 dark:border-gray-700 transition-colors duration-300">
       <div class="overflow-x-auto">
         <table class="w-full text-sm text-left">
-          <thead>
-            <tr class="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-gray-900/50 dark:to-gray-800 border-b-2 border-slate-200 dark:border-gray-700">
-              <th class="px-6 py-5 text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Día / Fecha</th>
-              <th class="px-4 py-5 text-center text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Horario</th>
-              <th class="px-4 py-5 text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Ingreso</th>
-              <th class="px-4 py-5 text-center text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Refrigerio</th>
-              <th class="px-4 py-5 text-center text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Salida</th>
-              <th class="px-4 py-5 text-center text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Terno</th>
-              <th class="px-4 py-5 text-center text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Estado</th>
-              <th class="px-6 py-5 text-right text-xs font-black text-slate-500 dark:text-gray-400 uppercase tracking-wider">Acción</th>
+          <thead
+            class="text-[10px] text-slate-400 dark:text-gray-500 uppercase bg-slate-50/50 dark:bg-gray-900/30 border-b border-slate-100 dark:border-gray-700 font-black tracking-widest">
+            <tr>
+              <th class="px-6 py-5">Día / Fecha</th>
+              <th class="px-2 py-5 text-center">Horario</th>
+              <th class="px-2 py-5">Ingreso</th>
+              <th class="px-2 py-5 text-center">Refrigerio (S/R)</th>
+              <th class="px-2 py-5 text-center">Salida</th>
+              <th class="px-2 py-5 text-center">Terno</th>
+              <th class="px-2 py-5 text-center">Estado</th>
+              <th class="px-6 py-5 text-right">Acción</th>
             </tr>
           </thead>
 
-          <tbody class="divide-y divide-slate-100 dark:divide-gray-700">
+          <tbody class="divide-y divide-slate-50 dark:divide-gray-700">
             <tr *ngFor="let f of asistenciasView"
-                [ngClass]="{
-                  'bg-emerald-50/30 dark:bg-emerald-900/10': f.editado, 
-                  'bg-rose-50/20 dark:bg-rose-900/5': f.diaNombre === 'DOMINGO'
-                }"
-                class="hover:bg-slate-50/80 dark:hover:bg-gray-700/30 transition-all duration-200 group">
+              [ngClass]="{'bg-emerald-50/20 dark:bg-emerald-900/10': f.editado, 'bg-rose-50/10 dark:bg-rose-900/5': f.diaNombre === 'DOMINGO'}"
+              class="hover:bg-slate-50/80 dark:hover:bg-gray-700/30 transition-all group">
 
-              <!-- Día / Fecha -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center shadow-inner">
-                    <span class="text-lg font-black text-slate-500 dark:text-gray-300">{{ f.numeroDia }}</span>
-                  </div>
+                  <span class="text-lg font-black text-slate-300 dark:text-gray-600 w-8">{{ f.numeroDia }}</span>
                   <div class="flex flex-col">
-                    <span class="font-bold text-slate-700 dark:text-gray-200 text-sm">{{ f.diaNombre }}</span>
-                    <span class="text-[10px] text-slate-400 dark:text-gray-500 font-mono">{{ f.fecha }}</span>
+                    <span class="font-bold text-slate-700 dark:text-gray-200 text-xs">{{ f.diaNombre }}</span>
+                    <span class="text-[9px] text-slate-400 dark:text-gray-500 font-mono">{{ f.fecha }}</span>
                   </div>
                 </div>
-               </td>
+              </td>
 
-              <!-- Horario Programado -->
-              <td class="px-4 py-4 text-center">
-                <div class="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-100 dark:bg-gray-700 rounded-xl">
-                  <mat-icon class="!w-3 !h-3 !text-[12px] text-slate-400 dark:text-gray-500">schedule</mat-icon>
-                  <span class="text-xs font-bold text-slate-600 dark:text-gray-300">{{ f.horaEntradaProg }}</span>
-                </div>
-                </td>
+              <td class="px-2 py-4 text-center">
+                <span
+                  class="px-2 py-1 bg-slate-100 dark:bg-gray-700 text-slate-600 dark:text-gray-300 rounded-lg text-[10px] font-black border border-slate-200 dark:border-gray-600">
+                  {{ f.horaEntradaProg }}
+                </span>
+              </td>
 
-              <!-- Hora Ingreso -->
-              <td class="px-4 py-4">
-                <div class="relative max-w-[120px]">
+              <td class="px-2 py-4">
+                <div class="relative max-w-[110px]">
                   <input type="time" [(ngModel)]="f.horaIngreso" (ngModelChange)="onIngresoChange(f)"
-                         class="w-full p-2.5 rounded-xl text-xs font-bold outline-none transition-all shadow-sm"
-                         [ngClass]="f.tardanza > 0 ? 
-                           'border-2 border-rose-300 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400' : 
-                           'border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500'">
-                  <span *ngIf="f.tardanza > 0" class="absolute -top-2.5 -right-2 text-[9px] font-black text-white bg-gradient-to-r from-rose-500 to-rose-600 px-2 py-0.5 rounded-full shadow-md animate-pulse">
+                    class="w-full p-2 border rounded-xl text-xs font-bold outline-none shadow-sm transition-colors"
+                    [ngClass]="f.tardanza > 0 ? 
+                           'border-rose-200 dark:border-rose-700 bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400' : 
+                           'border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-200'">
+                  <span *ngIf="f.tardanza > 0"
+                    class="absolute -top-2.5 -right-2 text-[9px] font-black text-white bg-rose-500 dark:bg-rose-600 px-2 py-0.5 rounded-full border-2 border-white dark:border-gray-800 animate-bounce">
                     +{{ f.tardanza }}m
                   </span>
                 </div>
-                </td>
+              </td>
 
-              <!-- Refrigerio (Salida/Retorno) -->
-              <td class="px-4 py-4">
-                <div class="flex items-center gap-1 bg-slate-50 dark:bg-gray-900/50 p-1.5 rounded-xl border border-slate-200 dark:border-gray-700">
-                  <input type="time" [(ngModel)]="f.salidaAlmuerzo" (ngModelChange)="marcarEditado(f)" 
-                         class="w-1/2 p-1.5 bg-transparent text-[10px] font-bold text-slate-600 dark:text-gray-300 outline-none text-center">
-                  <div class="w-px h-4 bg-slate-300 dark:bg-gray-600"></div>
-                  <input type="time" [(ngModel)]="f.retornoAlmuerzo" (ngModelChange)="marcarEditado(f)" 
-                         class="w-1/2 p-1.5 bg-transparent text-[10px] font-bold text-slate-600 dark:text-gray-300 outline-none text-center">
+              <td class="px-2 py-4">
+                <div
+                  class="flex items-center gap-1 bg-slate-50 dark:bg-gray-900/50 p-1 rounded-xl border border-slate-100 dark:border-gray-700">
+                  <input type="time" [(ngModel)]="f.salidaAlmuerzo" (ngModelChange)="marcarEditado(f)"
+                    class="w-1/2 p-1 bg-transparent text-[10px] font-bold text-slate-500 dark:text-gray-400 outline-none">
+                  <div class="w-px h-3 bg-slate-200 dark:bg-gray-600"></div>
+                  <input type="time" [(ngModel)]="f.retornoAlmuerzo" (ngModelChange)="marcarEditado(f)"
+                    class="w-1/2 p-1 bg-transparent text-[10px] font-bold text-slate-500 dark:text-gray-400 outline-none">
                 </div>
-                </td>
+              </td>
 
-              <!-- Hora Salida -->
-              <td class="px-4 py-4 text-center">
+              <td class="px-2 py-4 text-center">
                 <input type="time" [(ngModel)]="f.horaSalida" (ngModelChange)="marcarEditado(f)"
-                       class="w-full max-w-[110px] p-2.5 border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-900 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500 text-slate-700 dark:text-gray-200 text-center">
-                </td>
+                  class="w-full max-w-[100px] p-2 border border-slate-200 dark:border-gray-600 bg-white dark:bg-gray-900 text-slate-700 dark:text-gray-200 rounded-xl text-xs font-bold outline-none focus:ring-2 focus:ring-emerald-500">
+              </td>
 
-              <!-- Terno (Toggle Switch Mejorado) -->
-              <td class="px-4 py-4 text-center">
-                <label class="relative inline-flex items-center cursor-pointer group">
-                  <input type="checkbox" 
-                         [(ngModel)]="f.terno" 
-                         (ngModelChange)="marcarEditado(f)" 
-                         class="sr-only peer">
-                  <div class="w-11 h-6 bg-slate-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-md"></div>
-                  <span class="ml-2 text-[10px] font-bold text-slate-500 dark:text-gray-400 group-hover:text-emerald-600 transition-colors">
-                    {{ f.terno ? 'SÍ' : 'NO' }}
-                  </span>
+              <td class="px-2 py-4 text-center">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" [(ngModel)]="f.terno" (ngModelChange)="marcarEditado(f)" class="sr-only peer">
+                  <div
+                    class="w-9 h-5 bg-slate-200 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500">
+                  </div>
                 </label>
-                </td>
+              </td>
 
-              <!-- Estado Asistencia -->
-              <td class="px-4 py-4 text-center">
-                <select [(ngModel)]="f.tipoAsistencia" (ngModelChange)="marcarEditado(f)"
-                        [ngClass]="{
+              <td class="px-2 py-4 text-center">
+                <select [(ngModel)]="f.tipoAsistencia" (ngModelChange)="marcarEditado(f)" [ngClass]="{
                           'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800': f.tipoAsistencia === 'ASISTIO',
                           'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800': f.tipoAsistencia === 'TARDANZA',
                           'bg-rose-50 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 border-rose-200 dark:border-rose-800': f.tipoAsistencia === 'FALTA'
                         }"
-                        class="text-[10px] font-black rounded-xl px-3 py-2 border outline-none cursor-pointer w-28 transition-all">
+                  class="text-[10px] font-black rounded-xl px-2 py-2 border outline-none cursor-pointer w-24 transition-colors">
                   <option *ngFor="let tipo of listaTipos" [value]="tipo">{{ tipo }}</option>
                   <option value="LIBRE" disabled>LIBRE</option>
                 </select>
-                </td>
+              </td>
 
-              <!-- Acción -->
               <td class="px-6 py-4 text-right">
                 <button (click)="guardarFila(f)" [disabled]="!f.editado || f.guardando"
-                        class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black transition-all min-w-[110px] justify-center shadow-md"
-                        [ngClass]="f.editado ? 
-                          'bg-gradient-to-r from-emerald-600 to-teal-600 text-white hover:from-emerald-700 hover:to-teal-700 shadow-lg transform hover:scale-105' : 
+                  class="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black transition-all min-w-[110px] justify-center"
+                  [ngClass]="f.editado ? 
+                          'bg-emerald-600 dark:bg-emerald-500 text-white hover:bg-emerald-700 dark:hover:bg-emerald-600 shadow-lg' : 
                           'bg-slate-100 dark:bg-gray-700 text-slate-300 dark:text-gray-500 cursor-not-allowed'">
                   <mat-icon *ngIf="!f.guardando" class="!w-4 !h-4 !text-[16px]">{{ f.id ? 'sync' : 'save' }}</mat-icon>
-                  <span *ngIf="!f.guardando" class="uppercase tracking-wider">{{ f.id ? 'Actualizar' : 'Registrar' }}</span>
-                  <div *ngIf="f.guardando" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span *ngIf="!f.guardando" class="uppercase">{{ f.id ? 'Actualizar' : 'Registrar' }}</span>
+                  <div *ngIf="f.guardando"
+                    class="w-3 h-3 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                 </button>
-                </td>
-             </tr>
+              </td>
+            </tr>
           </tbody>
         </table>
       </div>
 
-      <!-- Mensaje sin selección -->
-      <div *ngIf="!adminIdSeleccionado" class="py-20 text-center bg-gradient-to-b from-white to-slate-50 dark:from-gray-800 dark:to-gray-900">
-        <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-gray-700 dark:to-gray-600 rounded-3xl shadow-inner mb-4">
-          <mat-icon class="!w-10 !h-10 !text-[40px] text-slate-400 dark:text-gray-500">person_search</mat-icon>
+      <div *ngIf="!adminIdSeleccionado" class="p-20 text-center">
+        <mat-icon class="!w-16 !h-16 !text-[64px] text-slate-200 dark:text-gray-700 mb-4">person_search</mat-icon>
+        <p class="text-slate-400 dark:text-gray-500 font-bold">Seleccione un administrativo para cargar la ficha mensual
+        </p>
+      </div>
+
+      <div *ngIf="cargando" class="p-16 text-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
+        <div
+          class="w-12 h-12 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin inline-block">
         </div>
-        <p class="text-slate-500 dark:text-gray-400 font-bold text-lg">Seleccione un administrativo</p>
-        <p class="text-slate-400 dark:text-gray-500 text-sm mt-1">Para cargar la ficha mensual de asistencia</p>
-      </div>
-
-      <!-- Loading -->
-      <div *ngIf="cargando" class="py-20 text-center bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
-        <div class="w-16 h-16 border-4 border-emerald-500/20 border-t-emerald-600 rounded-full animate-spin inline-block"></div>
-        <p class="mt-4 text-sm text-slate-500 dark:text-gray-400 font-bold uppercase tracking-wider">Cargando ficha mensual...</p>
+        <p class="mt-4 text-[10px] text-slate-400 dark:text-gray-500 font-black uppercase tracking-widest">Generando
+          Ficha Mensual...</p>
       </div>
     </div>
   </div>
-</div>
-
-
-
-
-
-
-
-<!-- DROPDOWN GLOBAL - Fuera de todos los contenedores con overflow -->
-<div *ngIf="showDropdown && adminControl.value && administrativosFiltrados.length > 0 && !adminIdSeleccionado" 
-     class="fixed z-[9999] bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl shadow-2xl overflow-y-auto"
-     [style.top.px]="dropdownPosition.top"
-     [style.left.px]="dropdownPosition.left"
-     [style.width.px]="dropdownPosition.width"
-     [style.maxHeight.px]="dropdownPosition.maxHeight"
-     style="min-width: 280px;">
-  <div *ngFor="let a of administrativosFiltrados"
-       (click)="seleccionarAdmin(a)"
-       class="px-4 py-3 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 cursor-pointer flex items-center gap-3 border-b border-slate-100 dark:border-gray-700 last:border-0 transition-colors group">
-    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white flex items-center justify-center text-sm font-bold shadow-md">
-      {{ a.nombres[0] }}{{ a.apellidos[0] }}
-    </div>
-    <div class="flex flex-col flex-1">
-      <span class="text-sm font-bold text-slate-700 dark:text-gray-200 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
-        {{ a.nombres }} {{ a.apellidos }}
-      </span>
-      <span class="text-[10px] text-slate-400 dark:text-gray-500 uppercase font-medium">{{ a.cargo || 'Personal' }}</span>
-    </div>
-    <mat-icon class="text-slate-300 dark:text-gray-600 group-hover:text-emerald-500 transition-colors">add_circle_outline</mat-icon>
-  </div>
-</div>
-
-<!-- Mensaje sin resultados -->
-<div *ngIf="showDropdown && adminControl.value && administrativosFiltrados.length === 0 && !adminIdSeleccionado" 
-     class="fixed z-[9999] bg-white dark:bg-gray-800 border border-slate-200 dark:border-gray-700 rounded-xl shadow-2xl p-4 text-center"
-     [style.top.px]="dropdownPosition.top"
-     [style.left.px]="dropdownPosition.left"
-     [style.width.px]="dropdownPosition.width">
-  <p class="text-xs text-slate-500 dark:text-gray-400">No se encontraron administrativos</p>
 </div>
