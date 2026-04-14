@@ -1,100 +1,102 @@
-<div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-8 animate-fadeIn">
+<div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-gray-700 mb-8 animate-fadeIn transition-colors duration-300">
   <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
     <div class="flex-1">
-      <label class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 block">Personal Administrativo</label>
+      <label class="text-xs font-black text-slate-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">Personal Administrativo</label>
       <div class="relative">
         <select [(ngModel)]="usuarioId" (change)="cargarAdelantos()"
-          class="block w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 outline-none text-sm font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 appearance-none transition-all">
+          class="block w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-2xl p-4 outline-none text-sm font-bold text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 appearance-none transition-all">
           <option [value]="null" disabled>Seleccione un trabajador...</option>
           <option *ngFor="let admin of listaAdministrativos" [value]="admin.id">
             {{ admin.nombres }} {{ admin.apellidos }}
           </option>
         </select>
-        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400 dark:text-gray-500">
           <i class="fas fa-chevron-down"></i>
         </div>
       </div>
     </div>
 
-    <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl flex items-center gap-4">
-      <div class="bg-emerald-500 text-white p-3 rounded-xl shadow-lg shadow-emerald-200">
+    <div class="bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 p-4 rounded-2xl flex items-center gap-4 transition-colors duration-300">
+      <div class="bg-emerald-500 text-white p-3 rounded-xl shadow-lg shadow-emerald-200 dark:shadow-emerald-950">
         <i class="fas fa-calendar-check text-xl"></i>
       </div>
       <div>
-        <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest leading-none mb-1">Registrando en</p>
-        <p class="text-lg font-black text-emerald-900 leading-none">{{ mes }} {{ anio }}</p>
+        <p class="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest leading-none mb-1">Registrando en</p>
+        <p class="text-lg font-black text-emerald-900 dark:text-emerald-400 leading-none">{{ mes }} {{ anio }}</p>
       </div>
     </div>
   </div>
 </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-  <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 h-fit">
-    <h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+  <!-- Formulario Nuevo Adelanto -->
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-gray-700 h-fit transition-colors duration-300">
+    <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
       <i class="fas fa-plus-circle text-emerald-500"></i> Nuevo Adelanto
     </h3>
     
     <form [formGroup]="adelantoForm" (ngSubmit)="guardar()" class="space-y-5">
       <div>
-        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Concepto</label>
+        <label class="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider">Concepto</label>
         <input formControlName="nombre" type="text" placeholder="Ej. Vale de movilidad"
-          class="mt-1 block w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none text-sm focus:ring-2 focus:ring-emerald-500 transition-all">
+          class="mt-1 block w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl p-3 outline-none text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600">
       </div>
       <div>
-        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider">Monto (S/)</label>
+        <label class="text-xs font-bold text-slate-400 dark:text-gray-500 uppercase tracking-wider">Monto (S/)</label>
         <input formControlName="monto" type="number" placeholder="0.00"
-          class="mt-1 block w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none text-sm focus:ring-2 focus:ring-emerald-500 transition-all">
+          class="mt-1 block w-full bg-slate-50 dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl p-3 outline-none text-sm text-slate-700 dark:text-gray-200 focus:ring-2 focus:ring-emerald-500 transition-all placeholder:text-slate-400 dark:placeholder:text-gray-600">
       </div>
       
       <button type="submit" [disabled]="adelantoForm.invalid || cargando || !usuarioId" 
-        class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-400 text-white font-bold rounded-2xl shadow-lg shadow-emerald-100 transition-all flex justify-center">
+        class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 dark:disabled:bg-gray-700 disabled:text-slate-400 dark:disabled:text-gray-500 text-white font-bold rounded-2xl shadow-lg shadow-emerald-100 dark:shadow-emerald-950/30 transition-all flex justify-center">
         <span *ngIf="!cargando">Registrar Adelanto</span>
         <div *ngIf="cargando" class="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
       </button>
-      <p *ngIf="!usuarioId" class="text-[10px] text-center text-red-400 font-bold uppercase mt-2">
+      <p *ngIf="!usuarioId" class="text-[10px] text-center text-red-400 dark:text-red-500 font-bold uppercase mt-2">
         <i class="fas fa-exclamation-triangle"></i> Seleccione un usuario primero
       </p>
     </form>
   </div>
 
-  <div class="lg:col-span-2 bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
+  <!-- Lista de Vales Pendientes -->
+  <div class="lg:col-span-2 bg-white dark:bg-gray-800 p-6 rounded-3xl shadow-sm border border-slate-200 dark:border-gray-700 transition-colors duration-300">
     <div class="flex justify-between items-center mb-6">
       <div>
-        <h3 class="text-lg font-bold text-slate-800">Vales Pendientes</h3>
-        <p class="text-xs text-slate-400">Filtrado por: {{ mes }} {{ anio }}</p>
+        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Vales Pendientes</h3>
+        <p class="text-xs text-slate-400 dark:text-gray-500">Filtrado por: {{ mes }} {{ anio }}</p>
       </div>
-      <div class="bg-emerald-50 px-4 py-2 rounded-full text-emerald-700 font-black text-sm border border-emerald-100">
+      <div class="bg-emerald-50 dark:bg-emerald-900/30 px-4 py-2 rounded-full text-emerald-700 dark:text-emerald-400 font-black text-sm border border-emerald-100 dark:border-emerald-800">
         Total: S/ {{ totalAdelantos | number:'1.2-2' }}
       </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div *ngFor="let a of adelantosPendientes" 
-        class="p-4 bg-slate-50 border border-slate-100 rounded-2xl flex justify-between items-center group hover:bg-white hover:border-emerald-200 transition-all shadow-sm">
+        class="p-4 bg-slate-50 dark:bg-gray-900/50 border border-slate-100 dark:border-gray-700 rounded-2xl flex justify-between items-center group hover:bg-white dark:hover:bg-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800 transition-all shadow-sm">
         <div class="flex items-center gap-3">
-          <div class="bg-white p-2 rounded-lg text-emerald-600 shadow-sm border border-slate-100">
+          <div class="bg-white dark:bg-gray-800 p-2 rounded-lg text-emerald-600 dark:text-emerald-400 shadow-sm border border-slate-100 dark:border-gray-700">
             <i class="fas fa-receipt"></i>
           </div>
           <div>
-            <p class="font-bold text-slate-700 leading-tight">{{ a.nombre }}</p>
-            <p class="text-[10px] text-slate-400 uppercase font-medium">
-  {{ a.fechaCreacion | date:'dd/MM/yyyy':'UTC' }}
-</p>
+            <p class="font-bold text-slate-700 dark:text-gray-200 leading-tight">{{ a.nombre }}</p>
+            <p class="text-[10px] text-slate-400 dark:text-gray-500 uppercase font-medium">
+              {{ a.fechaCreacion | date:'dd/MM/yyyy':'UTC' }}
+            </p>
           </div>
         </div>
         <div class="flex items-center space-x-3">
           <button (click)="anular(a.id)" 
-            class="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-all"
+            class="opacity-0 group-hover:opacity-100 p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all"
             title="Anular adelanto">
             <i class="fas fa-trash-alt"></i>
           </button>
-          <p class="text-lg font-black text-slate-800">S/ {{ a.monto | number:'1.2-2' }}</p>
+          <p class="text-lg font-black text-slate-800 dark:text-white">S/ {{ a.monto | number:'1.2-2' }}</p>
         </div>
       </div>
 
       <div *ngIf="adelantosPendientes.length === 0" class="col-span-full py-16 text-center">
-        <div class="text-slate-200 text-5xl mb-3"><i class="fas fa-check-double"></i></div>
-        <p class="text-slate-400 font-bold italic">No hay adelantos registrados para este mes.</p>
+        <div class="text-slate-200 dark:text-gray-700 text-5xl mb-3"><i class="fas fa-check-double"></i></div>
+        <p class="text-slate-400 dark:text-gray-500 font-bold italic">No hay adelantos registrados para este mes.</p>
       </div>
     </div>
   </div>
