@@ -49,6 +49,7 @@ export class ReporteAdministrativos implements OnInit {
   nombreSeleccionado: string = '';
   cargoAdministrativo: string = '';
   dniAdministrativo: string = '';
+  mostrarDropdown = false;
 
   // Datos del Reporte
   reporte: AsistenciaAdministrativoResponse[] = [];
@@ -95,12 +96,20 @@ export class ReporteAdministrativos implements OnInit {
     });
   }
 
-  filtrarPersonal() {
-    const busqueda = this.terminoBusqueda.toLowerCase().trim();
-    this.administrativosFiltrados = this.listaAdministrativos.filter(a => 
-      `${a.apellidos} ${a.nombres}`.toLowerCase().includes(busqueda)
-    );
+ filtrarPersonal() {
+  const busqueda = this.terminoBusqueda.toLowerCase().trim();
+  
+  // Si no hay búsqueda, mostramos todos (o podrías ocultar la lista)
+  if (!busqueda) {
+    this.administrativosFiltrados = [...this.listaAdministrativos];
+    return;
   }
+
+  this.administrativosFiltrados = this.listaAdministrativos.filter(a => 
+    `${a.apellidos} ${a.nombres}`.toLowerCase().includes(busqueda) ||
+    a.dni.includes(busqueda) // ¡Tip extra! Permite buscar también por DNI
+  );
+}
 
   seleccionarAdministrativo(admin: AdministrativoResponse) {
     this.administrativoId = admin.id;
@@ -108,6 +117,7 @@ export class ReporteAdministrativos implements OnInit {
     this.terminoBusqueda = this.nombreSeleccionado;
     this.cargoAdministrativo = admin.nombreCargo;
     this.dniAdministrativo = admin.dni;
+    this.mostrarDropdown = false; // Cerramos al seleccionar
     this.consultarReporte();
   }
 
