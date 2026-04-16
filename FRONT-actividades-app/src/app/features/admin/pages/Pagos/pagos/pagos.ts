@@ -29,7 +29,7 @@ import { AdelantoService } from '../../../../../core/services/adelanto_services'
 })
 export class Pagos implements OnInit {
   // --- Estado de la Vista ---
-  viewMode: 'generar' | 'historial' | 'adelantos' | 'bonificaciones' = 'generar';
+  viewMode: 'generar' | 'historial' | 'adelantos' | 'bonificaciones' | 'descuentos' = 'generar';
   usuarioSeleccionadoId: number | null = null;
   mesSeleccionado: string = 'ABRIL';
   anioSeleccionado: number = 2026;
@@ -145,7 +145,7 @@ export class Pagos implements OnInit {
   }
 
   // --- Navegación ---
-  cambiarTab(modo: 'generar' | 'historial' | 'adelantos' | 'bonificaciones'): void {
+  cambiarTab(modo: 'generar' | 'historial' | 'adelantos' | 'bonificaciones' | 'descuentos'): void {
     this.viewMode = modo;
     if (modo === 'historial') this.cargarHistorial();
   }
