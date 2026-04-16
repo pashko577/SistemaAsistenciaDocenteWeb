@@ -29,7 +29,7 @@ import { AdelantoService } from '../../../../../core/services/adelanto_services'
 })
 export class Pagos implements OnInit {
   // --- Estado de la Vista ---
-  viewMode: 'generar' | 'historial' | 'adelantos' = 'generar';
+  viewMode: 'generar' | 'historial' | 'adelantos' | 'bonificaciones' = 'generar';
   usuarioSeleccionadoId: number | null = null;
   mesSeleccionado: string = 'ABRIL';
   anioSeleccionado: number = 2026;
@@ -60,6 +60,31 @@ export class Pagos implements OnInit {
     { id: 4, nombre: 'Descuento por Hijos' },
     { id: 5, nombre: 'Otros Descuentos / Dirección' }
   ];
+  // --- Bonificaciones Manuales ---
+  bonificacionesManuales: { nombre: string, monto: number }[] = [];
+  mostrarFormBonificacion = false;
+  nuevaBonificacion = { nombre: '', monto: null as any };
+
+  get totalBonificaciones(): number {
+    return this.bonificacionesManuales.reduce((sum, item) => sum + Number(item.monto), 0);
+  }
+
+  agregarBonificacion(): void {
+    if (this.nuevaBonificacion.monto > 0 && this.nuevaBonificacion.nombre.trim() !== '') {
+      this.bonificacionesManuales.push({ 
+        nombre: this.nuevaBonificacion.nombre, 
+        monto: Number(this.nuevaBonificacion.monto) 
+      });
+      this.nuevaBonificacion = { nombre: '', monto: null as any };
+      this.mostrarFormBonificacion = false;
+      this.recalcularNeto();
+    }
+  }
+
+  eliminarBonificacion(index: number): void {
+    this.bonificacionesManuales.splice(index, 1);
+    this.recalcularNeto();
+  }
 
   get totalDeducciones(): number {
     return this.deduccionesManuales.reduce((sum, item) => {
@@ -77,7 +102,7 @@ export class Pagos implements OnInit {
   }
 
   recalcularNeto(): void {
-    this.netoProyectado = this.sueldoNetoPlanilla - this.totalAdelantos - this.totalDeducciones;
+    this.netoProyectado = this.sueldoNetoPlanilla - this.totalAdelantos - this.totalDeducciones + this.totalBonificaciones;
   }
 
   agregarDeduccion(): void {
@@ -120,7 +145,7 @@ export class Pagos implements OnInit {
   }
 
   // --- Navegación ---
-  cambiarTab(modo: 'generar' | 'historial' | 'adelantos'): void {
+  cambiarTab(modo: 'generar' | 'historial' | 'adelantos' | 'bonificaciones'): void {
     this.viewMode = modo;
     if (modo === 'historial') this.cargarHistorial();
   }
@@ -190,7 +215,7 @@ export class Pagos implements OnInit {
       contratoId: admin.contratoId,
       adelantoIds: this.adelantosPendientes.map(a => a.id),
       deducciones: this.deduccionesManuales, 
-      bonificaciones: []
+      bonificaciones: this.bonificacionesManuales
     };
 
     this.pagosService.crear(payload).subscribe(response => {
@@ -236,6 +261,7 @@ export class Pagos implements OnInit {
     this.totalAdelantos = 0;
     this.adelantosPendientes = [];
     this.deduccionesManuales = []; // Limpiar deducciones manuales también
+    this.bonificacionesManuales = []; // Limpiar bonificaciones
     this.obtenerDatosPlanilla();
   }
 }
