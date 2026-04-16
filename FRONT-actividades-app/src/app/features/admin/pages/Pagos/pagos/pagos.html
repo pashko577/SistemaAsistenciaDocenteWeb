@@ -24,6 +24,13 @@
         class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-400">
         Historial
       </button>
+      <button (click)="cambiarTab('bonificaciones')" 
+        [class.bg-white]="viewMode === 'bonificaciones'"
+        [class.dark:bg-gray-700]="viewMode === 'bonificaciones'"
+        [class.shadow-sm]="viewMode === 'bonificaciones'"
+        class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all text-gray-600 dark:text-gray-400 hover:text-emerald-700 dark:hover:text-emerald-400">
+        Bonificaciones
+      </button>
     </div>
 
     <!-- Adelantos -->
@@ -36,6 +43,70 @@
         (usuarioCambiado)="usuarioSeleccionadoId = $event" 
         (cambioAdelantos)="onCambioAdelantos($event)">
       </app-adelanto>
+    </div>
+
+    <!-- Bonificaciones -->
+    <div *ngIf="viewMode === 'bonificaciones'" class="bg-white dark:bg-gray-800 rounded-3xl shadow-xl overflow-hidden animate-fadeIn transition-colors duration-300 p-8">
+      <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight flex items-center gap-2">
+            <i class="fas fa-gift text-emerald-500"></i> Gestión de Bonificaciones Manuales
+          </h2>
+          <p class="text-sm text-slate-500 dark:text-gray-400">Agrega bonificaciones adicionales antes de generar la planilla de {{ mesSeleccionado | titlecase }} {{ anioSeleccionado }}.</p>
+        </div>
+        <button (click)="mostrarFormBonificacion = !mostrarFormBonificacion" 
+          class="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors shadow-sm">
+          <i class="fas" [ngClass]="mostrarFormBonificacion ? 'fa-minus' : 'fa-plus'"></i> 
+          {{ mostrarFormBonificacion ? 'Ocultar Formulario' : 'Nueva Bonificación' }}
+        </button>
+      </div>
+
+      <!-- Formulario nueva bonificacion -->
+      <div *ngIf="mostrarFormBonificacion" class="bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 p-6 rounded-2xl mb-8 animate-fadeIn">
+        <h4 class="text-sm font-bold text-emerald-700 dark:text-emerald-400 mb-4 uppercase tracking-widest">Añadir Bonificación</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-500 mb-1">Nombre o Motivo</label>
+            <input type="text" [(ngModel)]="nuevaBonificacion.nombre" placeholder="Ej. Bono por puntualidad" 
+              class="w-full text-sm p-3 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none">
+          </div>
+          <div class="flex items-end gap-4">
+            <div class="flex-1">
+              <label class="block text-xs font-bold text-slate-500 mb-1">Monto (S/)</label>
+              <input type="number" [(ngModel)]="nuevaBonificacion.monto" placeholder="0.00" min="0" step="0.1" 
+                class="w-full text-sm p-3 bg-white dark:bg-gray-900 border border-slate-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-emerald-400 outline-none">
+            </div>
+            <button (click)="agregarBonificacion()" [disabled]="!nuevaBonificacion.monto || nuevaBonificacion.monto <= 0 || nuevaBonificacion.nombre.trim() === ''"
+              class="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl text-sm font-bold shadow-md transition-all h-[46px] flex items-center justify-center">
+              <i class="fas fa-check mr-2"></i> Añadir
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lista bonificaciones -->
+      <div *ngIf="bonificacionesManuales.length > 0" class="space-y-3">
+        <div *ngFor="let bono of bonificacionesManuales; let i = index" 
+          class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-xl border border-slate-200 dark:border-gray-700 shadow-sm group">
+          <div class="flex items-center gap-3">
+            <div class="bg-emerald-100 dark:bg-emerald-900/30 w-10 h-10 rounded-full flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+              <i class="fas fa-star"></i>
+            </div>
+            <span class="font-semibold text-slate-700 dark:text-gray-200">{{ bono.nombre }}</span>
+          </div>
+          <div class="flex items-center gap-4">
+            <span class="text-lg font-black text-emerald-600 dark:text-emerald-400">+ S/ {{ bono.monto | number:'1.2-2' }}</span>
+            <button (click)="eliminarBonificacion(i)" class="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" title="Eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="bonificacionesManuales.length === 0 && !mostrarFormBonificacion" class="text-center py-12 bg-slate-50 dark:bg-gray-900/50 rounded-2xl border border-dashed border-slate-200 dark:border-gray-700">
+        <i class="fas fa-box-open text-slate-300 dark:text-gray-700 text-4xl mb-3 block"></i>
+        <p class="text-slate-500 dark:text-gray-400 font-medium">No hay bonificaciones agregadas para este pago.</p>
+      </div>
     </div>
 
     <!-- Generar Pago -->
@@ -87,6 +158,27 @@
             <div class="flex justify-between p-4 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl border border-emerald-100 dark:border-emerald-800">
               <span class="text-slate-600 dark:text-gray-300 font-medium">Sueldo Base Mensual</span>
               <span class="font-bold text-emerald-700 dark:text-emerald-400">S/ {{ sueldoBase | number:'1.2-2' }}</span>
+            </div>
+            
+            <div *ngFor="let bono of bonificacionesManuales; let i = index"
+              class="flex justify-between items-center p-3 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-xl text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-800 group transition-all shadow-sm">
+              <div class="flex flex-col">
+                <span class="text-sm font-semibold">Bono: {{ bono.nombre }}</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="font-bold">+ S/ {{ bono.monto | number:'1.2-2' }}</span>
+                <button (click)="eliminarBonificacion(i)" class="text-emerald-400 hover:text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity p-1" title="Quitar bono">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            </div>
+            
+            <div *ngIf="bonificacionesManuales.length === 0" class="pt-2">
+              <button (click)="cambiarTab('bonificaciones')"
+                class="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-emerald-300 dark:border-emerald-900/50 rounded-xl text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-400 dark:hover:border-emerald-400 transition-all text-sm font-bold shadow-sm">
+                <i class="fas fa-plus"></i>
+                Añadir Bonificación
+              </button>
             </div>
           </div>
 

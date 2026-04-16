@@ -80,9 +80,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="bg-white">
+            <tr class="bg-white border-b border-black" [class.border-b-0]="!pago.bonificaciones?.length">
               <td class="p-2 border-r border-black text-gray-800 uppercase">Sueldo Base según Actividad Académica</td>
               <td class="p-2 text-right font-bold text-black">S/ {{ (pago.montoActividad || pago.montoBase || 0) | number:'1.2-2' }}</td>
+            </tr>
+            <tr *ngFor="let bono of pago.bonificaciones; let isLast = last" class="bg-white border-b border-black" [class.border-b-0]="isLast">
+              <td class="p-2 border-r border-black text-gray-800 uppercase">Bonificación: {{ bono.nombre }}</td>
+              <td class="p-2 text-right font-bold text-green-700">+ {{ bono.monto | number:'1.2-2' }}</td>
             </tr>
           </tbody>
         </table>
