@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+@theme {
+  /* Marca Baldwin - Migrado de tailwind.config.js para compatibilidad con v4 */
+  --color-baldwin-verde: #2A6F4F;
+  --color-baldwin-cobalto: #2B58C1;
+  --color-baldwin-oro: #C99738;
+  --color-baldwin-surface: #F8FAFC;
+  --color-baldwin-slate-txt: #475569;
+
+  /* Degradado para botones principales */
+  --background-image-btn-gradient: linear-gradient(135deg, #2B58C1 0%, #2A6F4F 100%);
+}
+
 /* Configuración del modo oscuro para Tailwind v4 */
 @custom-variant dark (&:where(.dark, .dark *));
 

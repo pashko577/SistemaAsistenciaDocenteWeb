@@ -1,0 +1,66 @@
+<div class="space-y-4 animate-fadeIn">
+    <div class="flex justify-between items-center bg-white/40 dark:bg-slate-900/40 backdrop-blur-md p-6 rounded-3xl border border-white/20 dark:border-slate-800/50 shadow-xl shadow-slate-200/50 dark:shadow-none">
+        <div>
+            <h2 class="text-xl font-black text-slate-800 dark:text-white uppercase tracking-tight tracking-tighter">Biblioteca de <span
+                    class="text-baldwin-verde">Cursos</span></h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider opacity-70">Listado oficial de materias</p>
+        </div>
+        <button (click)="abrirModal()"
+            class="flex items-center gap-2 px-6 py-3 bg-btn-gradient hover:opacity-90 text-white text-[11px] font-black rounded-2xl transition-all shadow-lg shadow-baldwin-verde/30 active:scale-95">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-width="3" d="M12 4v16m8-8H4" />
+            </svg>
+            NUEVO CURSO
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        @for (curso of cursos(); track curso.id) {
+        <div
+            class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/50 hover:border-baldwin-verde dark:hover:border-baldwin-verde group transition-all duration-300 shadow-lg shadow-slate-200/40 dark:shadow-none hover:shadow-xl hover:-translate-y-1">
+            <div class="flex justify-between items-start mb-6">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-baldwin-verde shadow-inner group-hover:bg-baldwin-verde group-hover:text-white transition-all duration-300">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-width="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.084.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                </div>
+                <div class="flex gap-2">
+                    <button (click)="abrirModal(curso)"
+                        class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-baldwin-verde hover:bg-baldwin-verde/10 transition-all duration-300 opacity-0 group-hover:opacity-100" title="Editar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-width="2"
+                                d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                    </button>
+                    <button (click)="eliminarCurso(curso.id)"
+                        class="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-all duration-300 opacity-0 group-hover:opacity-100" title="Eliminar">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-width="2"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            <h4 class="text-md font-black text-slate-800 dark:text-white uppercase mb-1 tracking-tight">{{ curso.nombreCurso }}</h4>
+            <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest opacity-70">Materia Académica</p>
+        </div>
+        } @empty {
+        <div
+            class="col-span-full py-24 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-[3rem] bg-slate-50/50 dark:bg-transparent">
+            <div class="flex flex-col items-center gap-4 opacity-30">
+                <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.084.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <p class="text-slate-500 text-sm font-black uppercase tracking-widest">No hay cursos creados</p>
+            </div>
+        </div>
+        }
+    </div>
+</div>
+
+@if (showModal()) {
+<app-curso-form-modal [curso]="selectedCurso()" (onClose)="cerrarModal()" (onSave)="cargarCursos()">
+</app-curso-form-modal>
+}
