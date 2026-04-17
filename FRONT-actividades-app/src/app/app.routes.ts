@@ -58,7 +58,12 @@ export const routes: Routes = [
           .then(m => m.GestionContrato)
       },
       {
-        path: 'permisos', 
+        path: 'gestion-academica',
+        loadComponent: () => import('./features/admin/pages/getion-academica/gestion-academica/gestion-academica')
+          .then(m => m.GestionAcademica)
+      },
+      {
+        path: 'permisos',
         loadComponent: () => import('./features/admin/pages/gestion-permisos/permisos/permisos')
           .then(m => m.PermisosComponent)
       }

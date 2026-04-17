@@ -1,7 +1,6 @@
 package com.example.actividades_app.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.actividades_app.config.IsStaff;
@@ -19,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,7 +49,7 @@ public class DocenteController {
         return ResponseEntity.ok(docenteService.actualizarDocente(id, dto));
     }
 
-    @DeleteMapping("/{id}") 
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminarDocente(@PathVariable Long id) {
         docenteService.eliminarDocente(id);

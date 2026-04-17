@@ -11,9 +11,6 @@ public class ClaseResponseDTO {
 
     private Integer tiempoClase;
 
-
-
-
     private String aula;
 
     private Long cursoId;

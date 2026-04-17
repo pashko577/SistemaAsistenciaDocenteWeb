@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.actividades_app.config.IsStaff;
-import com.example.actividades_app.model.Entity.Administrativo;
 import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoRequestDTO;
 import com.example.actividades_app.model.dto.Adminitrativo.AdministrativoResponseDTO;
 import com.example.actividades_app.service.AdministrativoService;
@@ -41,7 +40,7 @@ public class AdministrativoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-  @GetMapping
+    @GetMapping
     @IsStaff
     public ResponseEntity<List<AdministrativoResponseDTO>> listarAdministrativos() {
         return ResponseEntity.ok(administrativoService.listarAdministrativos());

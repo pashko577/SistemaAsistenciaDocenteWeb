@@ -1,0 +1,43 @@
+<div class="p-8 max-w-7xl mx-auto space-y-8 animate-fadeIn">
+    <div class="flex flex-col gap-2">
+        <h1 class="text-3xl font-black text-slate-800 dark:text-white tracking-tighter uppercase">
+            Gestión <span class="text-baldwin-verde">Académica</span>
+        </h1>
+        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm">
+            Estructura de Niveles, Cursos, Grados y Secciones del sistema.
+        </p>
+    </div>
+
+    <div
+        class="flex p-1.5 bg-slate-100/80 dark:bg-slate-800/50 backdrop-blur-md rounded-2xl w-fit border border-slate-200 dark:border-slate-800 shadow-inner">
+        <button (click)="cambiarTab('niveles')"
+            [class]="tabActiva() === 'niveles' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-md scale-105' : 'text-slate-500 hover:text-slate-700'"
+            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+            Niveles
+        </button>
+        <button (click)="cambiarTab('cursos')"
+            [class]="tabActiva() === 'cursos' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-md scale-105' : 'text-slate-500 hover:text-slate-700'"
+            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+            Cursos
+        </button>
+        <button (click)="cambiarTab('grados')"
+            [class]="tabActiva() === 'grados' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-md scale-105' : 'text-slate-500 hover:text-slate-700'"
+            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+            Grados
+        </button>
+        <button (click)="cambiarTab('secciones')"
+            [class]="tabActiva() === 'secciones' ? 'bg-white dark:bg-slate-700 text-slate-800 dark:text-white shadow-md scale-105' : 'text-slate-500 hover:text-slate-700'"
+            class="px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300">
+            Secciones
+        </button>
+    </div>
+
+    <div class="animate-slideUp">
+        @switch (tabActiva()) {
+        @case ('niveles') { <app-nivel-list></app-nivel-list> }
+        @case ('cursos') { <app-curso-list></app-curso-list> }
+        @case ('grados') { <app-grado-list></app-grado-list> }
+        @case ('secciones') { <app-seccion-list></app-seccion-list> }
+        }
+    </div>
+</div>
