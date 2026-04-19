@@ -7,9 +7,9 @@ import com.example.actividades_app.model.dto.ModuloCurso.SeccionResponseDTO;
 import com.example.actividades_app.repository.GradoRepository;
 import com.example.actividades_app.repository.SeccionRepository;
 import com.example.actividades_app.service.SeccionService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,16 +21,12 @@ public class SeccionServiceImpl implements SeccionService {
     private final GradoRepository gradoRepository;
 
     @Override
+    @Transactional
     public SeccionResponseDTO crear(SeccionRequestDTO dto) {
+        validarGradoYSeccion(dto.getNomSeccion(), dto.getGradoId());
 
-        if (!gradoRepository.existsById(dto.getGradoId())) {
-            throw new RuntimeException("El grado no existe");
-        }
-
-        if (seccionRepository.existsByNomSeccionAndGradoId(dto.getNomSeccion(), dto.getGradoId())) {
-            throw new RuntimeException("La sección ya existe en ese grado");
-        }
-
+        // Usamos getReferenceById si solo necesitamos la entidad para la relación (más
+        // eficiente)
         Grado grado = gradoRepository.findById(dto.getGradoId())
                 .orElseThrow(() -> new RuntimeException("Grado no encontrado"));
 
@@ -39,56 +35,35 @@ public class SeccionServiceImpl implements SeccionService {
                 .grado(grado)
                 .build();
 
-        seccionRepository.save(seccion);
-
-        return SeccionResponseDTO.builder()
-                .id(seccion.getId())
-                .nomSeccion(seccion.getNomSeccion())
-                .gradoId(grado.getId())
-                .gradoNombre(grado.getNumGrado())
-                .build();
+        return mapToResponse(seccionRepository.save(seccion));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<SeccionResponseDTO> listar() {
-
-        return seccionRepository.findAll()
-                .stream()
-                .map(s -> SeccionResponseDTO.builder()
-                        .id(s.getId())
-                        .nomSeccion(s.getNomSeccion())
-                        .gradoId(s.getGrado().getId())
-                        .gradoNombre(s.getGrado().getNumGrado())
-                        .build())
+        return seccionRepository.findAll().stream()
+                .map(this::mapToResponse)
                 .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public SeccionResponseDTO obtenerPorId(Long id) {
-
-        Seccion seccion = seccionRepository.findById(id)
+        return seccionRepository.findById(id)
+                .map(this::mapToResponse)
                 .orElseThrow(() -> new RuntimeException("Sección no encontrada"));
-
-        return SeccionResponseDTO.builder()
-                .id(seccion.getId())
-                .nomSeccion(seccion.getNomSeccion())
-                .gradoId(seccion.getGrado().getId())
-                .gradoNombre(seccion.getGrado().getNumGrado())
-                .build();
     }
 
     @Override
+    @Transactional
     public SeccionResponseDTO actualizar(Long id, SeccionRequestDTO dto) {
-
         Seccion seccion = seccionRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Sección no encontrada"));
 
-        if (!gradoRepository.existsById(dto.getGradoId())) {
-            throw new RuntimeException("El grado no existe");
-        }
-
-        if (seccionRepository.existsByNomSeccionAndGradoId(dto.getNomSeccion(), dto.getGradoId())) {
-            throw new RuntimeException("La sección ya existe en ese grado");
+        // Validar si el grado cambió o si el nombre se repite en el mismo grado
+        if (!seccion.getGrado().getId().equals(dto.getGradoId()) ||
+                !seccion.getNomSeccion().equals(dto.getNomSeccion())) {
+            validarGradoYSeccion(dto.getNomSeccion(), dto.getGradoId());
         }
 
         Grado grado = gradoRepository.findById(dto.getGradoId())
@@ -97,23 +72,37 @@ public class SeccionServiceImpl implements SeccionService {
         seccion.setNomSeccion(dto.getNomSeccion());
         seccion.setGrado(grado);
 
-        seccionRepository.save(seccion);
-
-        return SeccionResponseDTO.builder()
-                .id(seccion.getId())
-                .nomSeccion(seccion.getNomSeccion())
-                .gradoId(grado.getId())
-                .gradoNombre(grado.getNumGrado())
-                .build();
+        return mapToResponse(seccionRepository.save(seccion));
     }
 
     @Override
+    @Transactional
     public void eliminar(Long id) {
-
         if (!seccionRepository.existsById(id)) {
             throw new RuntimeException("Sección no encontrada");
         }
-
         seccionRepository.deleteById(id);
+    }
+
+    // --- MÉTODOS DE APOYO (OPTIMIZACIÓN) ---
+
+    private void validarGradoYSeccion(String nombre, Long gradoId) {
+        if (!gradoRepository.existsById(gradoId)) {
+            throw new RuntimeException("El grado no existe");
+        }
+        if (seccionRepository.existsByNomSeccionAndGradoId(nombre, gradoId)) {
+            throw new RuntimeException("La sección '" + nombre + "' ya existe en este grado");
+        }
+    }
+
+    private SeccionResponseDTO mapToResponse(Seccion s) {
+        return SeccionResponseDTO.builder()
+                .id(s.getId())
+                .nomSeccion(s.getNomSeccion())
+                .gradoId(s.getGrado().getId())
+                .gradoNombre(s.getGrado().getNumGrado())
+                .nivelId(s.getGrado().getNivel().getId())
+                .nivelNombre(s.getGrado().getNivel().getNomNivel())
+                .build();
     }
 }

@@ -5,6 +5,9 @@ import { NivelListComponent } from '../components/nivel/nivel-list/nivel-list';
 import { CursoListComponent } from '../components/curso/curso-list/curso-list';
 import { GradoListComponent } from '../components/grado/grado-list/grado-list';
 import { SeccionListComponent } from '../components/seccion/seccion-list/seccion-list';
+import { ClaseListComponent } from '../components/clase/clase-list/clase-list';
+import { PeriodoListComponent } from '../components/periodo-academico/periodo-list/periodo-list';
+
 
 @Component({
   selector: 'app-gestion-academica',
@@ -14,15 +17,17 @@ import { SeccionListComponent } from '../components/seccion/seccion-list/seccion
     NivelListComponent,
     CursoListComponent,
     GradoListComponent,
-    SeccionListComponent
+    SeccionListComponent,
+    ClaseListComponent,
+    PeriodoListComponent,
   ],
   templateUrl: './gestion-academica.html'
 })
 export class GestionAcademica {
   // Extendemos las opciones de tabs
-  tabActiva = signal<'niveles' | 'cursos' | 'grados' | 'secciones'>('niveles');
+  tabActiva = signal<'niveles' | 'cursos' | 'grados' | 'secciones' | 'clases' | 'periodos'>('niveles');
 
-  cambiarTab(tab: 'niveles' | 'cursos' | 'grados' | 'secciones') {
+  cambiarTab(tab: 'niveles' | 'cursos' | 'grados' | 'secciones' | 'clases' | 'periodos') {
     this.tabActiva.set(tab);
   }
 }

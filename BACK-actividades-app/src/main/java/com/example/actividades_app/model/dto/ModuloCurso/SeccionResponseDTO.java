@@ -14,5 +14,7 @@ public class SeccionResponseDTO {
 
     private String gradoNombre;
 
+    private Long nivelId;
+    private String nivelNombre;
 
 }

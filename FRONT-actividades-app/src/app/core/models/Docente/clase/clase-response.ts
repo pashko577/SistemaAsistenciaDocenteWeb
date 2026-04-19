@@ -8,4 +8,6 @@ export interface ClaseResponse {
     seccionNombre: string;
     periodoAcademicoId: number;
     periodoNombre: string;
+    gradoNombre: string;
+    nivelNombre: string;
 }

@@ -1,0 +1,94 @@
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+    <div
+        class="w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+
+        <div
+            class="px-8 py-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/30 dark:bg-slate-800/20">
+            <div>
+                <h3 class="text-xl font-black text-slate-800 dark:text-white tracking-tight uppercase">
+                    {{ clase ? 'EDITAR' : 'PROGRAMAR' }} <span class="text-baldwin-verde">CLASE</span>
+                </h3>
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Configuración horaria y
+                    espacial</p>
+            </div>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="guardar()" class="p-8 space-y-5">
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Periodo
+                    Lectivo</label>
+                <select formControlName="periodoAcademicoId"
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white outline-none focus:ring-2 focus:ring-baldwin-verde/20 transition-all">
+                    <option value="" disabled>Seleccione un periodo...</option>
+                    @for (p of periodos(); track p.id) {
+                    <option [value]="p.id">
+                        {{ p.nombre }} {{ p.estado === 'ACTIVO' ? '(ACTUAL)' : '' }}
+                    </option>
+                    }
+                </select>
+                @if (form.get('periodoAcademicoId')?.touched && form.get('periodoAcademicoId')?.invalid) {
+                <span class="text-[9px] text-rose-500 font-bold ml-1 uppercase">El periodo es obligatorio</span>
+                }
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Curso
+                    Académico</label>
+                <select formControlName="cursoId"
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white outline-none focus:ring-2 focus:ring-baldwin-verde/20 transition-all">
+                    <option value="" disabled>Seleccione un curso...</option>
+                    @for (c of cursos(); track c.id) {
+                    <option [value]="c.id">{{ c.nombreCurso }}</option>
+                    }
+                </select>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">
+                    Sección / Grado
+                </label>
+                <select formControlName="seccionId"
+                    class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white outline-none focus:ring-2 focus:ring-baldwin-verde/20 transition-all">
+                    <option value="" disabled>Seleccione sección...</option>
+
+                    @for (grupo of seccionesAgrupadas(); track grupo.nivel) {
+                    <optgroup [label]="grupo.nivel" class="bg-slate-100 dark:bg-slate-800 text-slate-500">
+                        @for (s of grupo.secciones; track s.id) {
+                        <option [value]="s.id">
+                            {{ s.nomSeccion }} - {{ s.gradoNombre }}
+                        </option>
+                        }
+                    </optgroup>
+                    }
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Aula</label>
+                    <input type="text" formControlName="aula" placeholder="Ej: A-101"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white outline-none focus:ring-2 focus:ring-baldwin-verde/20 transition-all">
+                </div>
+
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Duración
+                        (Min)</label>
+                    <input type="number" formControlName="tiempoClase"
+                        class="w-full px-4 py-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-sm font-bold dark:text-white outline-none focus:ring-2 focus:ring-baldwin-verde/20 transition-all">
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" (click)="onClose.emit()"
+                    class="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-500 text-[10px] font-black uppercase tracking-widest hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
+                    Cerrar
+                </button>
+                <button type="submit" [disabled]="form.invalid"
+                    class="flex-1 px-4 py-3 rounded-xl bg-baldwin-verde hover:bg-emerald-600 disabled:opacity-50 text-white text-[10px] font-black uppercase tracking-widest transition-all shadow-lg shadow-baldwin-verde/20">
+                    {{ clase ? 'Actualizar' : 'Confirmar Clase' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
