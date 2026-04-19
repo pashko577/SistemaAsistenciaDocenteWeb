@@ -3,4 +3,6 @@ export interface SeccionResponse {
     nomSeccion: string;
     gradoId: number;
     gradoNombre: string;
+    nivelId: number;
+    nivelNombre: string;
 }

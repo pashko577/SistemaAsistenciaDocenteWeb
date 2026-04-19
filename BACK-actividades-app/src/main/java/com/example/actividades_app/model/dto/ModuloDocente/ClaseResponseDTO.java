@@ -19,6 +19,9 @@ public class ClaseResponseDTO {
     private Long seccionId;
     private String seccionNombre;
 
+    private String gradoNombre;
+    private String nivelNombre;
+
     private Long periodoAcademicoId;
     private String periodoNombre;
 

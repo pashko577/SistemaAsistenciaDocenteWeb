@@ -1,0 +1,101 @@
+<div
+    class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xl animate-fadeIn">
+    <div
+        class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/20">
+        <div>
+            <h2 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight uppercase">
+                GESTIÓN DE <span class="text-baldwin-verde">CLASES</span>
+            </h2>
+            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+                Total programadas: {{ clases().length }}
+            </p>
+        </div>
+        <button (click)="abrirModal()"
+            class="flex items-center gap-2 px-6 py-3 bg-baldwin-verde hover:bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl transition-all shadow-lg shadow-baldwin-verde/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-width="3" d="M12 4v16m8-8H4" />
+            </svg>
+            Nueva Clase
+        </button>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-slate-50 dark:bg-slate-800/40">
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Curso /
+                        Asignatura</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Sección &
+                        Grado</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Aula</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Duración</th>
+                    <th class="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">
+                        Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                @for (item of clases(); track item.id) {
+                <tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col">
+                            <span class="text-sm font-bold text-slate-700 dark:text-slate-200">{{ item.cursoNombre
+                                }}</span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-tighter">ID: #{{ item.id
+                                }}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex flex-col gap-1">
+                            <span
+                                class="inline-flex items-center w-fit px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-tight">
+                                {{ item.seccionNombre }} - {{ item.gradoNombre }}
+                            </span>
+                            <span class="text-[9px] text-slate-400 font-bold uppercase tracking-widest ml-1">
+                                {{ item.nivelNombre }}
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm font-medium text-slate-500 dark:text-slate-400 font-mono">{{ item.aula
+                            }}</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300">{{ item.tiempoClase }}
+                            min</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex justify-center gap-2">
+                            <button (click)="abrirModal(item)"
+                                class="p-2 text-slate-400 hover:text-baldwin-verde transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-width="2"
+                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                            </button>
+                            <button (click)="eliminar(item.id)"
+                                class="p-2 text-slate-400 hover:text-rose-500 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-width="2"
+                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                } @empty {
+                <tr>
+                    <td colspan="5" class="px-6 py-20 text-center">
+                        <p class="text-slate-400 font-bold uppercase text-xs tracking-widest">No hay clases programadas
+                            en este periodo.</p>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@if (mostrarModal()) {
+<app-clase-form-modal [clase]="claseSeleccionada()" (onClose)="cerrarModal()" (onSave)="cargarClases()">
+</app-clase-form-modal>
+}
