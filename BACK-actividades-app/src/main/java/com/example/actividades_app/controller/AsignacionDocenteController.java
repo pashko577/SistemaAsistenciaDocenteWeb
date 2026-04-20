@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/asignacion-docente")
 @RequiredArgsConstructor
 public class AsignacionDocenteController {
-private final AsignacionDocenteService asignacionService;
+    private final AsignacionDocenteService asignacionService;
 
     @PostMapping
     @IsStaff
@@ -61,4 +61,5 @@ private final AsignacionDocenteService asignacionService;
         asignacionService.eliminar(id);
         return ResponseEntity.noContent().build();
     }
+
 }

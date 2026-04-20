@@ -16,84 +16,87 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AsignacionDocenteServiceImpl implements AsignacionDocenteService {
 
-    private final AsignacionDocenteRepository asignacionRepository;
-    private final DocenteRepository docenteRepository;
-    private final ClaseRepository claseRepository;
-    private final TipoActividadRepository tipoActividadRepository;
+        private final AsignacionDocenteRepository asignacionRepository;
+        private final DocenteRepository docenteRepository;
+        private final ClaseRepository claseRepository;
+        private final TipoActividadRepository tipoActividadRepository;
 
-    @Override
-    public AsignacionDocenteResponseDTO registrar(AsignacionDocenteRequestDTO dto) {
+        @Override
+        public AsignacionDocenteResponseDTO registrar(AsignacionDocenteRequestDTO dto) {
 
-        Docente docente = docenteRepository.findById(dto.getDocenteId())
-                .orElseThrow(() -> new RuntimeException("Docente no encontrado"));
+                Docente docente = docenteRepository.findById(dto.getDocenteId())
+                                .orElseThrow(() -> new RuntimeException("Docente no encontrado"));
 
-        Clase clase = claseRepository.findById(dto.getClaseId())
-                .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
+                Clase clase = claseRepository.findById(dto.getClaseId())
+                                .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
 
-        TipoActividad tipoActividad = tipoActividadRepository.findById(dto.getTipoActividadId())
-                .orElseThrow(() -> new RuntimeException("TipoActividad no encontrado"));
+                TipoActividad tipoActividad = tipoActividadRepository.findById(dto.getTipoActividadId())
+                                .orElseThrow(() -> new RuntimeException("TipoActividad no encontrado"));
 
-        AsignacionDocente asignacion = AsignacionDocente.builder()
-                .estado(dto.getEstado())
-                .observaciones(dto.getObservaciones())
-                .docente(docente)
-                .clase(clase)
-                .tipoActividad(tipoActividad)
-                .build();
+                AsignacionDocente asignacion = AsignacionDocente.builder()
+                                .estado(dto.getEstado())
+                                .observaciones(dto.getObservaciones())
+                                .docente(docente)
+                                .clase(clase)
+                                .tipoActividad(tipoActividad)
+                                .build();
 
-        asignacionRepository.save(asignacion);
+                asignacionRepository.save(asignacion);
 
-        return mapToResponse(asignacion);
-    }
+                return mapToResponse(asignacion);
+        }
 
-    @Override
-    public AsignacionDocenteResponseDTO obtenerPorId(Long id) {
+        @Override
+        public AsignacionDocenteResponseDTO obtenerPorId(Long id) {
 
-        AsignacionDocente asignacion = asignacionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Asignación no encontrada"));
+                AsignacionDocente asignacion = asignacionRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Asignación no encontrada"));
 
-        return mapToResponse(asignacion);
-    }
+                return mapToResponse(asignacion);
+        }
 
-    @Override
-    public List<AsignacionDocenteResponseDTO> listar() {
+        @Override
+        public List<AsignacionDocenteResponseDTO> listar() {
 
-        return asignacionRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
-    }
+                return asignacionRepository.findAll()
+                                .stream()
+                                .map(this::mapToResponse)
+                                .collect(Collectors.toList());
+        }
 
-    @Override
-    public AsignacionDocenteResponseDTO actualizar(Long id, AsignacionDocenteRequestDTO dto) {
+        @Override
+        public AsignacionDocenteResponseDTO actualizar(Long id, AsignacionDocenteRequestDTO dto) {
 
-        AsignacionDocente asignacion = asignacionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Asignación no encontrada"));
+                AsignacionDocente asignacion = asignacionRepository.findById(id)
+                                .orElseThrow(() -> new RuntimeException("Asignación no encontrada"));
 
-        asignacion.setEstado(dto.getEstado());
-        asignacion.setObservaciones(dto.getObservaciones());
+                asignacion.setEstado(dto.getEstado());
+                asignacion.setObservaciones(dto.getObservaciones());
 
-        asignacionRepository.save(asignacion);
+                asignacionRepository.save(asignacion);
 
-        return mapToResponse(asignacion);
-    }
+                return mapToResponse(asignacion);
+        }
 
-    @Override
-    public void eliminar(Long id) {
-        asignacionRepository.deleteById(id);
-    }
+        @Override
+        public void eliminar(Long id) {
+                asignacionRepository.deleteById(id);
+        }
 
-    private AsignacionDocenteResponseDTO mapToResponse(AsignacionDocente a) {
+        private AsignacionDocenteResponseDTO mapToResponse(AsignacionDocente a) {
 
-        return AsignacionDocenteResponseDTO.builder()
-                .id(a.getId())
-                .estado(a.getEstado())
-                .observaciones(a.getObservaciones())
-                .docenteId(a.getDocente().getId())
-                .docenteNombre(a.getDocente().getUsuario().getPersona().getNombres())
-                .claseId(a.getClase().getId())
-                .tipoActividadId(a.getTipoActividad().getId())
-                .tipoActividadNombre(a.getTipoActividad().getNombre())
-                .build();
-    }
+                return AsignacionDocenteResponseDTO.builder()
+                                .id(a.getId())
+                                .estado(a.getEstado())
+                                .observaciones(a.getObservaciones())
+                                .docenteId(a.getDocente().getId())
+                                .docenteNombre(a.getDocente().getUsuario().getPersona().getNombres())
+                                .claseId(a.getClase().getId())
+                                .cursoNombre(a.getClase().getCurso().getNombreCurso())
+                                .gradoNombre(a.getClase().getSeccion().getGrado().getNumGrado())
+                                .seccionNombre(a.getClase().getSeccion().getNomSeccion())
+                                .tipoActividadId(a.getTipoActividad().getId())
+                                .tipoActividadNombre(a.getTipoActividad().getNombre())
+                                .build();
+        }
 }

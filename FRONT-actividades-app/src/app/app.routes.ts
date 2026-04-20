@@ -63,6 +63,11 @@ export const routes: Routes = [
           .then(m => m.GestionAcademica)
       },
       {
+        path: 'asignacion-docente',
+        loadComponent: () => import('./features/admin/pages/asignacion-docente/asignacion-docente/asignacion-docente')
+          .then(m => m.AsignacionDocente)
+      },
+      {
         path: 'permisos',
         loadComponent: () => import('./features/admin/pages/gestion-permisos/permisos/permisos')
           .then(m => m.PermisosComponent)
