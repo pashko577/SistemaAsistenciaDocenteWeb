@@ -1,0 +1,88 @@
+/* =========================================
+   MODAL OVERLAY - Estilos Garantizados
+   ========================================= */
+
+/* Capa de fondo del modal - CSS puro para máxima compatibilidad */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background-color: rgba(2, 6, 23, 0.88);  /* slate-950 con 88% opacidad */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+
+/* Contenedor del modal */
+.modal-container {
+  width: 100%;
+  max-width: 42rem;       /* max-w-2xl */
+  max-height: 95vh;
+  border-radius: 2.5rem;
+  background-color: white;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  margin: 2rem 0;
+  transform: translateZ(0);  /* Fuerza un stacking context propio */
+}
+
+/* Modo oscuro del contenedor */
+:host-context(.dark) .modal-container {
+  background-color: rgb(15, 23, 42); /* slate-900 */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(148, 163, 184, 0.1);
+}
+
+/* Header del modal */
+.modal-header {
+  padding: 2rem;
+  border-bottom: 1px solid rgb(241, 245, 249); /* slate-100 */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(248, 250, 252, 0.5); /* slate-50/50 */
+  flex-shrink: 0;
+}
+
+:host-context(.dark) .modal-header {
+  border-bottom-color: rgb(30, 41, 59); /* slate-800 */
+  background-color: rgba(30, 41, 59, 0.4);
+}
+
+/* Área de formulario scrollable */
+.modal-body {
+  overflow-y: auto;
+  flex: 1;
+  padding: 2rem;
+}
+
+/* Sobreescribir el hack del CSS del header para los inputs de ESTE componente */
+.modal-body input,
+.modal-body select {
+  background-color: rgb(248, 250, 252) !important; /* slate-50 */
+  border-color: rgb(226, 232, 240) !important;     /* slate-200 */
+  color: rgb(51, 65, 85) !important;               /* slate-700 */
+}
+
+:host-context(.dark) .modal-body input,
+:host-context(.dark) .modal-body select {
+  background-color: rgba(30, 41, 59, 0.5) !important; /* slate-800/50 */
+  border-color: rgba(51, 65, 85, 0.5) !important;     /* slate-700/50 */
+  color: rgb(226, 232, 240) !important;                /* slate-200 */
+}
+
+.modal-body input:focus,
+.modal-body select:focus {
+  border-color: #2A6F4F !important;
+  box-shadow: 0 0 0 4px rgba(42, 111, 79, 0.1) !important;
+  background-color: white !important;
+}
+
+:host-context(.dark) .modal-body input:focus,
+:host-context(.dark) .modal-body select:focus {
+  background-color: rgba(30, 41, 59, 0.7) !important;
+}
