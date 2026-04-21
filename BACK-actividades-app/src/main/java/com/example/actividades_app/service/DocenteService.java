@@ -10,6 +10,8 @@ public interface DocenteService {
     DocenteResponseDTO registerDocente(DocenteRequestDTO request);
     
     List<DocenteResponseDTO> listarTodos();
+
+    List<DocenteResponseDTO> listarDocentesConContrato();
     
     // Al actualizar, devuelves la nueva versión del docente
     DocenteResponseDTO actualizarDocente(Long id, DocenteRequestDTO request);

@@ -52,9 +52,10 @@
                         <td class="px-8 py-5">
                             <div class="flex flex-col">
                                 <span class="text-sm font-bold text-slate-800 dark:text-white italic">"{{ item.cursoNombre }}"</span>
-                                <span class="text-[10px] text-slate-400 font-black uppercase tracking-tighter opacity-70">
-                                    {{ item.gradoNombre }} - {{ item.seccionNombre }}
-                                </span>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="text-[10px] text-baldwin-verde font-black uppercase tracking-tighter">{{ item.nivelNombre }}</span>
+                                    <span class="text-[10px] text-slate-400 font-black uppercase tracking-tighter opacity-70">• {{ item.gradoNombre }} - {{ item.seccionNombre }}</span>
+                                </div>
                             </div>
                         </td>
 

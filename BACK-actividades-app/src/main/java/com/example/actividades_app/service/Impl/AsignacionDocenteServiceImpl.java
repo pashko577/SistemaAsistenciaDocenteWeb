@@ -70,8 +70,20 @@ public class AsignacionDocenteServiceImpl implements AsignacionDocenteService {
                 AsignacionDocente asignacion = asignacionRepository.findById(id)
                                 .orElseThrow(() -> new RuntimeException("Asignación no encontrada"));
 
+                Docente docente = docenteRepository.findById(dto.getDocenteId())
+                                .orElseThrow(() -> new RuntimeException("Docente no encontrado"));
+
+                Clase clase = claseRepository.findById(dto.getClaseId())
+                                .orElseThrow(() -> new RuntimeException("Clase no encontrada"));
+
+                TipoActividad tipoActividad = tipoActividadRepository.findById(dto.getTipoActividadId())
+                                .orElseThrow(() -> new RuntimeException("TipoActividad no encontrado"));
+
                 asignacion.setEstado(dto.getEstado());
                 asignacion.setObservaciones(dto.getObservaciones());
+                asignacion.setDocente(docente);
+                asignacion.setClase(clase);
+                asignacion.setTipoActividad(tipoActividad);
 
                 asignacionRepository.save(asignacion);
 
@@ -95,6 +107,7 @@ public class AsignacionDocenteServiceImpl implements AsignacionDocenteService {
                                 .cursoNombre(a.getClase().getCurso().getNombreCurso())
                                 .gradoNombre(a.getClase().getSeccion().getGrado().getNumGrado())
                                 .seccionNombre(a.getClase().getSeccion().getNomSeccion())
+                                .nivelNombre(a.getClase().getSeccion().getGrado().getNivel().getNomNivel())
                                 .tipoActividadId(a.getTipoActividad().getId())
                                 .tipoActividadNombre(a.getTipoActividad().getNombre())
                                 .build();

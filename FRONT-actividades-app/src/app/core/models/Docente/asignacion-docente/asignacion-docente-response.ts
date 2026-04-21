@@ -11,6 +11,7 @@ export interface AsignacionDocenteResponse {
     cursoNombre: string;
     gradoNombre: string;
     seccionNombre: string;
+    nivelNombre: string;
     // Estos campos ayudan a que la UI se vea como tus capturas previas
     tipoActividadId: number;
     tipoActividadNombre: string;
