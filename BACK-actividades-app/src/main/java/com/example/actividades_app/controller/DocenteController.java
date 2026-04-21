@@ -42,6 +42,12 @@ public class DocenteController {
         return ResponseEntity.ok(docenteService.listarTodos());
     }
 
+    @GetMapping("/con-contrato")
+    @IsStaff
+    public ResponseEntity<List<DocenteResponseDTO>> listarDocentesConContrato() {
+        return ResponseEntity.ok(docenteService.listarDocentesConContrato());
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<DocenteResponseDTO> actualizarDocente(@PathVariable Long id,

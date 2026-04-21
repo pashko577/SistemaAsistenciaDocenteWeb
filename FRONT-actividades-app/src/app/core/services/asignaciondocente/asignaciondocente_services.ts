@@ -50,7 +50,7 @@ export class AsignacionDocenteService {
      * Nota: Usa 'Docentes' con D mayúscula según tu controlador.
      */
     listarDocentes(): Observable<DocenteResponse[]> {
-        return this.http.get<DocenteResponse[]>(`${this.API_URL}/Docentes`);
+        return this.http.get<DocenteResponse[]>(`${this.API_URL}/Docentes/con-contrato`);
     }
 
     /** * Obtiene las clases académicas configuradas.

@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class DocenteServiceImpl implements DocenteService {
 
         private final DocenteRepository docenteRepository;
+        private final ContratoRepository contratoRepository;
         private final EspecialidadDocenteRepository especialidadDocenteRepository;
         private final UsuarioRepository usuarioRepository;
         private final SedeRepository sedeRepository;
@@ -145,6 +146,16 @@ public class DocenteServiceImpl implements DocenteService {
         @Transactional(readOnly = true)
         public List<DocenteResponseDTO> listarTodos() {
                 return docenteRepository.findAll().stream()
+                                .map(this::convertirAResponse)
+                                .collect(Collectors.toList());
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<DocenteResponseDTO> listarDocentesConContrato() {
+                return docenteRepository.findAll().stream()
+                                .filter(d -> contratoRepository.existsByUsuarioIdAndEstado(d.getUsuario().getId(),
+                                                Estado.ACTIVO))
                                 .map(this::convertirAResponse)
                                 .collect(Collectors.toList());
         }

@@ -18,6 +18,7 @@ public class AsignacionDocenteResponseDTO {
     private String cursoNombre;
     private String gradoNombre;
     private String seccionNombre;
+    private String nivelNombre;
 
     private Long tipoActividadId;
     private String tipoActividadNombre;

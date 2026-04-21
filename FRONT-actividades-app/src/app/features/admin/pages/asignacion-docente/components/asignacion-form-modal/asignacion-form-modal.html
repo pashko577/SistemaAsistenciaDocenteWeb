@@ -45,7 +45,7 @@
                             class="w-full rounded-2xl px-5 py-4 outline-none appearance-none text-sm font-bold cursor-pointer transition-all">
                             <option [ngValue]="null" disabled>Seleccione un docente de la lista</option>
                             @for (d of docentes(); track d.id) {
-                                <option [value]="d.id">{{ d.nombres }} {{ d.apellidos }}</option>
+                                <option [ngValue]="d.id">{{ d.nombres }} {{ d.apellidos }}</option>
                             }
                         </select>
                         <mat-icon class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">expand_more</mat-icon>
@@ -61,7 +61,7 @@
                                 class="w-full rounded-2xl px-5 py-4 outline-none appearance-none text-sm font-bold cursor-pointer transition-all">
                                 <option [ngValue]="null" disabled>Seleccionar clase...</option>
                                 @for (c of clases(); track c.id) {
-                                    <option [value]="c.id">{{ c.cursoNombre }} ({{ c.gradoNombre }} - {{ c.seccionNombre }})</option>
+                                    <option [ngValue]="c.id">{{ c.cursoNombre }} - {{ c.nivelNombre }} ({{ c.gradoNombre }} - {{ c.seccionNombre }})</option>
                                 }
                             </select>
                             <mat-icon class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">menu_book</mat-icon>
@@ -76,7 +76,7 @@
                                 class="w-full rounded-2xl px-5 py-4 outline-none appearance-none text-sm font-bold cursor-pointer transition-all">
                                 <option [ngValue]="null" disabled>Definir actividad...</option>
                                 @for (t of tiposActividad(); track t.id) {
-                                    <option [value]="t.id">{{ t.nombre }}</option>
+                                    <option [ngValue]="t.id">{{ t.nombre }}</option>
                                 }
                             </select>
                             <mat-icon class="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">layers</mat-icon>

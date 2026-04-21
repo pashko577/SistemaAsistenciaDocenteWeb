@@ -22,6 +22,8 @@ public interface ContratoRepository extends JpaRepository<Contrato, Long> {
 
     boolean existsByUsuarioId(Long usuarioId);
 
+    boolean existsByUsuarioIdAndEstado(Long usuarioId, Estado estado);
+
     boolean existsByUsuarioIdAndTipoActividadIdAndEstado(
             Long usuarioId,
             Long tipoActividadId,
