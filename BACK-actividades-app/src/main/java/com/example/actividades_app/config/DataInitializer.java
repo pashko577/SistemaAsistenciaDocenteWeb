@@ -29,6 +29,8 @@ public class DataInitializer {
                 crearModulo("Gestión Docente", "Mantenimiento de profesores", "/gestion-docente"),
                 crearModulo("Gestión Administrativo", "Mantenimiento de personal", "/gestion-administrativo"),
                 crearModulo("Gestión de Contratos", "Control de contratos", "/gestion-contratos"),
+                crearModulo("Gestión Académica", "Configuración académica", "/gestion-academica"),
+                crearModulo("Asignación Docente", "Asignación de clases", "/asignacion-docente"),
 
                 // Asistencias
                 crearModulo("Asistencia Docente", "Registro para profesores", "/asistencia-docente"),

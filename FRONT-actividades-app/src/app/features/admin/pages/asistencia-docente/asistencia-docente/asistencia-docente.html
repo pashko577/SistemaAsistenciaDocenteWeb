@@ -1,0 +1,66 @@
+<!-- Usamos @if (nueva sintaxis Angular 17+) igual que el resto del proyecto -->
+<div class="space-y-6 animate-fadeIn">
+
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md p-6 rounded-3xl border border-white/20 dark:border-slate-800/50 shadow-xl shadow-slate-200/50 dark:shadow-none">
+        <div>
+            <h1 class="text-2xl font-black text-slate-800 dark:text-white tracking-tight uppercase">
+                Gestión de <span class="text-baldwin-verde">Horarios</span>
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest opacity-70">
+                Configura y administra el horario maestro institucional
+            </p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex gap-1 bg-white dark:bg-slate-800/50 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm">
+            <button (click)="cambiarPestana('lista')"
+                [ngClass]="pestanaActiva() === 'lista' ? 'bg-btn-gradient text-white shadow-lg shadow-baldwin-verde/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                </svg>
+                Ver Horarios
+            </button>
+
+            <button (click)="cambiarPestana('config')"
+                [ngClass]="pestanaActiva() === 'config' ? 'bg-btn-gradient text-white shadow-lg shadow-baldwin-verde/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                </svg>
+                Nuevo Horario
+            </button>
+
+            <button (click)="cambiarPestana('bloques')"
+                [ngClass]="pestanaActiva() === 'bloques' ? 'bg-btn-gradient text-white shadow-lg shadow-baldwin-verde/30' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'"
+                class="flex items-center gap-2 px-5 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Configurar Bloques
+            </button>
+        </div>
+    </div>
+
+    <!-- Contenido por pestaña — @if recrea el componente garantizando ngOnInit -->
+    @if (pestanaActiva() === 'lista') {
+        <app-cronograma-docente-list></app-cronograma-docente-list>
+    }
+
+    @if (pestanaActiva() === 'config') {
+        <app-cronograma-docente-form (guardado)="onCronogramaGuardado()"></app-cronograma-docente-form>
+    }
+
+    @if (pestanaActiva() === 'bloques') {
+        @if (mostrarFormBloque()) {
+            <app-horario-bloque-form
+                [bloqueId]="bloqueEditId()"
+                (guardado)="finalizarEdicionBloque()"
+                (cancelar)="finalizarEdicionBloque()">
+            </app-horario-bloque-form>
+        } @else {
+            <app-horario-bloque-list (editar)="iniciarEdicionBloque($event)" (nuevo)="iniciarEdicionBloque(null)"></app-horario-bloque-list>
+        }
+    }
+</div>

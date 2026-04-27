@@ -71,6 +71,11 @@ export const routes: Routes = [
         path: 'permisos',
         loadComponent: () => import('./features/admin/pages/gestion-permisos/permisos/permisos')
           .then(m => m.PermisosComponent)
+      },
+      {
+        path: 'asistencia-docente',
+        loadComponent: () => import('./features/admin/pages/asistencia-docente/asistencia-docente/asistencia-docente')
+          .then(m => m.AsistenciaDocente)
       }
     ]
   },

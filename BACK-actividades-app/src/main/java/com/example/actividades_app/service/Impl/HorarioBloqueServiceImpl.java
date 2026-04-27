@@ -5,9 +5,11 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.example.actividades_app.model.Entity.HorarioBloque;
+import com.example.actividades_app.model.Entity.Nivel;
 import com.example.actividades_app.model.dto.ModuloHorario.HorarioBloqueRequestDTO;
 import com.example.actividades_app.model.dto.ModuloHorario.HorarioBloqueResponseDTO;
 import com.example.actividades_app.repository.HorarioBloqueRepository;
+import com.example.actividades_app.repository.NivelRepository;
 import com.example.actividades_app.service.HorarioBloqueService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,18 +19,27 @@ import lombok.RequiredArgsConstructor;
 public class HorarioBloqueServiceImpl implements HorarioBloqueService {
 
     private final HorarioBloqueRepository horarioBloqueRepository;
+    private final NivelRepository nivelRepository;
 
     @Override
     public HorarioBloqueResponseDTO crear(HorarioBloqueRequestDTO dto) {
 
-        if (horarioBloqueRepository.existsByOrdenBloque(dto.getOrdenBloque())) {
-            throw new RuntimeException("El orden del bloque ya existe");
+        // Validamos que no exista el orden para EL MISMO NIVEL
+        if (dto.getNivelId() != null && horarioBloqueRepository.existsByOrdenBloqueAndNivelId(dto.getOrdenBloque(), dto.getNivelId())) {
+            throw new RuntimeException("El orden del bloque ya existe para este nivel");
+        }
+
+        Nivel nivel = null;
+        if (dto.getNivelId() != null) {
+            nivel = nivelRepository.findById(dto.getNivelId())
+                    .orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
         }
 
         HorarioBloque bloque = HorarioBloque.builder()
                 .horaInicio(dto.getHoraInicio())
                 .horaFin(dto.getHoraFin())
                 .ordenBloque(dto.getOrdenBloque())
+                .nivel(nivel)
                 .build();
 
         horarioBloqueRepository.save(bloque);
@@ -39,6 +50,14 @@ public class HorarioBloqueServiceImpl implements HorarioBloqueService {
     @Override
     public List<HorarioBloqueResponseDTO> listar() {
         return horarioBloqueRepository.findAllByOrderByOrdenBloqueAsc()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public List<HorarioBloqueResponseDTO> listarPorNivel(Long nivelId) {
+        return horarioBloqueRepository.findByNivelIdOrderByOrdenBloqueAsc(nivelId)
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -58,6 +77,12 @@ public class HorarioBloqueServiceImpl implements HorarioBloqueService {
 
         HorarioBloque bloque = horarioBloqueRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Bloque no encontrado"));
+
+        if (dto.getNivelId() != null) {
+            Nivel nivel = nivelRepository.findById(dto.getNivelId())
+                    .orElseThrow(() -> new RuntimeException("Nivel no encontrado"));
+            bloque.setNivel(nivel);
+        }
 
         bloque.setHoraInicio(dto.getHoraInicio());
         bloque.setHoraFin(dto.getHoraFin());
@@ -80,6 +105,8 @@ public class HorarioBloqueServiceImpl implements HorarioBloqueService {
                 .horaInicio(bloque.getHoraInicio())
                 .horaFin(bloque.getHoraFin())
                 .ordenBloque(bloque.getOrdenBloque())
+                .nivelId(bloque.getNivel() != null ? bloque.getNivel().getId() : null)
+                .nivelNombre(bloque.getNivel() != null ? bloque.getNivel().getNomNivel() : "General")
                 .build();
     }
 

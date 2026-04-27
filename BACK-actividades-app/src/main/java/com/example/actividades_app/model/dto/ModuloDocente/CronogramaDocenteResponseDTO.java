@@ -19,4 +19,10 @@ public class CronogramaDocenteResponseDTO {
 
     private DiaSemana diaSemana;
 
+    // Campos descriptivos para la vista
+    private String docenteNombre;
+    private String cursoNombre;
+    private String gradoSeccion;
+    private String nivelNombre;
+
 }

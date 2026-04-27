@@ -11,6 +11,8 @@ public interface HorarioBloqueService {
 
     List<HorarioBloqueResponseDTO> listar();
 
+    List<HorarioBloqueResponseDTO> listarPorNivel(Long nivelId);
+
     HorarioBloqueResponseDTO obtenerPorId(Long id);
 
     HorarioBloqueResponseDTO actualizar(Long id, HorarioBloqueRequestDTO dto);

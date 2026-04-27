@@ -10,8 +10,10 @@ import com.example.actividades_app.model.Entity.HorarioBloque;
 @Repository
 public interface HorarioBloqueRepository extends JpaRepository<HorarioBloque, Long> {
 
-    boolean existsByOrdenBloque(Integer ordenBloque);
+    boolean existsByOrdenBloqueAndNivelId(Integer ordenBloque, Long nivelId);
 
     List<HorarioBloque> findAllByOrderByOrdenBloqueAsc();
+
+    List<HorarioBloque> findByNivelIdOrderByOrdenBloqueAsc(Long nivelId);
 
 }

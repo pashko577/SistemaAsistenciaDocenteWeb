@@ -14,4 +14,7 @@ public class HorarioBloqueResponseDTO {
     private LocalTime horaFin;
     private Integer ordenBloque;
 
+    private Long nivelId;
+    private String nivelNombre;
+
 }
