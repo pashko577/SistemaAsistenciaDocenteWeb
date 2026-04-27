@@ -30,6 +30,10 @@ public class HorarioBloque {
     @Column(name = "ordenBloque", nullable = false)
     private Integer ordenBloque;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nivel_id")
+    private Nivel nivel;
+
     @OneToMany(mappedBy = "horarioBloque")
     private List<CronogramaDocente> cronogramas;
 }

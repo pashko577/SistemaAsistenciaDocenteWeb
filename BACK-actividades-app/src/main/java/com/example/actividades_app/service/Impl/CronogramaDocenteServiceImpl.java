@@ -138,13 +138,21 @@ public class CronogramaDocenteServiceImpl implements CronogramaDocenteService {
     }
 
     private CronogramaDocenteResponseDTO mapToResponse(CronogramaDocente c) {
+        AsignacionDocente a = c.getAsignacionDocente();
         return CronogramaDocenteResponseDTO.builder()
                 .id(c.getId())
-                .asignacionDocenteId(c.getAsignacionDocente().getId())
+                .asignacionDocenteId(a.getId())
                 .horarioBloqueId(c.getHorarioBloque().getId())
                 .horaInicio(c.getHorarioBloque().getHoraInicio().toString())
                 .horaFin(c.getHorarioBloque().getHoraFin().toString())
                 .diaSemana(c.getDiaSemana())
+                // Nuevos campos descriptivos
+                .docenteNombre(a.getDocente().getUsuario().getPersona().getNombres() + " " + 
+                               a.getDocente().getUsuario().getPersona().getApellidos())
+                .cursoNombre(a.getClase().getCurso().getNombreCurso())
+                .gradoSeccion(a.getClase().getSeccion().getGrado().getNumGrado() + " " + 
+                              a.getClase().getSeccion().getNomSeccion())
+                .nivelNombre(a.getClase().getSeccion().getGrado().getNivel().getNomNivel())
                 .build();
     }
 

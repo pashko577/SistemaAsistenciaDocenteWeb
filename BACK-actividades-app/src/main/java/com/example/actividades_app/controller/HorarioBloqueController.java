@@ -43,6 +43,12 @@ public class HorarioBloqueController {
         return ResponseEntity.ok(horarioService.listar());
     }
 
+    @GetMapping("/nivel/{nivelId}")
+    @IsStaff
+    public ResponseEntity<List<HorarioBloqueResponseDTO>> listarPorNivel(@PathVariable Long nivelId) {
+        return ResponseEntity.ok(horarioService.listarPorNivel(nivelId));
+    }
+
     @GetMapping("/{id}")
     @IsStaff
     public ResponseEntity<HorarioBloqueResponseDTO> obtenerPorId(@PathVariable Long id) {

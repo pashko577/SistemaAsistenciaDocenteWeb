@@ -22,4 +22,6 @@ public class HorarioBloqueRequestDTO {
     
     @NotNull(message = "El orden del bloque es obligatorio")
     private Integer ordenBloque;
+
+    private Long nivelId;
 }
